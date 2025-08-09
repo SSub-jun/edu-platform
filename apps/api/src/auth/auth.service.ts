@@ -1,4 +1,5 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 interface MockUser {
   id: string;
@@ -13,6 +14,8 @@ interface LoginResponse {
 
 @Injectable()
 export class AuthService {
+  constructor(private readonly configService: ConfigService) {}
+
   private readonly mockUsers: MockUser[] = [
     { id: 'admin', pwd: 'admin123', role: 'admin' },
     { id: 'teacher', pwd: 'teach123', role: 'instructor' },
@@ -20,6 +23,15 @@ export class AuthService {
   ];
 
   async login(id: string, password: string): Promise<LoginResponse> {
+    const authMode = this.configService.get<string>('AUTH_MODE', 'mock');
+    
+    if (authMode === 'db') {
+      // TODO: DB 기반 인증 로직 구현
+      // 현재는 mock 경로만 실행
+      throw new UnauthorizedException('DB authentication not implemented yet');
+    }
+    
+    // Mock 인증 로직 (기본값)
     const user = this.mockUsers.find(
       (u) => u.id === id && u.pwd === password
     );

@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import request from 'supertest';
 import { Module } from '@nestjs/common';
 import { AuthController } from '../src/auth/auth.controller';
@@ -10,7 +11,21 @@ import { DevAuthGuard } from '../src/guards/dev-auth.guard';
 
 @Module({
   controllers: [AuthController, HealthController, ProgressController],
-  providers: [AuthService, DevAuthGuard],
+  providers: [
+    AuthService, 
+    DevAuthGuard,
+    {
+      provide: ConfigService,
+      useValue: {
+        get: jest.fn((key: string, defaultValue?: string) => {
+          if (key === 'AUTH_MODE') {
+            return defaultValue || 'mock';
+          }
+          return defaultValue;
+        }),
+      },
+    },
+  ],
 })
 class TestModule {}
 
@@ -31,7 +46,7 @@ describe('Contract Tests (e2e)', () => {
   });
 
   describe('/auth/login', () => {
-    it('성공: 200, accessToken 반환', async () => {
+    it('성공: 200, accessToken 반환 (AUTH_MODE=mock)', async () => {
       const response = await request(app.getHttpServer())
         .post('/auth/login')
         .send({
@@ -44,6 +59,38 @@ describe('Contract Tests (e2e)', () => {
       expect(response.body).toHaveProperty('role');
       expect(response.body.accessToken).toBe('dev-token');
       expect(response.body.role).toBe('admin');
+    });
+
+    it('실패: 401 - AUTH_MODE=db (구현되지 않음)', async () => {
+      // 새로운 테스트 모듈을 생성하여 AUTH_MODE=db로 설정
+      const dbModuleFixture: TestingModule = await Test.createTestingModule({
+        imports: [TestModule],
+      })
+      .overrideProvider(ConfigService)
+      .useValue({
+        get: jest.fn((key: string, defaultValue?: string) => {
+          if (key === 'AUTH_MODE') {
+            return 'db';
+          }
+          return defaultValue;
+        }),
+      })
+      .compile();
+
+      const dbApp = dbModuleFixture.createNestApplication();
+      await dbApp.init();
+
+      try {
+        await request(dbApp.getHttpServer())
+          .post('/auth/login')
+          .send({
+            id: 'admin',
+            password: 'admin123'
+          })
+          .expect(401);
+      } finally {
+        await dbApp.close();
+      }
     });
 
     it('실패: 401 - 잘못된 자격증명', async () => {

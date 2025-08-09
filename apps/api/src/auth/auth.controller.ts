@@ -18,6 +18,13 @@ class OtpVerifyDto {
   deviceId: string;
 }
 
+/**
+ * 인증 컨트롤러
+ * 
+ * AUTH_MODE 환경변수에 따라 인증 방식이 결정됩니다:
+ * - AUTH_MODE=mock (기본값): Mock 사용자로 인증
+ * - AUTH_MODE=db: 데이터베이스 기반 인증 (구현 예정)
+ */
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
