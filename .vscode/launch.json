@@ -1,0 +1,27 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Web: Next.js",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "pnpm --filter web dev",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "API: Attach (NestJS)",
+      "type": "node",
+      "request": "attach",
+      "protocol": "inspector",
+      "port": 9229,
+      "restart": true,
+      "cwd": "${workspaceFolder}/apps/api"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Run Web + Attach API",
+      "configurations": ["Web: Next.js", "API: Attach (NestJS)"]
+    }
+  ]
+}

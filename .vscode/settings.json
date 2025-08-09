@@ -3,5 +3,29 @@
     {
       "mode": "auto"
     }
-  ]
+  ],
+  // 프로젝트 규칙
+  "projectRules": {
+    "fileModificationRestriction": "지정한 파일 외 수정 금지",
+    "testPassRequirement": "테스트 통과가 완료 조건",
+    "domainGuidelinesCompliance": "도메인지침.md 위배 금지",
+    "refactoringRestriction": "리팩터링 금지(명시되기 전)"
+  },
+  // 파일 수정 제한 설정
+  "files.exclude": {
+    "**/node_modules": true,
+    "**/.git": true,
+    "**/.turbo": true
+  },
+  // 테스트 실행 설정
+  "testing.automaticallyOpenPeekView": "never",
+  "testing.followRunningTest": false,
+  // 코드 품질 설정
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  // 도메인 지침 준수 강제
+  "files.associations": {
+    "*.md": "markdown"
+  }
 }

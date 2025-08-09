@@ -1,0 +1,9 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    { "label": "Dev: All (turbo)", "type": "shell", "command": "pnpm dev" },
+    { "label": "Dev: API only", "type": "shell", "command": "pnpm --filter api dev" },
+    { "label": "Dev: Web only", "type": "shell", "command": "pnpm --filter web dev" },
+    { "label": "Build: All", "type": "shell", "command": "pnpm build" }
+  ]
+}
