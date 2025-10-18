@@ -20,3 +20,7 @@ cmds = [
 [start]
 cmd = "node apps/api/dist/main.js"
 
+# Railway needs this
+[variables]
+NODE_ENV = "production"
+
