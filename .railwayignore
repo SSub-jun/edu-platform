@@ -1,0 +1,5 @@
+# Railway ignore - force use nixpacks.toml
+Dockerfile
+docker-compose.yml
+*.dockerfile
+
