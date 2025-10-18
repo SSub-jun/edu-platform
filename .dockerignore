@@ -2,10 +2,13 @@
 .git
 .gitignore
 .github
+.gitattributes
 
-# Dependencies
+# Dependencies - exclude everything, then include what we need
 node_modules
 **/node_modules
+.pnpm-store
+**/.pnpm
 
 # Build outputs
 dist
@@ -14,17 +17,22 @@ build
 **/build
 .turbo
 **/.turbo
+.next
+**/.next
 
 # Logs
 *.log
 npm-debug.log*
 pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # Testing
 coverage
 **/__tests__
 **/*.test.ts
 **/*.spec.ts
+**/*.e2e-spec.ts
 test
 **/test
 
@@ -34,25 +42,39 @@ test
 *.swp
 *.swo
 .DS_Store
+*.sublime-*
 
 # Env files (Railway provides these)
 .env
 .env.*
 !.env.example
 
-# Docs and examples
-apps/docs
-apps/web
-apps/portal-web
-apps/portal-api
-packages/ui
-scripts
-*.md
-README.md
+# Completely exclude other apps (we only need api + db)
+apps/docs/**
+apps/web/**
+apps/portal-web/**
+apps/portal-api/**
+packages/ui/**
+packages/eslint-config/**
+packages/typescript-config/**
 
-# Keep only what we need for API
-!apps/api
-!packages/db
+# Scripts and docs
+scripts/**
+docs/**
+*.md
+!README.md
+
+# Uploads (not needed for build)
+**/uploads/**
+
+# Supabase files
+supabase-*.sql
+gptJournalMd.txt
+프로젝트_현황_요약.txt
+
+# Keep only what we need for API build
+!apps/api/**
+!packages/db/**
 !package.json
 !pnpm-lock.yaml
 !pnpm-workspace.yaml
