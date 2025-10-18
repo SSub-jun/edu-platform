@@ -1,0 +1,6 @@
+# Railway Nixpacks configuration
+# Force Node.js 20.x for all services
+
+[phases.setup]
+nixPkgs = ["nodejs-20_x"]
+
