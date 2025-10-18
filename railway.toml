@@ -1,8 +1,9 @@
 # Railway configuration for API service
-# This file should be in the root of the repository
+# Use Docker for precise control over Node.js version
 
 [build]
-builder = "NIXPACKS"
+builder = "DOCKERFILE"
+dockerfilePath = "apps/api/Dockerfile"
 
 [deploy]
 restartPolicyType = "ON_FAILURE"
