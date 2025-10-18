@@ -20,9 +20,13 @@ async function bootstrap() {
     transform: true,
   }));
   
-  // CORS 설정
+  // CORS 설정 (프로덕션에서는 환경변수로 제어)
+  const allowedOrigins = process.env.ALLOWED_ORIGINS 
+    ? process.env.ALLOWED_ORIGINS.split(',')
+    : ['http://localhost:3000'];
+  
   app.enableCors({
-    origin: 'http://localhost:3000',
+    origin: allowedOrigins,
     credentials: true,
   });
 
@@ -35,9 +39,10 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
 
-  const port = process.env.API_PORT || 4000;
+  // Railway는 PORT 환경변수를 자동 제공
+  const port = process.env.PORT || process.env.API_PORT || 4000;
   await app.listen(port);
-  console.log(`Application is running on: http://localhost:${port}`);
-  console.log(`Swagger documentation: http://localhost:${port}/docs`);
+  console.log(`Application is running on port: ${port}`);
+  console.log(`Swagger documentation available at: /docs`);
 }
 bootstrap();
