@@ -1,0 +1,62 @@
+# Git
+.git
+.gitignore
+.github
+
+# Dependencies
+node_modules
+**/node_modules
+
+# Build outputs
+dist
+**/dist
+build
+**/build
+.turbo
+**/.turbo
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Testing
+coverage
+**/__tests__
+**/*.test.ts
+**/*.spec.ts
+test
+**/test
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+.DS_Store
+
+# Env files (Railway provides these)
+.env
+.env.*
+!.env.example
+
+# Docs and examples
+apps/docs
+apps/web
+apps/portal-web
+apps/portal-api
+packages/ui
+scripts
+*.md
+README.md
+
+# Keep only what we need for API
+!apps/api
+!packages/db
+!package.json
+!pnpm-lock.yaml
+!pnpm-workspace.yaml
+!turbo.json
+!.node-version
+!nixpacks.toml
+
