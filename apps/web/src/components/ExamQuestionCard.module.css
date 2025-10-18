@@ -1,0 +1,236 @@
+.card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease-in-out;
+}
+
+.card:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  transform: translateY(-2px);
+  border-color: var(--border-secondary);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid var(--border-muted);
+}
+
+.questionNumber {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary);
+  background: linear-gradient(135deg, var(--info-light) 0%, #bfdbfe 100%);
+  border: 1px solid var(--primary);
+  padding: 6px 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.1);
+}
+
+.progressDots {
+  display: flex;
+  gap: 8px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--bg-muted);
+  border: 1px solid var(--border-secondary);
+  transition: all 0.2s ease-in-out;
+}
+
+.dotActive {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+  border-color: var(--primary);
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+}
+
+.dotCompleted {
+  background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+  border-color: var(--success);
+  box-shadow: 0 2px 4px rgba(5, 150, 105, 0.2);
+}
+
+.questionContent {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.questionStem {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin: 0;
+  padding: 20px;
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-muted) 100%);
+  border-radius: 12px;
+  border: 1px solid var(--border-muted);
+}
+
+.choices {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.choiceLabel {
+  display: flex;
+  align-items: flex-start;
+  padding: 20px;
+  border: 2px solid var(--border-primary);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  background-color: var(--bg-primary);
+}
+
+.choiceLabel:hover:not(.choiceLabelDisabled) {
+  border-color: var(--primary);
+  background-color: var(--bg-secondary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.1);
+}
+
+.choiceLabelSelected {
+  border-color: var(--primary);
+  background: linear-gradient(135deg, var(--info-light) 0%, #e0f2fe 100%);
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.2);
+}
+
+.choiceLabelDisabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.choiceInput {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.choiceContent {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  width: 100%;
+}
+
+.choiceNumber {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--bg-muted);
+  border: 2px solid var(--border-secondary);
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease-in-out;
+}
+
+.choiceLabelSelected .choiceNumber {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+  color: white;
+  border-color: var(--primary);
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);
+}
+
+.choiceText {
+  flex: 1;
+  font-size: 16px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+.choiceLabelSelected .choiceText {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* 접근성 개선 */
+.choiceLabel:focus-within {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .card {
+    padding: 24px;
+    border-radius: 14px;
+  }
+  
+  .header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+  }
+  
+  .progressDots {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .questionStem {
+    font-size: 18px;
+    padding: 16px;
+  }
+  
+  .choiceLabel {
+    padding: 16px;
+  }
+  
+  .choiceContent {
+    gap: 12px;
+  }
+  
+  .choiceNumber {
+    width: 28px;
+    height: 28px;
+    font-size: 13px;
+  }
+  
+  .choiceText {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 20px;
+    border-radius: 12px;
+  }
+  
+  .questionStem {
+    font-size: 16px;
+    padding: 14px;
+  }
+  
+  .choiceLabel {
+    padding: 14px;
+  }
+  
+  .choiceText {
+    font-size: 14px;
+  }
+}
+

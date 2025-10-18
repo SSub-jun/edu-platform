@@ -1,83 +1,231 @@
-import { Controller, Post, Body, HttpStatus, HttpException } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiProperty } from '@nestjs/swagger';
+import { Controller, Post, Body, HttpStatus, HttpException, Req, UseGuards, HttpCode } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiProperty, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { LoginDto, SignupDto, LoginResponseDto, SignupResponseDto } from './dto/auth.dto';
-
-// 기존 OTP DTO들 (참고용으로 유지)
-class OtpRequestDto {
-  @ApiProperty({ description: '전화번호' })
-  phone: string;
-}
-
-class OtpVerifyDto {
-  @ApiProperty({ description: '요청 ID' })
-  requestId: string;
-  @ApiProperty({ description: 'OTP 코드' })
-  code: string;
-  @ApiProperty({ description: '디바이스 ID' })
-  deviceId: string;
-}
+import { LoginDto, RefreshDto, LoginResponseDto, RefreshResponseDto, LogoutResponseDto } from './dto/auth.dto';
+import { RegisterDto, RegisterResponseDto, VerifyOtpResponseDto } from './dto/register.dto';
+import { AssignCompanyDto, AssignCompanyResponseDto } from './dto/assign-company.dto';
+import { SendOtpDto } from '../otp/dto/send-otp.dto';
+import { VerifyOtpDto as VerifyDto } from '../otp/dto/verify-otp.dto';
+import { OtpService } from '../otp/otp.service';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import type { Request } from 'express';
 
 /**
  * 인증 컨트롤러
  * 
- * AUTH_MODE 환경변수에 따라 인증 방식이 결정됩니다:
- * - AUTH_MODE=mock (기본값): Mock 사용자로 인증
- * - AUTH_MODE=db: 데이터베이스 기반 인증 (구현 예정)
+ * JWT 기반 인증 시스템:
+ * - Access Token (짧은 만료시간)
+ * - Refresh Token (긴 만료시간)
+ * - 단일세션 정책 (동시접속 제한)
+ * - BCrypt 비밀번호 해시
  */
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly otpService: OtpService,
+  ) {}
 
   @Post('login')
-  @ApiOperation({ summary: 'ID/PW 로그인' })
+  @ApiOperation({ 
+    summary: '로그인',
+    description: '사용자명과 비밀번호로 로그인합니다. 단일세션 정책으로 기존 세션은 자동 만료됩니다.'
+  })
   @ApiBody({ type: LoginDto })
   @ApiResponse({ 
     status: 201, 
-    description: '로그인 성공',
+    description: '로그인 성공 - Access Token과 Refresh Token 발급',
     type: LoginResponseDto
   })
   @ApiResponse({ 
     status: 401, 
-    description: '인증 실패 - 잘못된 ID/PW'
+    description: '인증 실패 - 잘못된 사용자명 또는 비밀번호'
   })
-  async login(@Body() loginDto: LoginDto): Promise<LoginResponseDto> {
-    return this.authService.login(loginDto.id, loginDto.password);
+  async login(@Body() loginDto: LoginDto, @Req() req: Request): Promise<LoginResponseDto> {
+    return this.authService.login(loginDto.username, loginDto.password, req);
   }
 
-  @Post('signup')
-  @ApiOperation({ summary: '회원가입' })
-  @ApiBody({ type: SignupDto })
+  @Post('refresh')
+  @ApiOperation({ 
+    summary: '토큰 갱신',
+    description: 'Refresh Token을 사용하여 새로운 Access Token과 Refresh Token을 발급받습니다.'
+  })
+  @ApiBody({ type: RefreshDto })
   @ApiResponse({ 
     status: 201, 
-    description: '회원가입 성공',
-    type: SignupResponseDto
+    description: '토큰 갱신 성공',
+    type: RefreshResponseDto
   })
-  async signup(@Body() signupDto: SignupDto): Promise<SignupResponseDto> {
-    return this.authService.signup(signupDto.id, signupDto.password, signupDto.phone || '');
+  @ApiResponse({ 
+    status: 401, 
+    description: '토큰 갱신 실패 - 유효하지 않은 Refresh Token'
+  })
+  async refresh(@Body() refreshDto: RefreshDto): Promise<RefreshResponseDto> {
+    return this.authService.refresh(refreshDto.refreshToken);
   }
 
-  // 기존 OTP 엔드포인트들 - 410 Gone으로 응답 (프론트엔드 영향 방지)
-  @Post('otp/request')
-  @ApiOperation({ summary: 'OTP 요청 (비활성화됨)' })
-  @ApiBody({ type: OtpRequestDto })
-  @ApiResponse({ 
-    status: 410, 
-    description: 'OTP 기능이 비활성화되었습니다. ID/PW 로그인을 사용하세요.'
+  @Post('logout')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ 
+    summary: '로그아웃',
+    description: '현재 세션을 폐기합니다.'
   })
-  requestOtp() {
-    throw new HttpException('OTP 기능이 비활성화되었습니다. ID/PW 로그인을 사용하세요.', HttpStatus.GONE);
+  @ApiResponse({ 
+    status: 201, 
+    description: '로그아웃 성공',
+    type: LogoutResponseDto
+  })
+  @ApiResponse({ 
+    status: 401, 
+    description: '인증 실패 - 유효하지 않은 Access Token'
+  })
+  async logout(@Req() req: Request & { user: any }): Promise<LogoutResponseDto> {
+    const user = req.user;
+    return this.authService.logout(user.sub, user.sessionId);
   }
 
-  @Post('otp/verify')
-  @ApiOperation({ summary: 'OTP 검증 (비활성화됨)' })
-  @ApiBody({ type: OtpVerifyDto })
-  @ApiResponse({ 
-    status: 410, 
-    description: 'OTP 기능이 비활성화되었습니다. ID/PW 로그인을 사용하세요.'
+  @Post('phone/send-otp')
+  @HttpCode(204)
+  @ApiOperation({ 
+    summary: 'OTP 전송',
+    description: '휴대폰 번호로 인증번호를 전송합니다. 개발환경에서는 서버 콘솔에 출력됩니다.'
   })
-  verifyOtp() {
-    throw new HttpException('OTP 기능이 비활성화되었습니다. ID/PW 로그인을 사용하세요.', HttpStatus.GONE);
+  @ApiBody({ type: SendOtpDto })
+  @ApiResponse({ 
+    status: 204, 
+    description: 'OTP 전송 성공'
+  })
+  @ApiResponse({ 
+    status: 429, 
+    description: '요청 제한 - 재전송 간격 또는 일일 한도 초과',
+    schema: {
+      example: {
+        code: 'RATE_LIMITED',
+        message: '30초 후 재전송 가능합니다',
+        remainingSeconds: 25
+      }
+    }
+  })
+  async sendOtp(@Body() sendOtpDto: SendOtpDto): Promise<void> {
+    await this.otpService.sendOtp(sendOtpDto.phone, sendOtpDto.purpose);
+  }
+
+  @Post('phone/verify')
+  @ApiOperation({ 
+    summary: 'OTP 인증',
+    description: '휴대폰 인증번호를 검증하고 회원가입용 토큰을 발급합니다.'
+  })
+  @ApiBody({ type: VerifyDto })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'OTP 인증 성공',
+    type: VerifyOtpResponseDto
+  })
+  @ApiResponse({ 
+    status: 422, 
+    description: 'OTP 인증 실패',
+    schema: {
+      examples: {
+        invalid: {
+          value: { code: 'INVALID_OTP', message: '잘못된 인증번호입니다.' }
+        },
+        expired: {
+          value: { code: 'EXPIRED_OTP', message: '인증번호가 만료되었습니다.' }
+        }
+      }
+    }
+  })
+  async verifyOtp(@Body() verifyOtpDto: VerifyDto): Promise<VerifyOtpResponseDto> {
+    return this.otpService.verifyOtp(verifyOtpDto.phone, verifyOtpDto.code);
+  }
+
+  @Post('register')
+  @ApiOperation({ 
+    summary: '회원가입',
+    description: 'OTP 인증 완료 후 회원가입을 진행합니다. 초대코드가 있으면 해당 회사로 자동 배정됩니다.'
+  })
+  @ApiBody({ type: RegisterDto })
+  @ApiResponse({ 
+    status: 201, 
+    description: '회원가입 성공 - 자동 로그인 처리',
+    type: RegisterResponseDto
+  })
+  @ApiResponse({ 
+    status: 409, 
+    description: '전화번호 중복',
+    schema: {
+      example: { code: 'PHONE_ALREADY_REGISTERED', message: '이미 가입된 전화번호입니다.' }
+    }
+  })
+  @ApiResponse({ 
+    status: 422, 
+    description: '입력 검증 실패',
+    schema: {
+      examples: {
+        weakPassword: {
+          value: { code: 'WEAK_PASSWORD', message: '비밀번호는 최소 8자이며, 대문자/소문자/숫자/특수문자를 각각 1개 이상 포함해야 합니다.' }
+        },
+        invalidOtp: {
+          value: { code: 'INVALID_OTP', message: '유효하지 않은 인증 토큰입니다.' }
+        },
+        invalidInviteCode: {
+          value: { code: 'INVALID_INVITE_CODE', message: '유효하지 않은 초대코드입니다.' }
+        }
+      }
+    }
+  })
+  async register(@Body() registerDto: RegisterDto, @Req() req: Request): Promise<RegisterResponseDto> {
+    return this.authService.register(
+      registerDto.phone,
+      registerDto.otpToken,
+      registerDto.password,
+      registerDto.email,
+      registerDto.inviteCode,
+      req,
+    );
+  }
+
+  @Post('assign-company')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ 
+    summary: '회사 배정',
+    description: '미배정 사용자가 초대코드를 입력하여 회사에 배정됩니다.'
+  })
+  @ApiBody({ type: AssignCompanyDto })
+  @ApiResponse({ 
+    status: 201, 
+    description: '회사 배정 성공',
+    type: AssignCompanyResponseDto
+  })
+  @ApiResponse({ 
+    status: 409, 
+    description: '이미 회사에 배정된 사용자',
+    schema: {
+      example: { code: 'ALREADY_ASSIGNED', message: '이미 회사에 배정된 사용자입니다.' }
+    }
+  })
+  @ApiResponse({ 
+    status: 422, 
+    description: '입력 검증 실패',
+    schema: {
+      examples: {
+        invalidInviteCode: {
+          value: { code: 'INVALID_INVITE_CODE', message: '유효하지 않은 초대코드입니다.' }
+        },
+        companyInactive: {
+          value: { code: 'COMPANY_INACTIVE', message: '비활성화된 회사입니다.' }
+        }
+      }
+    }
+  })
+  async assignCompany(
+    @Body() assignCompanyDto: AssignCompanyDto, 
+    @Req() req: Request & { user: any }
+  ): Promise<AssignCompanyResponseDto> {
+    const userId = req.user.sub;
+    return this.authService.assignCompany(userId, assignCompanyDto.inviteCode);
   }
 }

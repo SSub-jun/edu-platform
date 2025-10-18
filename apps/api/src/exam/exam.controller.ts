@@ -1,99 +1,137 @@
-import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam, ApiUnauthorizedResponse } from '@nestjs/swagger';
-import { DevAuthGuard } from '../guards/dev-auth.guard';
-
-class ExamSubmitDto {
-  answers: Record<string, string>;
-}
+import { Controller, Post, Get, Delete, Body, Param, UseGuards, Request } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiBody, ApiParam } from '@nestjs/swagger';
+import { ExamService } from './exam.service';
+import { ModeAwareAuthGuard } from '../auth/guards/mode-aware-auth.guard';
+import { Auth } from '../auth/decorators/auth.decorator';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { Roles } from '../auth/decorators/auth.decorator';
+import { SubmitExamDto, StartExamResponseDto, SubmitExamResponseDto, ResetExamAttemptsDto, ResetExamAttemptsResponseDto, DeleteExamAttemptResponseDto } from './dto/exam.dto';
 
 @ApiTags('Exam')
 @Controller('exam')
+@Auth()
+@ApiBearerAuth()
 export class ExamController {
-  @Post('subjects/:id/start')
-  @UseGuards(DevAuthGuard)
-  @ApiOperation({ summary: '시험 시작' })
-  @ApiParam({ name: 'id', description: '과목 ID' })
+  constructor(private readonly examService: ExamService) {}
+
+  @Get('subjects/:subjectId/check-eligibility')
+  @Roles('student')
+  @ApiOperation({
+    summary: '과목 시험 응시 가능 여부 확인',
+    description: '모든 레슨의 진도율이 90% 이상인지, 남은 시도 횟수가 있는지 확인'
+  })
+  @ApiParam({ name: 'subjectId', description: '과목 ID' })
   @ApiResponse({ 
     status: 200, 
-    description: '시험 시작 성공',
+    description: '응시 가능 여부 조회 성공',
     schema: {
-      type: 'object',
       properties: {
-        attemptId: { type: 'string', example: 'mock' },
-        questions: { 
+        eligible: { type: 'boolean' },
+        reason: { type: 'string' },
+        remainingAttempts: { type: 'number' },
+        lessonProgress: {
           type: 'array',
           items: {
-            type: 'object',
             properties: {
-              id: { type: 'string', example: 'q1' },
-              stem: { type: 'string', example: '문제 내용...' },
-              choices: { type: 'array', items: { type: 'string' }, example: ['a', 'b', 'c', 'd'] }
+              lessonId: { type: 'string' },
+              lessonTitle: { type: 'string' },
+              progressPercent: { type: 'number' }
             }
           }
         }
       }
     }
   })
-  @ApiUnauthorizedResponse({ description: '인증 토큰이 없거나 유효하지 않음' })
-  startExam(@Param('id') subjectId: string) {
-    return {
-      attemptId: 'mock',
-      questions: [
-        {
-          id: 'q1',
-          stem: '문제 내용...',
-          choices: ['a', 'b', 'c', 'd']
-        }
-      ]
-    };
+  async checkEligibility(
+    @Param('subjectId') subjectId: string,
+    @Request() req: any
+  ) {
+    return await this.examService.checkEligibility(req.user.sub, subjectId);
   }
 
-  @Post('attempts/:id/submit')
-  @UseGuards(DevAuthGuard)
-  @ApiOperation({ summary: '시험 제출' })
-  @ApiParam({ name: 'id', description: '시도 ID' })
-  @ApiBody({ type: ExamSubmitDto })
+  @Post('subjects/:subjectId/start')
+  @Roles('student')
+  @ApiOperation({
+    summary: '과목 시험 시작',
+    description: '과목 시험을 시작합니다. 모든 레슨 진도율 90% 이상 필요, 최대 3회 응시 가능'
+  })
+  @ApiParam({ name: 'subjectId', description: '과목 ID' })
+  @ApiResponse({ 
+    status: 200, 
+    description: '시험 시작 성공',
+    type: StartExamResponseDto
+  })
+  @ApiResponse({ status: 403, description: 'PROGRESS_NOT_ENOUGH | ATTEMPT_LIMIT_EXCEEDED' })
+  async startExam(
+    @Param('subjectId') subjectId: string,
+    @Request() req: any
+  ): Promise<StartExamResponseDto> {
+    return await this.examService.startExam(req.user.sub, subjectId);
+  }
+
+  @Post('attempts/:attemptId/submit')
+  @Roles('student')
+  @ApiOperation({
+    summary: '시험 제출',
+    description: '시험 답안을 제출하고 자동 채점합니다. 합격 기준 70점 이상'
+  })
+  @ApiParam({ name: 'attemptId', description: '시험 시도 ID' })
+  @ApiBody({ type: SubmitExamDto })
   @ApiResponse({ 
     status: 200, 
     description: '시험 제출 성공',
-    schema: {
-      type: 'object',
-      properties: {
-        score: { type: 'number', example: 80 },
-        progress: { type: 'number', example: 90 },
-        finalScore: { type: 'number', example: 80 },
-        passed: { type: 'boolean', example: true }
-      }
-    }
+    type: SubmitExamResponseDto
   })
-  @ApiUnauthorizedResponse({ description: '인증 토큰이 없거나 유효하지 않음' })
-  submitExam(@Param('id') attemptId: string, @Body() body: ExamSubmitDto) {
-    return {
-      score: 80,
-      progress: 90,
-      finalScore: 80,
-      passed: true
-    };
+  @ApiResponse({ status: 404, description: '진행 중인 시험을 찾을 수 없음' })
+  @ApiResponse({ status: 409, description: 'DUPLICATE_SUBMISSION' })
+  async submitExam(
+    @Param('attemptId') attemptId: string,
+    @Body() submitDto: SubmitExamDto,
+    @Request() req: any
+  ): Promise<SubmitExamResponseDto> {
+    return await this.examService.submitExam(req.user.sub, attemptId, submitDto);
   }
 
-  @Post('subjects/:id/retake')
-  @UseGuards(DevAuthGuard)
-  @ApiOperation({ summary: '시험 재응시 가능 여부 확인' })
-  @ApiParam({ name: 'id', description: '과목 ID' })
+  @Post('reset-attempts')
+  @Roles('instructor')
+  @ApiOperation({
+    summary: '학생의 시험 시도 기록 초기화 (강사 전용)',
+    description: '특정 학생의 특정 과목 시험 시도 기록을 모두 삭제하여 다시 3회 응시 가능하도록 초기화'
+  })
+  @ApiBody({ type: ResetExamAttemptsDto })
   @ApiResponse({ 
     status: 200, 
-    description: '재응시 가능 여부 확인 성공',
-    schema: {
-      type: 'object',
-      properties: {
-        available: { type: 'boolean', example: true }
-      }
-    }
+    description: '시험 시도 기록 초기화 성공',
+    type: ResetExamAttemptsResponseDto
   })
-  @ApiUnauthorizedResponse({ description: '인증 토큰이 없거나 유효하지 않음' })
-  checkRetake(@Param('id') subjectId: string) {
-    return {
-      available: true
-    };
+  @ApiResponse({ status: 403, description: '권한 없음 (강사만 가능)' })
+  async resetExamAttempts(
+    @Body() resetDto: ResetExamAttemptsDto
+  ): Promise<ResetExamAttemptsResponseDto> {
+    return await this.examService.resetExamAttempts(resetDto.userId, resetDto.subjectId);
+  }
+
+  @Delete('attempts/:attemptId')
+  @Roles('instructor', 'admin')
+  @ApiOperation({
+    summary: '개별 시험 기록 삭제 (강사/관리자 전용)',
+    description: '특정 시험 기록 하나를 삭제하여 학생이 다시 시험을 볼 수 있도록 함'
+  })
+  @ApiParam({ 
+    name: 'attemptId', 
+    description: '삭제할 시험 기록 ID',
+    example: 'clmxxxxxxxxxxxxx'
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: '시험 기록 삭제 성공',
+    type: DeleteExamAttemptResponseDto
+  })
+  @ApiResponse({ status: 403, description: '권한 없음 (강사/관리자만 가능)' })
+  @ApiResponse({ status: 404, description: '시험 기록을 찾을 수 없음' })
+  async deleteExamAttempt(
+    @Param('attemptId') attemptId: string
+  ): Promise<DeleteExamAttemptResponseDto> {
+    return await this.examService.deleteExamAttempt(attemptId);
   }
 }

@@ -1,0 +1,443 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+  min-height: 100vh;
+  background: linear-gradient(to bottom, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+}
+
+.header {
+  margin-bottom: 40px;
+  background: var(--bg-primary);
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid var(--border-primary);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.breadcrumbLink {
+  color: var(--primary);
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.breadcrumbLink:hover {
+  color: var(--primary-hover);
+  background-color: var(--bg-muted);
+  text-decoration: none;
+}
+
+.breadcrumbSeparator {
+  color: var(--text-light);
+  font-weight: 600;
+}
+
+.breadcrumbCurrent {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.lessonInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.lessonTitle {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.lessonMeta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.progressText {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  padding: 6px 12px;
+  background: linear-gradient(135deg, var(--info-light) 0%, #bfdbfe 100%);
+  border: 1px solid var(--info);
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(2, 132, 199, 0.1);
+}
+
+.progressBar {
+  height: 10px;
+  background-color: var(--bg-muted);
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-muted);
+  margin-top: 8px;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--info) 100%);
+  border-radius: 8px;
+  transition: width 0.3s ease-in-out;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 32px;
+}
+
+.videoSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.video {
+  width: 100%;
+}
+
+.videoControls {
+  display: flex;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.syncButton {
+  background-color: var(--bg-primary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-secondary);
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+}
+
+.syncButton:hover {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border-color: var(--secondary);
+  transform: translateY(-1px);
+}
+
+.examButton {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+  color: white;
+  border: 1px solid var(--primary);
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.2);
+}
+
+.examButton:hover:not(.examButtonDisabled) {
+  background: linear-gradient(135deg, var(--primary-hover) 0%, #1e40af 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3);
+}
+
+.examButtonDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+  transform: none;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease-in-out;
+}
+
+.card:hover {
+  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  transform: translateY(-2px);
+  border-color: var(--border-secondary);
+}
+
+.cardTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 16px 0;
+}
+
+.cardContent {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.infoItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-muted);
+}
+
+.infoItem:last-child {
+  border-bottom: none;
+}
+
+.infoLabel {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.infoValue {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.nextLessonInfo {
+  padding: 16px;
+  background: linear-gradient(135deg, var(--warning-light) 0%, #fed7aa 100%);
+  border-radius: 12px;
+  border: 1px solid var(--warning);
+  box-shadow: 0 2px 4px rgba(217, 119, 6, 0.1);
+}
+
+.blockedMessage {
+  font-size: 15px;
+  color: var(--warning);
+  margin: 0;
+  line-height: 1.6;
+  font-weight: 600;
+}
+
+.blockerItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background: linear-gradient(135deg, var(--error-light) 0%, #fee2e2 100%);
+  border-radius: 12px;
+  border: 1px solid var(--error);
+  box-shadow: 0 2px 4px rgba(220, 38, 38, 0.1);
+  margin-bottom: 12px;
+}
+
+.blockerItem:last-child {
+  margin-bottom: 0;
+}
+
+.blockerIcon {
+  font-size: 18px;
+  flex-shrink: 0;
+  color: var(--error);
+  filter: drop-shadow(0 1px 2px rgba(220, 38, 38, 0.1));
+}
+
+.blockerMessage {
+  font-size: 15px;
+  color: var(--error);
+  line-height: 1.6;
+  font-weight: 600;
+}
+
+/* 로딩 상태 */
+.loading {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.skeletonHeader,
+.skeletonVideo,
+.skeletonContent {
+  background: linear-gradient(
+    90deg,
+    #f3f4f6 25%,
+    #e5e7eb 50%,
+    #f3f4f6 75%
+  );
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 8px;
+}
+
+.skeletonHeader {
+  height: 80px;
+}
+
+.skeletonVideo {
+  height: 400px;
+}
+
+.skeletonContent {
+  height: 200px;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* 에러 상태 */
+.error {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.errorCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--error-light);
+  border-radius: 16px;
+  padding: 40px;
+  text-align: center;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.1);
+}
+
+.errorTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--error);
+  margin: 0 0 12px 0;
+}
+
+.errorDescription {
+  font-size: 16px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 24px 0;
+  font-weight: 500;
+}
+
+.errorActions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.button {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease-in-out;
+  min-height: 44px;
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.2);
+}
+
+.button:hover {
+  background: linear-gradient(135deg, var(--primary-hover) 0%, #1e40af 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3);
+}
+
+.buttonSecondary {
+  background-color: var(--bg-primary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-secondary);
+}
+
+.buttonSecondary:hover {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border-color: var(--secondary);
+  transform: translateY(-1px);
+}
+
+.notFound {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 400px;
+  text-align: center;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+  }
+  
+  .content {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .lessonInfo {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .lessonMeta {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .videoControls {
+    flex-direction: column;
+  }
+  
+  .errorActions {
+    flex-direction: column;
+  }
+}

@@ -1,6 +1,39 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  
+  /* 개선된 색상 팔레트 */
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --secondary: #64748b;
+  --secondary-hover: #475569;
+  
+  /* 텍스트 색상 */
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  --text-light: #94a3b8;
+  
+  /* 배경 색상 */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-muted: #f1f5f9;
+  --bg-accent: #e2e8f0;
+  
+  /* 테두리 색상 */
+  --border-primary: #e2e8f0;
+  --border-secondary: #cbd5e1;
+  --border-muted: #f1f5f9;
+  
+  /* 상태 색상 */
+  --success: #059669;
+  --success-light: #d1fae5;
+  --warning: #d97706;
+  --warning-light: #fef3c7;
+  --error: #dc2626;
+  --error-light: #fee2e2;
+  --info: #0284c7;
+  --info-light: #e0f2fe;
 }
 
 @media (prefers-color-scheme: dark) {

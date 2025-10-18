@@ -1,0 +1,359 @@
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(to bottom, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+}
+
+/* 준비 단계 */
+.preparationCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  margin: auto;
+  max-width: 700px;
+  width: 100%;
+}
+
+.examHeader {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.examTitle {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 12px 0;
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.examDescription {
+  font-size: 18px;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+.examConditions {
+  margin-bottom: 40px;
+}
+
+.conditionsTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 20px 0;
+}
+
+.conditionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.conditionItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: linear-gradient(135deg, var(--success-light) 0%, #f0fdf4 100%);
+  border: 1px solid var(--success);
+  border-radius: 12px;
+  font-size: 15px;
+  color: var(--success);
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(5, 150, 105, 0.1);
+}
+
+.conditionIcon {
+  font-size: 18px;
+  filter: drop-shadow(0 1px 2px rgba(5, 150, 105, 0.1));
+}
+
+.examActions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+/* 시험 진행 중 */
+.examProgress {
+  margin-bottom: 24px;
+}
+
+.examInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.progressInfo {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.progressBar {
+  height: 10px;
+  background-color: var(--bg-muted);
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-muted);
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--info) 100%);
+  border-radius: 8px;
+  transition: width 0.3s ease-in-out;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+
+.examNavigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 32px;
+  padding: 24px;
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-muted) 100%);
+  border-radius: 12px;
+  border: 1px solid var(--border-primary);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.navigationInfo {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+/* 버튼 스타일 */
+.buttonPrimary {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+  color: white;
+  border: 1px solid var(--primary);
+  border-radius: 10px;
+  padding: 14px 28px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 140px;
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.2);
+}
+
+.buttonPrimary:hover:not(:disabled):not(.buttonDisabled) {
+  background: linear-gradient(135deg, var(--primary-hover) 0%, #1e40af 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3);
+}
+
+.buttonSecondary {
+  background-color: var(--bg-primary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-secondary);
+  border-radius: 10px;
+  padding: 14px 28px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 140px;
+}
+
+.buttonSecondary:hover:not(:disabled) {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border-color: var(--secondary);
+  transform: translateY(-2px);
+}
+
+.button {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 14px 28px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.2);
+}
+
+.button:hover {
+  background: linear-gradient(135deg, var(--primary-hover) 0%, #1e40af 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3);
+}
+
+.buttonDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.buttonPrimary:disabled,
+.buttonSecondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 모달 */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background: var(--bg-primary);
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 480px;
+  width: 90%;
+  text-align: center;
+  border: 1px solid var(--border-primary);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.modalContent h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 12px 0;
+}
+
+.modalContent p {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin: 0 0 24px 0;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+.modalActions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+/* 로딩 및 에러 상태 */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex: 1;
+  min-height: 200px;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #f3f4f6;
+  border-top: 3px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex: 1;
+  min-height: 200px;
+  text-align: center;
+}
+
+.error h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #dc2626;
+  margin: 0;
+}
+
+.error p {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* 반응형 */
+@media (max-width: 640px) {
+  .container {
+    padding: 16px;
+  }
+  
+  .preparationCard {
+    padding: 24px;
+  }
+  
+  .examTitle {
+    font-size: 20px;
+  }
+  
+  .examActions {
+    flex-direction: column;
+  }
+  
+  .examNavigation {
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+  }
+  
+  .examInfo {
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+  }
+  
+  .modalContent {
+    margin: 16px;
+  }
+  
+  .modalActions {
+    flex-direction: column;
+  }
+}

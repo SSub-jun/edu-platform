@@ -3,29 +3,26 @@ import { INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import request from 'supertest';
 import { Module } from '@nestjs/common';
-import { AuthController } from '../src/auth/auth.controller';
-import { AuthService } from '../src/auth/auth.service';
+import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
+import { AuthModule } from '../src/auth/auth.module';
 import { HealthController } from '../src/health/health.controller';
 import { ProgressController } from '../src/progress/progress.controller';
-import { DevAuthGuard } from '../src/guards/dev-auth.guard';
+import { ExamController } from '../src/exam/exam.controller';
+import { QnaController } from '../src/qna/qna.controller';
+import { PrismaModule } from '../src/prisma/prisma.module';
 
 @Module({
-  controllers: [AuthController, HealthController, ProgressController],
-  providers: [
-    AuthService, 
-    DevAuthGuard,
-    {
-      provide: ConfigService,
-      useValue: {
-        get: jest.fn((key: string, defaultValue?: string) => {
-          if (key === 'AUTH_MODE') {
-            return defaultValue || 'mock';
-          }
-          return defaultValue;
-        }),
-      },
-    },
+  imports: [
+    PassportModule,
+    PrismaModule,
+    JwtModule.register({
+      secret: 'test-secret',
+      signOptions: { expiresIn: '15m' },
+    }),
+    AuthModule,
   ],
+  controllers: [HealthController, ProgressController, ExamController, QnaController],
 })
 class TestModule {}
 
@@ -35,14 +32,35 @@ describe('Contract Tests (e2e)', () => {
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [TestModule],
-    }).compile();
+    })
+    .overrideProvider(ConfigService)
+    .useValue({
+      get: jest.fn((key: string, defaultValue?: string) => {
+        if (key === 'AUTH_MODE') {
+          return 'mock';
+        }
+        if (key === 'JWT_SECRET') {
+          return 'test-secret';
+        }
+        if (key === 'JWT_EXPIRES') {
+          return '15m';
+        }
+        if (key === 'REFRESH_EXPIRES') {
+          return '7d';
+        }
+        return defaultValue;
+      }),
+    })
+    .compile();
 
     app = moduleFixture.createNestApplication();
     await app.init();
   });
 
   afterEach(async () => {
-    await app.close();
+    if (app) {
+      await app.close();
+    }
   });
 
   describe('/auth/login', () => {
@@ -71,6 +89,15 @@ describe('Contract Tests (e2e)', () => {
         get: jest.fn((key: string, defaultValue?: string) => {
           if (key === 'AUTH_MODE') {
             return 'db';
+          }
+          if (key === 'JWT_SECRET') {
+            return 'test-secret';
+          }
+          if (key === 'JWT_EXPIRES') {
+            return '15m';
+          }
+          if (key === 'REFRESH_EXPIRES') {
+            return '7d';
           }
           return defaultValue;
         }),

@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "progress" ADD COLUMN     "maxReachedSeconds" DOUBLE PRECISION NOT NULL DEFAULT 0,
+ADD COLUMN     "videoDuration" DOUBLE PRECISION NOT NULL DEFAULT 0;

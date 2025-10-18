@@ -1,0 +1,198 @@
+.container {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+}
+
+.answered {
+  font-weight: 600;
+  color: #059669;
+}
+
+.divider {
+  color: #6b7280;
+}
+
+.total {
+  font-weight: 600;
+  color: #374151;
+}
+
+.label {
+  color: #6b7280;
+  margin-left: 4px;
+}
+
+.progressBar {
+  width: 100%;
+  height: 6px;
+  background-color: #f3f4f6;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.progressFill {
+  height: 100%;
+  background-color: #059669;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.questionGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.questionButton {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 2px solid;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.questionButton:hover:not(.disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.questionButton.unanswered {
+  border-color: #d1d5db;
+  color: #6b7280;
+}
+
+.questionButton.answered {
+  border-color: #059669;
+  background-color: #f0fdf4;
+  color: #059669;
+}
+
+.questionButton.current {
+  border-color: #3b82f6;
+  background-color: #3b82f6;
+  color: white;
+}
+
+.questionButton.current.answered {
+  border-color: #3b82f6;
+  background-color: #3b82f6;
+  color: white;
+}
+
+.questionButton.disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.questionNumber {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.checkmark {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 12px;
+  height: 12px;
+  background-color: #059669;
+  color: white;
+  border-radius: 50%;
+  font-size: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.current .checkmark {
+  background-color: white;
+  color: #3b82f6;
+}
+
+.status {
+  text-align: center;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.completeMessage {
+  color: #059669;
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+}
+
+.incompleteMessage {
+  color: #d97706;
+  background-color: #fffbeb;
+  border: 1px solid #fed7aa;
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 16px;
+  }
+  
+  .header {
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+  }
+  
+  .summary {
+    justify-content: center;
+  }
+  
+  .questionGrid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+  
+  .questionButton {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+
+
+
+
+
+
+

@@ -1,0 +1,39 @@
+# 📝 Development Journal
+
+## 📌 마지막 완료된 작업
+- **CP-5** 진행 중: 진도/시험 API 뼈대 생성
+- 계약 테스트 락(CP-1) 구현 완료
+- API 인증 로직 수정 → ID/PW 로그인 방식 반영, 회원가입 시에만 본인인증
+- Q&A 게시판 API 기능 구현 (질문/답변 등록, 조회)
+- Prisma DB 연결 설정 완료, 마이그레이션(`init-edu-schema`) 적용
+- API 서버와 WEB 서버 로컬 실행 및 Swagger 문서 접근 확인
+- 모든 단위 테스트 및 e2e 테스트 통과
+
+---
+
+## 🎯 다음에 할 작업
+- 진도 순차학습 잠금 로직 구현 (이전 진도 완료 여부 체크)
+- 시험 재응시 제한 (최대 3회, 조건 미충족 시 HTTP 422 반환)
+- 웹 UI와 API 연동 테스트
+- 시험 문항 랜덤 추출 로직 구현 (시드 15문항 → 랜덤 10문항)
+
+---
+
+## 🛠 현재 개발 환경
+- **AUTH_MODE**: db
+- **API Port**: 4000
+- **WEB Port**: 3000
+- **DB**: PostgreSQL (로컬, `edudb`)
+
+---
+
+## 🚀 빠른 실행 명령어
+```bash
+# API 서버 실행
+pnpm --filter api start:dev
+
+# 웹 서버 실행
+pnpm --filter web dev
+
+# Swagger 문서 확인
+open http://localhost:4000/docs

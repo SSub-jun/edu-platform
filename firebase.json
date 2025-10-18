@@ -1,0 +1,15 @@
+{
+  "hosting": {
+    "site": "kist2017-eduportal-1758444010",
+    "public": "temp-static",
+    "ignore": ["**/.*", "**/node_modules/**"],
+    "rewrites": [
+      {
+        "source": "/api/**",
+        "run": { "serviceId": "portal-api", "region": "asia-northeast3" }
+      }
+    ]
+  }
+}
+
+

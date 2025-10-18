@@ -7,16 +7,21 @@
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf dist",
-    "db:generate": "prisma generate",
-    "db:migrate": "prisma migrate dev",
-    "db:seed": "prisma db seed",
-    "db:studio": "prisma studio",
-    "db:push": "prisma db push"
+    "generate": "prisma generate --schema ./prisma/schema.prisma",
+    "migrate:dev": "prisma migrate dev --schema ./prisma/schema.prisma",
+    "migrate:deploy": "prisma migrate deploy --schema ./prisma/schema.prisma",
+    "migrate:reset": "prisma migrate reset --schema ./prisma/schema.prisma",
+    "validate": "prisma validate --schema ./prisma/schema.prisma",
+    "seed": "prisma db seed",
+    "studio": "prisma studio --schema ./prisma/schema.prisma",
+    "push": "prisma db push --schema ./prisma/schema.prisma"
   },
   "dependencies": {
-    "@prisma/client": "^5.22.0"
+    "@prisma/client": "^5.22.0",
+    "bcrypt": "^6.0.0"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
     "@types/node": "^20.0.0",
     "prisma": "^5.22.0",
     "typescript": "^5.0.0"

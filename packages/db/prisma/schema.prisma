@@ -10,36 +10,419 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id           String    @id @default(cuid())
-  username     String    @unique
-  passwordHash String
-  role         UserRole  @default(student)
-  phone        String?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+model Company {
+  id            String   @id @default(cuid())
+  name          String
+  startDate     DateTime // 수강 시작일
+  endDate       DateTime // 수강 종료일
+  isActive      Boolean  @default(true)
+  inviteCode    String?  @unique // 초대코드 (관리자가 생성/설정)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   // Relations
-  sessions Session[]
+  users         User[]
+  activeLessons CompanyLesson[]
+
+  @@map("companies")
+}
+
+model CompanyLesson {
+  id        String   @id @default(cuid())
+  companyId String
+  lessonId  String
+  createdAt DateTime @default(now())
+
+  // Relations
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  lesson  Lesson  @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, lessonId])
+  @@map("company_lessons")
+}
+
+model User {
+  id              String    @id @default(cuid())
+  username        String    @unique
+  passwordHash    String    // BCrypt 해시
+  role            UserRole  @default(student)
+  phone           String?   @unique // 휴대폰 번호 (회원가입 시 필수)
+  phoneVerifiedAt DateTime? // 휴대폰 인증 완료 시간
+  email           String?   // 이메일 (선택사항)
+  companyId       String?   // Company 소속
+  lastLoginAt     DateTime? // 마지막 로그인 시간
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  company        Company?  @relation(fields: [companyId], references: [id])
+  sessions       Session[]
+  subjectProgress SubjectProgress[]
+  progress       Progress[]
+  examAttempts   ExamAttempt[]
+  qnaPosts       QnaPost[]
+  qnaReplies     QnaReply[]
 
   @@map("users")
 }
 
 model Session {
-  id        String    @id @default(cuid())
-  userId    String
-  deviceId  String
-  createdAt DateTime  @default(now())
-  revokedAt DateTime?
+  id                String    @id @default(cuid())
+  userId            String
+  deviceInfo        String?   // 디바이스 정보 (User-Agent 등)
+  ip                String?   // IP 주소
+  refreshTokenHash  String    // Refresh 토큰 해시 (BCrypt)
+  createdAt         DateTime  @default(now())
+  revokedAt         DateTime? // 세션 폐기 시간
 
   // Relations
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId, revokedAt]) // 유효한 세션 조회용 인덱스
   @@map("sessions")
+}
+
+model Subject {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  order       Int       @default(0)
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  lessons          Lesson[]
+  subjectProgress  SubjectProgress[]
+  examAttempts     ExamAttempt[]
+  questions        Question[]
+
+  @@map("subjects")
+}
+
+model Lesson {
+  id          String    @id @default(cuid())
+  subjectId   String
+  title       String
+  description String?
+  order       Int       @default(0)
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  subject         Subject         @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  videoParts      VideoPart[]
+  progress        Progress[]
+  companyLessons  CompanyLesson[]
+  examAttempts    ExamAttempt[]
+  questions       Question[]
+
+  @@map("lessons")
+}
+
+model VideoPart {
+  id          String    @id @default(cuid())
+  lessonId    String
+  title       String
+  description String?
+  order       Int       @default(0)
+  durationMs  Int       // 재생 시간 (밀리초)
+  videoUrl    String?   // 영상 파일 URL (로컬: /uploads/videos/..., 클라우드: https://...)
+  thumbnailUrl String?  // 썸네일 이미지 URL
+  fileSize    Int?      // 파일 크기 (bytes)
+  mimeType    String?   // video/mp4, video/webm 등
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@map("video_parts")
+}
+
+model SubjectProgress {
+  id              String   @id @default(cuid())
+  userId          String
+  subjectId       String
+  progressPercent Float    @default(0) // 0.0 ~ 100.0
+  lastLessonId    String?
+  lastPartId      String?
+  lastPlayedMs    Int      @default(0)
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, subjectId])
+  @@map("subject_progress")
+}
+
+model Progress {
+  id                 String       @id @default(cuid())
+  userId             String
+  lessonId           String
+  progressPercent    Float        @default(0) // 0.0 ~ 100.0 (maxReachedSeconds / videoDuration * 100)
+  maxReachedSeconds  Float        @default(0) // 사용자가 도달한 최대 시청 시점 (초 단위)
+  videoDuration      Float        @default(0) // 비디오 총 길이 (초 단위)
+  status             ProgressStatus @default(inProgress)
+  completedAt        DateTime?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  // Relations
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+  @@map("progress")
+}
+
+model Question {
+  id          String   @id @default(cuid())
+  subjectId   String   // Subject 단위 문제 (메인)
+  lessonId    String?  // 옵션 (특정 Lesson 연관 시)
+  stem        String   // 문제 내용
+  explanation String?  // 해설
+  answerIndex Int      @default(0) // 정답 선택지 인덱스 (0-3)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  lesson  Lesson? @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  choices Choice[]
+
+  @@index([subjectId])
+  @@index([lessonId])
+  @@map("questions")
+}
+
+model Choice {
+  id         String   @id @default(cuid())
+  questionId String
+  text       String   // 보기 내용
+  isAnswer   Boolean  @default(false) // 정답 여부
+  order      Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@map("choices")
+}
+
+model ExamAttempt {
+  id            String        @id @default(cuid())
+  userId        String
+  subjectId     String        // Subject 단위 시험 (메인)
+  lessonId      String?       // 옵션 (구버전 호환용)
+  attemptNumber Int           @default(1) // 시도 횟수 (1, 2, 3 - 최대 3회)
+  status        ExamStatus    @default(inProgress)
+  score         Float?        // 시험 점수 (0.0 ~ 100.0)
+  passed        Boolean?      // 합격 여부
+  questionIds   Json?         // 응시 당시 출제된 문제 ID 목록
+  answers       Json?         // 제출 답변 (questionId와 선택한 choiceId 매핑)
+  startedAt     DateTime      @default(now())
+  submittedAt   DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // Relations
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  lesson  Lesson? @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@index([userId, subjectId])
+  @@index([userId, subjectId, attemptNumber])
+  @@map("exam_attempts")
+}
+
+model OtpRequest {
+  id        String     @id @default(cuid())
+  phone     String
+  code      String
+  purpose   OtpPurpose
+  expiresAt DateTime
+  usedAt    DateTime?
+  attempts  Int        @default(0)
+  createdAt DateTime   @default(now())
+
+  @@index([phone, purpose, createdAt])
+  @@map("otp_requests")
 }
 
 enum UserRole {
   student
   instructor
   admin
+}
+
+enum ProgressStatus {
+  inProgress
+  completed
+}
+
+enum ExamStatus {
+  inProgress
+  submitted
+}
+
+enum OtpPurpose {
+  signup
+}
+
+// Portal Exam Models
+model PortalExamBank {
+  id        String   @id @default(cuid())
+  title     String
+  questions PortalQuestion[]
+  sessions  PortalExamSession[]
+  createdAt DateTime @default(now())
+
+  @@map("portal_exam_banks")
+}
+
+model PortalQuestion {
+  id        String   @id @default(cuid())
+  bankId    String
+  bank      PortalExamBank @relation(fields: [bankId], references: [id], onDelete: Cascade)
+  stem      String
+  choices   PortalChoice[]
+  answerId  String   // 정답 choice id (단일정답)
+  createdAt DateTime @default(now())
+
+  // Relations
+  sessionQuestions PortalSessionQuestion[]
+  answers          PortalAnswer[]
+
+  @@index([bankId])
+  @@map("portal_questions")
+}
+
+model PortalChoice {
+  id          String         @id @default(cuid())
+  questionId  String
+  question    PortalQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  label       String         // 보기 텍스트
+
+  @@index([questionId])
+  @@map("portal_choices")
+}
+
+model PortalExamSession {
+  id            String   @id @default(cuid())
+  sessionNo     Int
+  code          String   @unique                // 입장 코드(대문자+숫자)
+  title         String
+  bankId        String?
+  bank          PortalExamBank? @relation(fields: [bankId], references: [id])
+  mode          PortalSelectionMode
+  questionCount Int      @default(20)           // 세션별 출제 수(가변)
+  timeLimitMinutes Int   @default(30)           // 제한시간(분)
+  isPublished   Boolean  @default(false)
+  closedAt      DateTime?
+  createdAt     DateTime @default(now())
+  questions     PortalSessionQuestion[]         // MANUAL일 때만 사용
+  participants  PortalParticipant[]
+  attempts      PortalAttempt[]
+
+  @@map("portal_exam_sessions")
+}
+
+enum PortalSelectionMode {
+  RANDOM
+  MANUAL
+}
+
+model PortalSessionQuestion {
+  id         String           @id @default(cuid())
+  sessionId  String
+  session    PortalExamSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  questionId String
+  question   PortalQuestion    @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  orderIndex Int
+
+  @@unique([sessionId, questionId])
+  @@index([sessionId])
+  @@map("portal_session_questions")
+}
+
+model PortalParticipant {
+  id         String   @id @default(cuid())
+  sessionId  String
+  session    PortalExamSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  name       String
+  pin4       String            // 세션 내 유일(정규식 ^\\d{4}$)
+  createdAt  DateTime @default(now())
+
+  // Relations
+  attempts   PortalAttempt[]
+
+  @@unique([sessionId, pin4])
+  @@index([sessionId])
+  @@map("portal_participants")
+}
+
+model PortalAttempt {
+  id            String   @id @default(cuid())
+  sessionId     String
+  participantId String
+  session       PortalExamSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  participant   PortalParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  startedAt     DateTime @default(now())
+  submittedAt   DateTime?
+  score         Int?
+  passed        Boolean?
+  answers       PortalAnswer[]
+
+  @@unique([sessionId, participantId])   // 초기: 1세션 1회 응시
+  @@index([sessionId])
+  @@map("portal_attempts")
+}
+
+model PortalAnswer {
+  id         String       @id @default(cuid())
+  attemptId  String
+  attempt    PortalAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  questionId String
+  question   PortalQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  choiceId   String
+
+  @@unique([attemptId, questionId])
+  @@index([attemptId])
+  @@index([questionId])
+  @@map("portal_answers")
+}
+
+// QNA System Models (Simple)
+model QnaPost {
+  id        String     @id @default(cuid())
+  userId    String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  body      String
+  createdAt DateTime   @default(now())
+  replies   QnaReply[]
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("qna_posts")
+}
+
+model QnaReply {
+  id        String   @id @default(cuid())
+  postId    String
+  post      QnaPost  @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  body      String
+  createdAt DateTime @default(now())
+
+  @@index([postId])
+  @@map("qna_replies")
 }

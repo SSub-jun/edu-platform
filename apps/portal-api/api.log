@@ -1,0 +1,348 @@
+
+> portal-api@0.0.1 start:dev /Users/byeonjunseob/edu-platform/apps/portal-api
+> nest start --watch
+
+[2J[3J[H[[90m3:30:31 PM[0m] Starting compilation in watch mode...
+
+[[90m3:30:32 PM[0m] Found 0 errors. Watching for file changes.
+
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPassportModule dependencies initialized[39m[38;5;3m +7ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPrismaModule dependencies initialized[39m[38;5;3m +7ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mJwtModule dependencies initialized[39m[38;5;3m +10ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigHostModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mHealthModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mJwtModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAppModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPortalModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mRootHealthController {/}:[39m[38;5;3m +10ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/healthz, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAdminController {/admin}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/login, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/magic-login, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions/:id/select-questions, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions/:id/publish, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks/:id/questions, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks/:id/questions, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks/:id/questions.csv, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks/:id/questions/:questionId, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks/:id/questions/:questionId/delete, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions/:id/results, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions/:id/results.csv, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions/:id/close, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mPublicController {/portal}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/portal/sessions/:code, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/portal/sessions/:sessionId/join, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/portal/sessions/:sessionId/start, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/portal/attempts/:attemptId/submit, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/portal/attempts/:attemptId/result, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mHealthController {/health}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/health, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/health/healthz, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 59952  - [39m10/08/2025, 3:30:33 PM [32m    LOG[39m [38;5;3m[NestApplication] [39m[32mNest application successfully started[39m[38;5;3m +13ms[39m
+✅ portal-api listening on 3000
+[2J[3J[H[[90m3:59:25 PM[0m] File change detected. Starting incremental compilation...
+
+[[90m3:59:26 PM[0m] Found 0 errors. Watching for file changes.
+
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPassportModule dependencies initialized[39m[38;5;3m +8ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPrismaModule dependencies initialized[39m[38;5;3m +228ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mJwtModule dependencies initialized[39m[38;5;3m +3ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigHostModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mHealthModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mJwtModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAppModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPortalModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mRootHealthController {/}:[39m[38;5;3m +11ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/healthz, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAdminController {/admin}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/login, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/magic-login, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions/:id/select-questions, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions/:id/publish, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks/:id/questions, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks/:id/questions, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks/:id/questions.csv, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks/:id/questions/:questionId, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks/:id/questions/:questionId/delete, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions/:id/results, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions/:id/results.csv, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions/:id/close, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mPublicController {/portal}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/portal/sessions/:code, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/portal/sessions/:sessionId/join, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/portal/sessions/:sessionId/start, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/portal/attempts/:attemptId/submit, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/portal/attempts/:attemptId/result, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mHealthController {/health}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/health, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/health/healthz, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [32m    LOG[39m [38;5;3m[NestApplication] [39m[32mNest application successfully started[39m[38;5;3m +7ms[39m
+[31m[Nest] 83516  - [39m10/08/2025, 3:59:27 PM [31m  ERROR[39m [38;5;3m[NestApplication] [39m[31mError: listen EADDRINUSE: address already in use 0.0.0.0:3000[39m[38;5;3m +4ms[39m
+node:net:1907
+    const ex = new UVExceptionWithHostPort(err, 'listen', address, port);
+               ^
+
+Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at Server.setupListenHandle [as _listen2] (node:net:1907:16)
+    at listenInCluster (node:net:1964:12)
+    at node:net:2170:7
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+
+Node.js v22.11.0
+[2J[3J[H[[90m3:59:27 PM[0m] File change detected. Starting incremental compilation...
+
+[[90m3:59:28 PM[0m] Found 0 errors. Watching for file changes.
+
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPassportModule dependencies initialized[39m[38;5;3m +7ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPrismaModule dependencies initialized[39m[38;5;3m +2ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mJwtModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigHostModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mHealthModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mJwtModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAppModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPortalModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mRootHealthController {/}:[39m[38;5;3m +11ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/healthz, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAdminController {/admin}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/login, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/magic-login, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions/:id/select-questions, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions/:id/publish, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks/:id/questions, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks/:id/questions, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks/:id/questions.csv, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks/:id/questions/:questionId, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks/:id/questions/:questionId/delete, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions/:id/results, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions/:id/results.csv, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions/:id/close, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mPublicController {/portal}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/portal/sessions/:code, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/portal/sessions/:sessionId/join, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/portal/sessions/:sessionId/start, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/portal/attempts/:attemptId/submit, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/portal/attempts/:attemptId/result, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mHealthController {/health}:[39m[38;5;3m +1ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/health, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/health/healthz, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [32m    LOG[39m [38;5;3m[NestApplication] [39m[32mNest application successfully started[39m[38;5;3m +7ms[39m
+[31m[Nest] 83569  - [39m10/08/2025, 3:59:28 PM [31m  ERROR[39m [38;5;3m[NestApplication] [39m[31mError: listen EADDRINUSE: address already in use 0.0.0.0:3000[39m[38;5;3m +4ms[39m
+node:net:1907
+    const ex = new UVExceptionWithHostPort(err, 'listen', address, port);
+               ^
+
+Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at Server.setupListenHandle [as _listen2] (node:net:1907:16)
+    at listenInCluster (node:net:1964:12)
+    at node:net:2170:7
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+
+Node.js v22.11.0
+[2J[3J[H[[90m4:05:34 PM[0m] File change detected. Starting incremental compilation...
+
+[2J[3J[H[[90m1:51:55 PM[0m] File change detected. Starting incremental compilation...
+
+[2J[3J[H[[90m1:52:48 PM[0m] File change detected. Starting incremental compilation...
+
+[2J[3J[H[[90m2:24:37 PM[0m] File change detected. Starting incremental compilation...
+
+[2J[3J[H[[90m2:25:41 PM[0m] File change detected. Starting incremental compilation...
+
+[[90m2:25:43 PM[0m] Found 0 errors. Watching for file changes.
+
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPassportModule dependencies initialized[39m[38;5;3m +11ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPrismaModule dependencies initialized[39m[38;5;3m +22ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mJwtModule dependencies initialized[39m[38;5;3m +24ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigHostModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mHealthModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mJwtModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAppModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPortalModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mRootHealthController {/}:[39m[38;5;3m +13ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/healthz, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAdminController {/admin}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/login, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/magic-login, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions/:id/select-questions, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions/:id/publish, PATCH} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks/:id/questions, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks/:id/questions, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks/:id/questions.csv, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks/:id/questions/:questionId, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks/:id/questions/:questionId/delete, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions/:id/results, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions/:id/results.csv, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions/:id/close, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mPublicController {/portal}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/portal/sessions/:code, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/portal/sessions/:sessionId/join, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/portal/sessions/:sessionId/start, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/portal/attempts/:attemptId/submit, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/portal/attempts/:attemptId/result, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mHealthController {/health}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/health, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/health/healthz, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 21103  - [39m10/09/2025, 2:25:44 PM [32m    LOG[39m [38;5;3m[NestApplication] [39m[32mNest application successfully started[39m[38;5;3m +25ms[39m
+✅ portal-api listening on 3000
+[2J[3J[H[[90m2:29:38 PM[0m] File change detected. Starting incremental compilation...
+
+[[90m2:29:39 PM[0m] Found 0 errors. Watching for file changes.
+
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPassportModule dependencies initialized[39m[38;5;3m +9ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPrismaModule dependencies initialized[39m[38;5;3m +3ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mJwtModule dependencies initialized[39m[38;5;3m +3ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigHostModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mHealthModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mJwtModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAppModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPortalModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mRootHealthController {/}:[39m[38;5;3m +14ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/healthz, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAdminController {/admin}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/login, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/magic-login, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions/:id/select-questions, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions/:id/publish, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks/:id/questions, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks/:id/questions, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks/:id/questions.csv, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks/:id/questions/:questionId, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks/:id/questions/:questionId/delete, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions/:id/results, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions/:id/results.csv, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions/:id/close, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mPublicController {/portal}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/portal/sessions/:code, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/portal/sessions/:sessionId/join, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/portal/sessions/:sessionId/start, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/portal/attempts/:attemptId/submit, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/portal/attempts/:attemptId/result, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mHealthController {/health}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/health, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/health/healthz, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 24019  - [39m10/09/2025, 2:29:39 PM [32m    LOG[39m [38;5;3m[NestApplication] [39m[32mNest application successfully started[39m[38;5;3m +8ms[39m
+✅ portal-api listening on 3000
+[2J[3J[H[[90m2:32:00 PM[0m] File change detected. Starting incremental compilation...
+
+[2J[3J[H[[90m3:40:09 PM[0m] File change detected. Starting incremental compilation...
+
+[[90m3:40:10 PM[0m] Found 0 errors. Watching for file changes.
+
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPassportModule dependencies initialized[39m[38;5;3m +7ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPrismaModule dependencies initialized[39m[38;5;3m +414ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mJwtModule dependencies initialized[39m[38;5;3m +7ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigHostModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mHealthModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mJwtModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAppModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPortalModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mRootHealthController {/}:[39m[38;5;3m +22ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/healthz, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAdminController {/admin}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/login, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/magic-login, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions/:id/select-questions, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions/:id/publish, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks/:id/questions, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks/:id/questions, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks/:id/questions.csv, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks/:id/questions/:questionId, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/banks/:id/questions/:questionId/delete, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions/:id/results, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions/:id/results.csv, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/sessions/:id/close, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mPublicController {/portal}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/portal/sessions/:code, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/portal/sessions/:sessionId/join, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/portal/sessions/:sessionId/start, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/portal/attempts/:attemptId/submit, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/portal/attempts/:attemptId/result, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mHealthController {/health}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/health, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/health/healthz, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [32m    LOG[39m [38;5;3m[NestApplication] [39m[32mNest application successfully started[39m[38;5;3m +7ms[39m
+[31m[Nest] 77711  - [39m10/09/2025, 3:40:11 PM [31m  ERROR[39m [38;5;3m[NestApplication] [39m[31mError: listen EADDRINUSE: address already in use 0.0.0.0:3000[39m[38;5;3m +6ms[39m
+node:net:1907
+    const ex = new UVExceptionWithHostPort(err, 'listen', address, port);
+               ^
+
+Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at Server.setupListenHandle [as _listen2] (node:net:1907:16)
+    at listenInCluster (node:net:1964:12)
+    at node:net:2170:7
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+
+Node.js v22.11.0
+ ELIFECYCLE  Command failed.

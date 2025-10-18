@@ -1,0 +1,62 @@
+/**
+ * CustomSeekBar 스타일
+ * 
+ * - Watched Overlay: 시청한 구간 파란색 표시
+ * - 포인터 변경: 시청 구간에서만 pointer, 미시청 구간은 not-allowed
+ */
+
+/* Watched Overlay: 시청한 구간 파란색 */
+.vjs-watched-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: rgba(59, 130, 246, 0.4); /* Tailwind blue-500 with opacity */
+  pointer-events: none; /* 클릭 이벤트 통과 */
+  z-index: 1;
+  transition: width 0.1s ease-out;
+}
+
+/* Progress Holder: 상대 위치 지정 */
+.video-js .vjs-progress-holder {
+  position: relative;
+}
+
+/* SeekBar Handle: 파란색 원 */
+.video-js .vjs-play-progress {
+  background-color: rgb(59, 130, 246) !important; /* Tailwind blue-500 */
+  z-index: 2;
+}
+
+/* 포인터 스타일: 기본은 허용 */
+.video-js .vjs-progress-holder {
+  cursor: pointer;
+}
+
+/* Load Progress: 회색 (버퍼링된 구간) */
+.video-js .vjs-load-progress {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Progress Bar 배경: 어두운 회색 */
+.video-js .vjs-slider {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Tooltip: 시간 표시 */
+.video-js .vjs-time-tooltip {
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+/* 반응형: 모바일에서 터치 영역 확대 */
+@media (max-width: 768px) {
+  .video-js .vjs-progress-holder {
+    height: 1em; /* 터치하기 쉽게 */
+  }
+}
+
+

@@ -2,14 +2,14 @@
 
 import { useAuthGuard } from '../hooks/useAuthGuard';
 import { useRouter } from 'next/navigation';
+import { authClient } from '../../lib/auth';
 
 export default function StudentPage() {
   const { isAuthenticated } = useAuthGuard();
   const router = useRouter();
 
-  const handleLogout = () => {
-    localStorage.removeItem('accessToken');
-    router.push('/login');
+  const handleLogout = async () => {
+    await authClient.logout();
   };
 
   if (!isAuthenticated) {
@@ -127,6 +127,30 @@ export default function StudentPage() {
               }}
             >
               Q&A 보기
+            </button>
+          </div>
+
+          <div style={{
+            padding: '20px',
+            border: '1px solid #e0e0e0',
+            borderRadius: '8px',
+            backgroundColor: '#f8f9fa'
+          }}>
+            <h3 style={{ marginBottom: '15px', color: '#333' }}>🎯 시험 포털</h3>
+            <p style={{ color: '#666', marginBottom: '15px' }}>세션 코드로 실시간 시험 참여</p>
+            <button 
+              onClick={() => router.push('/portal/exam')}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: '#28a745',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontWeight: 'bold'
+              }}
+            >
+              시험 참여
             </button>
           </div>
 

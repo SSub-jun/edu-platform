@@ -2,14 +2,14 @@
 
 import { useAuthGuard } from '../hooks/useAuthGuard';
 import { useRouter } from 'next/navigation';
+import { authClient } from '../../lib/auth';
 
 export default function AdminPage() {
   const { isAuthenticated } = useAuthGuard();
   const router = useRouter();
 
-  const handleLogout = () => {
-    localStorage.removeItem('accessToken');
-    router.push('/login');
+  const handleLogout = async () => {
+    await authClient.logout();
   };
 
   if (!isAuthenticated) {
@@ -61,87 +61,352 @@ export default function AdminPage() {
 
         <div style={{ 
           display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-          gap: '20px'
+          gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
+          gap: '25px'
         }}>
+          {/* 기관 관리 */}
           <div style={{
-            padding: '20px',
+            padding: '25px',
             border: '1px solid #e0e0e0',
-            borderRadius: '8px',
-            backgroundColor: '#f8f9fa'
+            borderRadius: '12px',
+            backgroundColor: '#f8f9fa',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
           }}>
-            <h3 style={{ marginBottom: '15px', color: '#333' }}>사용자 관리</h3>
-            <p style={{ color: '#666', marginBottom: '15px' }}>전체 사용자 계정 관리 및 권한 설정</p>
-            <button style={{
-              padding: '8px 16px',
-              backgroundColor: '#0070f3',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer'
+            <h3 style={{ 
+              marginBottom: '10px', 
+              color: '#333',
+              fontSize: '20px',
+              fontWeight: 'bold',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
             }}>
-              사용자 목록
-            </button>
+              🏢 기관 관리
+            </h3>
+            <p style={{ 
+              color: '#666', 
+              marginBottom: '20px',
+              fontSize: '14px',
+              lineHeight: '1.5'
+            }}>
+              교육기관/기업 생성, 초대코드 관리, 과목 배정
+            </p>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <button 
+                onClick={() => router.push('/admin/companies')}
+                style={{
+                  padding: '12px 16px',
+                  backgroundColor: '#0070f3',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                🏢 기관 목록 관리
+              </button>
+              
+              <button 
+                onClick={() => router.push('/admin/companies/assign')}
+                style={{
+                  padding: '12px 16px',
+                  backgroundColor: '#0070f3',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                📚 과목 배정 관리
+              </button>
+            </div>
           </div>
 
+          {/* 계정 관리 */}
           <div style={{
-            padding: '20px',
+            padding: '25px',
             border: '1px solid #e0e0e0',
-            borderRadius: '8px',
-            backgroundColor: '#f8f9fa'
+            borderRadius: '12px',
+            backgroundColor: '#f8f9fa',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
           }}>
-            <h3 style={{ marginBottom: '15px', color: '#333' }}>콘텐츠 관리</h3>
-            <p style={{ color: '#666', marginBottom: '15px' }}>강의 자료 및 시험 문제 관리</p>
-            <button style={{
-              padding: '8px 16px',
-              backgroundColor: '#0070f3',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer'
+            <h3 style={{ 
+              marginBottom: '10px', 
+              color: '#333',
+              fontSize: '20px',
+              fontWeight: 'bold',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
             }}>
-              콘텐츠 관리
-            </button>
+              👤 계정 관리
+            </h3>
+            <p style={{ 
+              color: '#666', 
+              marginBottom: '20px',
+              fontSize: '14px',
+              lineHeight: '1.5'
+            }}>
+              강사, 학생, 관리자 계정 생성 및 삭제
+            </p>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <button 
+                onClick={() => router.push('/admin/users/instructors')}
+                style={{
+                  padding: '12px 16px',
+                  backgroundColor: '#0070f3',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                👩‍🏫 강사 계정 관리
+              </button>
+              
+              <button 
+                onClick={() => router.push('/admin/users/students')}
+                style={{
+                  padding: '12px 16px',
+                  backgroundColor: '#0070f3',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                👥 학생 계정 관리
+              </button>
+            </div>
           </div>
 
+          {/* 교육 콘텐츠 관리 */}
           <div style={{
-            padding: '20px',
+            padding: '25px',
             border: '1px solid #e0e0e0',
-            borderRadius: '8px',
-            backgroundColor: '#f8f9fa'
+            borderRadius: '12px',
+            backgroundColor: '#f8f9fa',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
           }}>
-            <h3 style={{ marginBottom: '15px', color: '#333' }}>통계 및 리포트</h3>
-            <p style={{ color: '#666', marginBottom: '15px' }}>학습 현황 및 성과 분석</p>
-            <button style={{
-              padding: '8px 16px',
-              backgroundColor: '#0070f3',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer'
+            <h3 style={{ 
+              marginBottom: '10px', 
+              color: '#333',
+              fontSize: '20px',
+              fontWeight: 'bold',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
             }}>
-              리포트 보기
-            </button>
+              📚 교육 콘텐츠 감독
+            </h3>
+            <p style={{ 
+              color: '#666', 
+              marginBottom: '20px',
+              fontSize: '14px',
+              lineHeight: '1.5'
+            }}>
+              전체 과목, 시험 문제, 학습 자료 품질 관리
+            </p>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <button 
+                onClick={() => router.push('/admin/subjects')}
+                style={{
+                  padding: '12px 16px',
+                  backgroundColor: '#0070f3',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                📖 전체 과목 관리
+              </button>
+              
+              <button 
+                onClick={() => router.push('/admin/questions')}
+                style={{
+                  padding: '12px 16px',
+                  backgroundColor: '#0070f3',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                📝 문제 은행 관리
+              </button>
+            </div>
           </div>
 
+          {/* 포털 시험 관리 */}
           <div style={{
-            padding: '20px',
+            padding: '25px',
             border: '1px solid #e0e0e0',
-            borderRadius: '8px',
-            backgroundColor: '#f8f9fa'
+            borderRadius: '12px',
+            backgroundColor: '#f8f9fa',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
           }}>
-            <h3 style={{ marginBottom: '15px', color: '#333' }}>시스템 설정</h3>
-            <p style={{ color: '#666', marginBottom: '15px' }}>플랫폼 설정 및 환경 구성</p>
-            <button style={{
-              padding: '8px 16px',
-              backgroundColor: '#0070f3',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer'
+            <h3 style={{ 
+              marginBottom: '10px', 
+              color: '#333',
+              fontSize: '20px',
+              fontWeight: 'bold',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
             }}>
-              설정 관리
-            </button>
+              🎯 포털 시험 관리
+            </h3>
+            <p style={{ 
+              color: '#666', 
+              marginBottom: '20px',
+              fontSize: '14px',
+              lineHeight: '1.5'
+            }}>
+              실시간 시험 세션, 문제 은행, 결과 분석
+            </p>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <button 
+                onClick={() => router.push('/admin/portal/sessions')}
+                style={{
+                  padding: '12px 16px',
+                  backgroundColor: '#0070f3',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                🎮 시험 세션 관리
+              </button>
+              
+              <button 
+                onClick={() => router.push('/admin/portal/banks')}
+                style={{
+                  padding: '12px 16px',
+                  backgroundColor: '#0070f3',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                🏦 문제 은행 관리
+              </button>
+            </div>
+          </div>
+
+          {/* Q&A 관리 */}
+          <div style={{
+            padding: '25px',
+            border: '1px solid #e0e0e0',
+            borderRadius: '12px',
+            backgroundColor: '#f8f9fa',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+          }}>
+            <h3 style={{ 
+              marginBottom: '10px', 
+              color: '#333',
+              fontSize: '20px',
+              fontWeight: 'bold',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              💬 Q&A 관리
+            </h3>
+            <p style={{ 
+              color: '#666', 
+              marginBottom: '20px',
+              fontSize: '14px',
+              lineHeight: '1.5'
+            }}>
+              전체 질문 답변 모니터링 및 품질 관리
+            </p>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <button 
+                onClick={() => router.push('/qna')}
+                style={{
+                  padding: '12px 16px',
+                  backgroundColor: '#0070f3',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                💭 질문 답변 관리
+              </button>
+              
+              <button 
+                onClick={() => router.push('/admin/qna/analytics')}
+                style={{
+                  padding: '12px 16px',
+                  backgroundColor: '#0070f3',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                📊 Q&A 통계
+              </button>
+            </div>
           </div>
         </div>
       </div>

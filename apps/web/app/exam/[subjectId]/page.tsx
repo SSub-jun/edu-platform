@@ -20,7 +20,7 @@ export default function ExamPage() {
   const subjectId = params.subjectId as string;
   
   const [examData, setExamData] = useState<ExamData | null>(null);
-  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [answers, setAnswers] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -55,17 +55,41 @@ export default function ExamPage() {
     } catch (error) {
       alert('시험을 시작할 수 없습니다.');
       console.error(error);
-      router.push('/dashboard');
+      router.push('/curriculum');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAnswerChange = (questionId: string, answer: string) => {
+  const handleAnswerChange = (questionId: string, choiceIndex: number) => {
     setAnswers(prev => ({
       ...prev,
-      [questionId]: answer
+      [questionId]: choiceIndex
     }));
+  };
+
+  const handleBackToDashboard = () => {
+    // 토큰에서 role 확인하여 적절한 페이지로 이동
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const userRole = payload.role;
+        
+        if (userRole === 'instructor') {
+          router.push('/instructor');
+        } else if (userRole === 'admin') {
+          router.push('/admin');
+        } else {
+          router.push('/curriculum'); // 학생은 curriculum으로 이동
+        }
+      } catch (e) {
+        // 토큰 파싱 실패 시 curriculum으로
+        router.push('/curriculum');
+      }
+    } else {
+      router.push('/login');
+    }
   };
 
   const handleSubmit = async () => {
@@ -80,13 +104,19 @@ export default function ExamPage() {
 
     setSubmitting(true);
     try {
+      // answers를 API 형식에 맞게 변환
+      const formattedAnswers = Object.entries(answers).map(([questionId, choiceIndex]) => ({
+        questionId,
+        choiceIndex
+      }));
+
       const response = await fetch(`http://localhost:4000/exam/attempts/${examData.attemptId}/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
         },
-        body: JSON.stringify({ answers }),
+        body: JSON.stringify({ answers: formattedAnswers }),
       });
 
       if (!response.ok) {
@@ -102,10 +132,6 @@ export default function ExamPage() {
     } finally {
       setSubmitting(false);
     }
-  };
-
-  const handleBackToDashboard = () => {
-    router.push('/dashboard');
   };
 
   if (loading) {
@@ -146,28 +172,19 @@ export default function ExamPage() {
           </h1>
           
           <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(3, 1fr)', 
+            display: 'flex', 
+            flexDirection: 'column',
             gap: '20px',
-            marginBottom: '40px'
+            marginBottom: '40px',
+            alignItems: 'center'
           }}>
-            <div style={{ padding: '20px', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
-              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#0070f3' }}>
-                {result.score}점
+            <div style={{ padding: '30px 50px', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
+              <div style={{ fontSize: '48px', fontWeight: 'bold', color: result.passed ? '#28a745' : '#dc3545' }}>
+                {Math.round(result.examScore)}점
               </div>
-              <div style={{ fontSize: '14px', color: '#666' }}>점수</div>
-            </div>
-            <div style={{ padding: '20px', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
-              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#28a745' }}>
-                {result.progress}%
+              <div style={{ fontSize: '16px', color: '#666', marginTop: '10px' }}>
+                {result.passed ? '합격 기준: 70점 이상' : '불합격 (70점 미만)'}
               </div>
-              <div style={{ fontSize: '14px', color: '#666' }}>진행률</div>
-            </div>
-            <div style={{ padding: '20px', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
-              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#ffc107' }}>
-                {result.finalScore}점
-              </div>
-              <div style={{ fontSize: '14px', color: '#666' }}>최종점수</div>
             </div>
           </div>
 
@@ -183,7 +200,7 @@ export default function ExamPage() {
               cursor: 'pointer'
             }}
           >
-            대시보드로 돌아가기
+            커리큘럼으로 돌아가기
           </button>
         </div>
       </div>
@@ -267,15 +284,15 @@ export default function ExamPage() {
                     border: '1px solid #ddd',
                     borderRadius: '6px',
                     cursor: 'pointer',
-                    backgroundColor: answers[question.id] === choice ? '#e3f2fd' : 'white',
+                    backgroundColor: answers[question.id] === choiceIndex ? '#e3f2fd' : 'white',
                     transition: 'background-color 0.2s'
                   }}>
                     <input
                       type="radio"
                       name={question.id}
-                      value={choice}
-                      checked={answers[question.id] === choice}
-                      onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+                      value={choiceIndex}
+                      checked={answers[question.id] === choiceIndex}
+                      onChange={() => handleAnswerChange(question.id, choiceIndex)}
                       style={{ marginRight: '12px' }}
                     />
                     <span style={{ fontSize: '16px' }}>
