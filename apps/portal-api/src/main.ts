@@ -35,7 +35,9 @@ async function bootstrap() {
 
   const port = parseInt(process.env.PORT ?? '8080', 10);
   await app.listen(port, '0.0.0.0');
-  console.log(`✅ portal-api listening on ${port}`);
+  console.log(`✅ Portal API is running on port: ${port}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`Swagger documentation available at: /docs`);
 }
 
 bootstrap();
