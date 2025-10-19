@@ -41,8 +41,9 @@ async function bootstrap() {
 
   // Railway는 PORT 환경변수를 자동 제공
   const port = process.env.PORT || process.env.API_PORT || 4000;
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
   console.log(`Application is running on port: ${port}`);
+  console.log(`Environment: ${process.env.NODE_ENV}`);
   console.log(`Swagger documentation available at: /docs`);
 }
 bootstrap();
