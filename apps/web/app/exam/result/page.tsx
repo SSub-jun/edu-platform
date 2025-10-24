@@ -3,7 +3,7 @@
 export const dynamic = 'force-dynamic';
 
 import React, { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useNextAvailable } from '../../../src/hooks/useNextAvailable';
 import { useRetakeExam } from '../../../src/hooks/useExam';
@@ -12,14 +12,25 @@ import styles from './page.module.css';
 
 export default function ExamResultPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const [urlParams, setUrlParams] = useState<{ attemptId: string | null; score: string | null; passed: boolean; lessonId: string | null }>({
+    attemptId: null,
+    score: null,
+    passed: false,
+    lessonId: null,
+  });
   
-  // URL 파라미터에서 결과 정보 추출
-  const attemptId = searchParams.get('attemptId');
-  const score = searchParams.get('score');
-  const passed = searchParams.get('passed') === 'true';
-  const lessonId = searchParams.get('lessonId');
+  // URL 파라미터 파싱 (클라이언트 사이드)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setUrlParams({
+      attemptId: params.get('attemptId'),
+      score: params.get('score'),
+      passed: params.get('passed') === 'true',
+      lessonId: params.get('lessonId'),
+    });
+  }, []);
   
+  const { attemptId, score, passed, lessonId } = urlParams;
   const [showDetails, setShowDetails] = useState(false);
   
   const { data: nextAvailable, isLoading: nextLoading } = useNextAvailable();
@@ -27,7 +38,7 @@ export default function ExamResultPage() {
 
   // 파라미터 검증
   useEffect(() => {
-    if (!attemptId || !score) {
+    if (attemptId !== null && score !== null && !attemptId && !score) {
       router.push('/curriculum');
     }
   }, [attemptId, score, router]);

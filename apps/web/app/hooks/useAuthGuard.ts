@@ -1,12 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { authClient } from '../../lib/auth';
 
 export const useAuthGuard = () => {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -16,9 +15,13 @@ export const useAuthGuard = () => {
         const currentPath = window.location.pathname;
         const timestamp = new Date().toISOString();
         
+        // URL에서 redirect 파라미터 가져오기 (클라이언트 사이드)
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectParam = urlParams.get('redirect');
+        
         console.log(`[AUTH_GUARD] ${timestamp}`);
         console.log(`  CURRENT_PATH: ${currentPath}`);
-        console.log(`  SEARCH_PARAMS_REDIRECT: ${searchParams.get('redirect')}`);
+        console.log(`  SEARCH_PARAMS_REDIRECT: ${redirectParam}`);
 
         // Auth 클라이언트에서 인증 상태 확인
         const authenticated = authClient.isAuthenticated();
@@ -26,7 +29,7 @@ export const useAuthGuard = () => {
         console.log(`  IS_AUTHENTICATED: ${authenticated}`);
         
         if (!authenticated) {
-          const redirect = searchParams.get('redirect') || currentPath || '/curriculum';
+          const redirect = redirectParam || currentPath || '/curriculum';
           const loginPath = `/login?redirect=${encodeURIComponent(redirect)}`;
           
           console.log(`[AUTH_GUARD REDIRECT] ${currentPath} -> ${loginPath}`);
@@ -111,7 +114,7 @@ export const useAuthGuard = () => {
     };
 
     checkAuth();
-  }, [router, searchParams]);
+  }, [router]);
 
   const logout = async () => {
     await authClient.logout();

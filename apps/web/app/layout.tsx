@@ -18,6 +18,8 @@ export const metadata: Metadata = {
   description: "온라인 학습 및 시험 플랫폼",
 };
 
+export const dynamic = 'force-dynamic';
+
 export default function RootLayout({
   children,
 }: Readonly<{

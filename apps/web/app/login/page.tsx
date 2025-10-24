@@ -3,7 +3,7 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { authClient } from '../../lib/auth';
 import styles from './page.module.css';
 
@@ -13,12 +13,11 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   // 이미 로그인된 경우 리다이렉트
   useEffect(() => {
     // 로그인 페이지는 항상 접근 가능: 자동 리디렉션 제거
-  }, [router, searchParams]);
+  }, [router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +36,8 @@ export default function LoginPage() {
       
       if (result.success && result.user) {
         // role에 따라 다른 페이지로 리다이렉트
-        const redirect = searchParams.get('redirect') || '/curriculum';
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirect = urlParams.get('redirect') || '/curriculum';
         let targetUrl: string;
         
         switch (result.user.role) {
