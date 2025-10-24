@@ -16,28 +16,10 @@ export function useToast() {
   const showError = (error: any, options: ToastOptions = {}) => {
     const errorMessage = getErrorMessage(error);
     
-    if (options.showAction && errorMessage.actionLabel) {
-      toast.error(
-        `${errorMessage.title}: ${errorMessage.description}`,
-        {
-          duration: 6000,
-          action: errorMessage.actionLabel
-            ? {
-                label: errorMessage.actionLabel,
-                onClick: () => {
-                  if (errorMessage.actionType && actionHandlers[errorMessage.actionType]) {
-                    actionHandlers[errorMessage.actionType]();
-                  }
-                },
-              }
-            : undefined,
-        }
-      );
-    } else {
-      toast.error(`${errorMessage.title}: ${errorMessage.description}`, {
-        duration: 5000,
-      });
-    }
+    // react-hot-toast는 action 속성을 지원하지 않으므로 간단한 에러 메시지만 표시
+    toast.error(`${errorMessage.title}: ${errorMessage.description}`, {
+      duration: options.showAction ? 6000 : 5000,
+    });
 
     // 자동 액션 실행
     if (options.autoAction && errorMessage.actionType && actionHandlers[errorMessage.actionType]) {
