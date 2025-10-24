@@ -102,7 +102,7 @@ export default function SignupPage() {
           
           {currentStep === 'done' && (
             <StepDone
-              onComplete={handleStepComplete}
+              onComplete={() => router.push('/curriculum')}
               signupData={signupData as SignupData}
             />
           )}
