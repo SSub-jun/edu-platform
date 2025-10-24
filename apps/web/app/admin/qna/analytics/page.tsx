@@ -128,17 +128,17 @@ export default function AdminQnaAnalyticsPage() {
       for (let i = days - 1; i >= 0; i--) {
         const date = new Date();
         date.setDate(date.getDate() - i);
-        const dateStr = date.toISOString().split('T')[0];
+        const dateStr = date.toISOString().split('T')[0]!; // ISO 문자열은 항상 'T'를 포함하므로 [0]은 항상 존재
         
         const dayPosts = posts.filter(post => {
-          const postDate = new Date(post.createdAt).toISOString().split('T')[0];
+          const postDate = new Date(post.createdAt).toISOString().split('T')[0]!;
           return postDate === dateStr;
         }).length;
 
         const dayReplies = posts.reduce((sum, post) => {
           if (post.replies) {
             return sum + post.replies.filter(reply => {
-              const replyDate = new Date(reply.createdAt).toISOString().split('T')[0];
+              const replyDate = new Date(reply.createdAt).toISOString().split('T')[0]!;
               return replyDate === dateStr;
             }).length;
           }
