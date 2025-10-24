@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { useAuthGuard } from '../hooks/useAuthGuard';
 import { useRouter } from 'next/navigation';
 import { authClient } from '../../lib/auth';
