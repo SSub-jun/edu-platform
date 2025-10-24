@@ -96,7 +96,7 @@ class CustomSeekBar extends SeekBar {
   handleMouseDown(event: MouseEvent) {
     // Video.js 내부적으로 calculateDistance 호출하므로
     // 이미 클램프된 값으로 처리됨
-    super.handleMouseDown(event);
+    (SeekBar.prototype as any).handleMouseDown.call(this, event);
   }
 
   /**
@@ -105,21 +105,21 @@ class CustomSeekBar extends SeekBar {
   handleMouseMove(event: MouseEvent) {
     // 이미 calculateDistance에서 클램프되므로
     // super 호출만으로 충분
-    super.handleMouseMove(event);
+    (SeekBar.prototype as any).handleMouseMove.call(this, event);
   }
 
   /**
    * 🔒 터치 시작: 클램프 후 처리
    */
   handleTouchStart(event: TouchEvent) {
-    super.handleTouchStart(event);
+    (SeekBar.prototype as any).handleTouchStart.call(this, event);
   }
 
   /**
    * 🔒 터치 이동: 클램프 후 처리
    */
   handleTouchMove(event: TouchEvent) {
-    super.handleTouchMove(event);
+    (SeekBar.prototype as any).handleTouchMove.call(this, event);
   }
 
   /**
@@ -138,7 +138,7 @@ class CustomSeekBar extends SeekBar {
       this.watchedOverlay.remove();
       this.watchedOverlay = null;
     }
-    super.dispose();
+    (SeekBar.prototype as any).dispose.call(this);
   }
 }
 
