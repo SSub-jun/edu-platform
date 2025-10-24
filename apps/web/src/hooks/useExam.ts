@@ -20,12 +20,12 @@ export function useStartExam() {
         data: response.data,
       });
       
-      // 백엔드에서 직접 데이터 객체를 반환하므로 response.data를 그대로 사용
-      if (!response.data) {
+      // 백엔드 응답 구조: { success: true, data: { attemptId, lessonId, questions } }
+      if (!response.data.data) {
         throw new Error(`No data in response: ${JSON.stringify(response)}`);
       }
       
-      return response.data;
+      return response.data.data;
     },
     onSuccess: (data, lessonId) => {
       // 레슨 상태 갱신
@@ -57,12 +57,12 @@ export function useSubmitExam() {
         data: response.data,
       });
       
-      // 백엔드에서 직접 데이터 객체를 반환하므로 response.data를 그대로 사용
-      if (!response.data) {
+      // 백엔드 응답 구조: { success: true, data: { ... } }
+      if (!response.data.data) {
         throw new Error(`No data in response: ${JSON.stringify(response)}`);
       }
       
-      return response.data;
+      return response.data.data;
     },
     onSuccess: () => {
       // 커리큘럼과 next-available 상태 갱신
@@ -88,12 +88,12 @@ export function useRetakeExam() {
         data: response.data,
       });
       
-      // 백엔드에서 직접 데이터 객체를 반환하므로 response.data를 그대로 사용
-      if (!response.data) {
+      // 백엔드 응답 구조: { success: true, data: { ... } }
+      if (!response.data.data) {
         throw new Error(`No data in response: ${JSON.stringify(response)}`);
       }
       
-      return response.data;
+      return response.data.data;
     },
     onSuccess: (data, lessonId) => {
       // 레슨 상태 갱신
