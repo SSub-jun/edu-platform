@@ -124,7 +124,7 @@ export default function AdminQnaAnalyticsPage() {
 
       // 일별 통계 (최근 7일)
       const days = parseInt(timeRange);
-      const dailyStats = [];
+      const dailyStats: Array<{ date: string; posts: number; replies: number }> = [];
       for (let i = days - 1; i >= 0; i--) {
         const date = new Date();
         date.setDate(date.getDate() - i);
