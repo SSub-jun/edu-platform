@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw';
-import { CurriculumResponse, LessonStatusResponse, StartExamResponse, SubmitExamResponse } from '../types/api';
+import { CurriculumResponse, LessonStatusResponse, StartExamResponse, SubmitExamResponse } from '../../types/api';
 
 const baseUrl = 'http://localhost:4000';
 
@@ -175,6 +175,7 @@ export const handlers = [
     });
   }),
 ];
+
 
 
 
