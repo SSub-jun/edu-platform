@@ -333,12 +333,12 @@ export default function AdminSubjectAssignPage() {
                               }}
                               onMouseEnter={(e) => {
                                 if (!isAssigned) {
-                                  e.target.style.backgroundColor = '#e9ecef';
+                                  (e.currentTarget as HTMLElement).style.backgroundColor = '#e9ecef';
                                 }
                               }}
                               onMouseLeave={(e) => {
                                 if (!isAssigned) {
-                                  e.target.style.backgroundColor = '#f8f9fa';
+                                  (e.currentTarget as HTMLElement).style.backgroundColor = '#f8f9fa';
                                 }
                               }}
                             >
