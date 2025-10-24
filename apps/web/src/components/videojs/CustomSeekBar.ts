@@ -67,7 +67,7 @@ class CustomSeekBar extends SeekBar {
    * maxReached를 초과하지 않도록 상한선 적용
    */
   calculateDistance(event: MouseEvent | TouchEvent): number {
-    const distance = super.calculateDistance(event);
+    const distance = (super as any).calculateDistance(event);
     
     if (this.videoDuration <= 0) return distance;
 
