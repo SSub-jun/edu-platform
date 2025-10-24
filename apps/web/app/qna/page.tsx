@@ -65,7 +65,8 @@ export default function QnaPage() {
   const fetchPosts = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:4000/qna/posts', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const response = await fetch(`${apiUrl}/qna/posts`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
         },
@@ -87,7 +88,8 @@ export default function QnaPage() {
     if (!questionTitle.trim() || !questionBody.trim()) return;
 
     try {
-      const response = await fetch('http://localhost:4000/qna/posts', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const response = await fetch(`${apiUrl}/qna/posts`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -115,7 +117,8 @@ export default function QnaPage() {
     if (!replyingTo || !replyBody.trim()) return;
 
     try {
-      const response = await fetch('http://localhost:4000/qna/replies', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const response = await fetch(`${apiUrl}/qna/replies`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -32,7 +32,8 @@ export default function InstructorPage() {
   const loadSubjects = async () => {
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await fetch('http://localhost:4000/instructor/subjects', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const response = await fetch(`${apiUrl}/instructor/subjects`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -68,7 +69,8 @@ export default function InstructorPage() {
     if (newSubject.name.trim()) {
       try {
         const token = localStorage.getItem('accessToken');
-        const response = await fetch('http://localhost:4000/instructor/subjects', {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+        const response = await fetch(`${apiUrl}/instructor/subjects`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,

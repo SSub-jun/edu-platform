@@ -63,7 +63,8 @@ export default function SubjectManagePage() {
   const loadSubjectData = async () => {
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await fetch(`http://localhost:4000/instructor/subjects/${subjectId}`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const response = await fetch(`${apiUrl}/instructor/subjects/${subjectId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -113,7 +114,8 @@ export default function SubjectManagePage() {
     if (confirm('이 문제를 삭제하시겠습니까?')) {
       try {
         const token = localStorage.getItem('accessToken');
-        const response = await fetch(`http://localhost:4000/instructor/questions/${questionId}`, {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+        const response = await fetch(`${apiUrl}/instructor/questions/${questionId}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -145,7 +147,8 @@ export default function SubjectManagePage() {
     }
 
     try {
-      const response = await fetch(`http://localhost:4000/instructor/subjects/${subjectId}/lessons`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const response = await fetch(`${apiUrl}/instructor/subjects/${subjectId}/lessons`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
@@ -179,7 +182,8 @@ export default function SubjectManagePage() {
     }
 
     try {
-      const response = await fetch(`http://localhost:4000/instructor/lessons/${lessonId}`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const response = await fetch(`${apiUrl}/instructor/lessons/${lessonId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
@@ -212,7 +216,8 @@ export default function SubjectManagePage() {
     }
 
     try {
-      const response = await fetch(`http://localhost:4000/instructor/subjects/${subjectId}/questions`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const response = await fetch(`${apiUrl}/instructor/subjects/${subjectId}/questions`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
@@ -251,7 +256,8 @@ export default function SubjectManagePage() {
     if (confirm(`"${subjectName}" 과목을 정말로 삭제하시겠습니까?\n\n⚠️ 이 작업은 되돌릴 수 없으며, 관련된 모든 시험 문제와 학생 데이터가 비활성화됩니다.`)) {
       try {
         const token = localStorage.getItem('accessToken');
-        const response = await fetch(`http://localhost:4000/instructor/subjects/${subjectId}`, {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+        const response = await fetch(`${apiUrl}/instructor/subjects/${subjectId}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`,
