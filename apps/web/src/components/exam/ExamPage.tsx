@@ -77,10 +77,14 @@ export function ExamPage({
 
     if (!examData) return;
 
-    const answerArray = examData.questions.map(question => ({
-      questionId: question.id,
-      choiceIndex: answers[question.id]
-    }));
+    const answerArray = examData.questions
+      .map(question => ({
+        questionId: question.id,
+        choiceIndex: answers[question.id]
+      }))
+      .filter((answer): answer is { questionId: string; choiceIndex: number } => 
+        answer.choiceIndex !== undefined
+      );
 
     submitExamMutation.mutate(
       { attemptId: examData.attemptId, answers: answerArray },
