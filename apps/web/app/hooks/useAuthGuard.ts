@@ -66,14 +66,22 @@ export const useAuthGuard = () => {
           } catch (error) {
             console.error('[AUTH_GUARD ERROR] Company check failed:', error);
             // 프로필 확인 실패 시에도 회사 배정 페이지로 이동
-            if (error.response?.status === 401) {
+            const isAxiosError = (err: unknown): err is { response?: { status?: number } } => {
+              return typeof err === 'object' && err !== null && 'response' in err;
+            };
+            
+            if (isAxiosError(error) && error.response?.status === 401) {
               router.push('/login');
             } else {
               // 강사/관리자는 회사 배정 실패 시에도 진행
               const token = localStorage.getItem('accessToken');
               if (token) {
                 try {
-                  const payload = JSON.parse(atob(token.split('.')[1]));
+                  const tokenParts = token.split('.');
+                  if (tokenParts.length !== 3) {
+                    throw new Error('Invalid JWT token format');
+                  }
+                  const payload = JSON.parse(atob(tokenParts[1]!));
                   if (payload.role === 'instructor' || payload.role === 'admin') {
                     console.log(`[AUTH_GUARD] Company check failed but allowing ${payload.role} to proceed`);
                   } else {
