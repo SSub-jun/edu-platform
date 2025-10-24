@@ -372,8 +372,8 @@ export default function InstructorPage() {
                   gap: '8px',
                   transition: 'background-color 0.2s'
                 }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#0051a5'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = '#0070f3'}
+                onMouseEnter={(e) => (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#0051a5'}
+                onMouseLeave={(e) => (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#0070f3'}
               >
                 📊 학생 현황 보기
               </button>
@@ -426,8 +426,8 @@ export default function InstructorPage() {
                   gap: '8px',
                   transition: 'background-color 0.2s'
                 }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#0051a5'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = '#0070f3'}
+                onMouseEnter={(e) => (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#0051a5'}
+                onMouseLeave={(e) => (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#0070f3'}
               >
                 💭 질문 답변하기
               </button>
