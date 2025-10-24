@@ -243,8 +243,8 @@ export default function QnaPage() {
                   outline: 'none',
                   transition: 'border-color 0.2s ease'
                 }}
-                onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                onFocus={(e) => (e.currentTarget as HTMLInputElement).style.borderColor = '#3b82f6'}
+                onBlur={(e) => (e.currentTarget as HTMLInputElement).style.borderColor = '#d1d5db'}
                 required
               />
               <textarea
@@ -267,8 +267,8 @@ export default function QnaPage() {
                   fontFamily: 'inherit',
                   lineHeight: '1.5'
                 }}
-                onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                onFocus={(e) => (e.currentTarget as HTMLTextAreaElement).style.borderColor = '#3b82f6'}
+                onBlur={(e) => (e.currentTarget as HTMLTextAreaElement).style.borderColor = '#d1d5db'}
                 required
               />
               <button
@@ -284,8 +284,8 @@ export default function QnaPage() {
                   fontWeight: '600',
                   transition: 'background-color 0.2s ease'
                 }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#059669'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = '#10b981'}
+                onMouseEnter={(e) => (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#059669'}
+                onMouseLeave={(e) => (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#10b981'}
               >
                 질문 등록
               </button>

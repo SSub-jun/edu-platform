@@ -542,7 +542,7 @@ export default function LessonVideosManagePage() {
                   marginTop: '10px'
                 }}>
                   <div><strong>파일 크기:</strong> {formatFileSize(video.fileSize)}</div>
-                  <div><strong>형식:</strong> {video.mimeType?.split('/')[1].toUpperCase() || 'N/A'}</div>
+                  <div><strong>형식:</strong> {video.mimeType?.split('/')[1]?.toUpperCase() || 'N/A'}</div>
                   {video.videoUrl && (
                     <div>
                       <a 

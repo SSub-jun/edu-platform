@@ -43,7 +43,8 @@ class TokenStorage {
         .map((c) => c.trim())
         .find((c) => c.startsWith('ap-auth='));
       if (cookie) {
-        this.accessToken = cookie.split('=')[1] || '';
+        const parts = cookie.split('=');
+        this.accessToken = parts[1] || '';
         console.log(`[TOKEN_STORAGE] Recovered token from cookie`);
       }
     }

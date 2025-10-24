@@ -205,14 +205,14 @@ export default function InstructorPage() {
                     marginBottom: '10px'
                   }}
                   onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = '#0051a5';
-                    e.target.style.transform = 'translateY(-1px)';
-                    e.target.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
+                    (e.currentTarget as HTMLElement).style.backgroundColor = '#0051a5';
+                    (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)';
+                    (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
                   }}
                   onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = '#0070f3';
-                    e.target.style.transform = 'translateY(0)';
-                    e.target.style.boxShadow = 'none';
+                    (e.currentTarget as HTMLElement).style.backgroundColor = '#0070f3';
+                    (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
+                    (e.currentTarget as HTMLElement).style.boxShadow = 'none';
                   }}
                 >
                   {subject.icon} {subject.name}

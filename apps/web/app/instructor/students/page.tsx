@@ -64,7 +64,7 @@ export default function StudentsPage() {
             student.subjectProgress.forEach((sp: any) => {
               subjectProgressMap[sp.subject.id] = {
                 progress: sp.progressPercent,
-                lastActivity: sp.updatedAt.split('T')[0]
+                lastActivity: sp.updatedAt.split('T')[0]! // ISO 날짜 문자열은 항상 'T' 포함
               };
             });
 
@@ -89,7 +89,7 @@ export default function StudentsPage() {
               id: student.id,
               name: student.username,
               email: student.email || '이메일 없음',
-              enrollDate: student.createdAt.split('T')[0],
+              enrollDate: student.createdAt.split('T')[0]!, // ISO 날짜 문자열은 항상 'T' 포함
               totalProgress: Math.round(totalProgress),
               subjectProgress: subjectProgressMap,
               status: isRecentlyActive ? 'active' : 'inactive'

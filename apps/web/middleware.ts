@@ -53,7 +53,11 @@ export function middleware(request: NextRequest) {
   let userRole = 'student'; // 기본값
   if (hasValidToken && tokenValue !== 'none') {
     try {
-      const payload = JSON.parse(atob(tokenValue.split('.')[1]));
+      const tokenParts = tokenValue.split('.');
+      if (tokenParts.length !== 3) {
+        throw new Error('Invalid JWT token format');
+      }
+      const payload = JSON.parse(atob(tokenParts[1]!));
       userRole = payload.role || 'student';
     } catch (e) {
       // 토큰 파싱 실패 시 기본값 유지
