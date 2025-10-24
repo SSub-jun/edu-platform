@@ -236,7 +236,7 @@ export default function StepPhone({ onComplete, initialData }: StepPhoneProps) {
           {otp.map((digit, index) => (
             <input
               key={index}
-              ref={(el) => (otpRefs.current[index] = el)}
+              ref={(el) => { otpRefs.current[index] = el; }}
               type="text"
               value={digit}
               onChange={(e) => handleOtpChange(index, e.target.value)}
