@@ -540,7 +540,7 @@ export default function AdminPortalSessionDetailPage() {
                           </div>
                         </div>
 
-                        {latestAttempt?.score !== null && (
+                        {latestAttempt?.score !== null && latestAttempt && (
                           <div style={{
                             textAlign: 'right',
                             fontSize: '20px',
