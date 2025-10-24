@@ -115,19 +115,23 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
         inviteCode: formData.inviteCode,
       });
 
-    } catch (error: any) {
+    } catch (error) {
       console.error('회원가입 실패:', error);
       
-      if (error.response?.status === 409) {
+      const isAxiosError = (err: unknown): err is { response?: { status?: number; data?: { code?: string; message?: string } } } => {
+        return typeof err === 'object' && err !== null && 'response' in err;
+      };
+      
+      if (isAxiosError(error) && error.response?.status === 409) {
         const data = error.response.data;
-        if (data.code === 'PHONE_ALREADY_REGISTERED') {
+        if (data?.code === 'PHONE_ALREADY_REGISTERED') {
           setError('이미 가입된 전화번호입니다.');
         } else {
           setError('중복된 정보가 있습니다. 확인해주세요.');
         }
-      } else if (error.response?.status === 422) {
+      } else if (isAxiosError(error) && error.response?.status === 422) {
         const data = error.response.data;
-        switch (data.code) {
+        switch (data?.code) {
           case 'WEAK_PASSWORD':
             setError('비밀번호는 최소 8자이며, 대문자/소문자/숫자/특수문자를 각각 1개 이상 포함해야 합니다.');
             break;
@@ -138,7 +142,7 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
             setError('유효하지 않은 초대코드입니다.');
             break;
           default:
-            setError(data.message || '입력 정보를 확인해주세요.');
+            setError(data?.message || '입력 정보를 확인해주세요.');
         }
       } else {
         setError('회원가입에 실패했습니다. 다시 시도해주세요.');

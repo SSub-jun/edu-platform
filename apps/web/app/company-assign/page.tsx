@@ -67,21 +67,25 @@ export default function CompanyAssignPage() {
         }, 3000);
       }
 
-    } catch (error: any) {
+    } catch (error) {
       console.error('회사 배정 실패:', error);
       
-      if (error.response?.status === 409) {
+      const isAxiosError = (err: unknown): err is { response?: { status?: number; data?: { code?: string; message?: string } } } => {
+        return typeof err === 'object' && err !== null && 'response' in err;
+      };
+      
+      if (isAxiosError(error) && error.response?.status === 409) {
         const data = error.response.data;
-        if (data.code === 'ALREADY_ASSIGNED') {
+        if (data?.code === 'ALREADY_ASSIGNED') {
           setError('이미 회사에 배정된 사용자입니다.');
           // 이미 배정된 경우 커리큘럼으로 이동
           setTimeout(() => router.push('/curriculum'), 2000);
         } else {
           setError('중복된 요청입니다.');
         }
-      } else if (error.response?.status === 422) {
+      } else if (isAxiosError(error) && error.response?.status === 422) {
         const data = error.response.data;
-        switch (data.code) {
+        switch (data?.code) {
           case 'INVALID_INVITE_CODE':
             setError('유효하지 않은 회사 코드입니다. 다시 확인해주세요.');
             break;
@@ -89,9 +93,9 @@ export default function CompanyAssignPage() {
             setError('비활성화된 회사입니다. 관리자에게 문의해주세요.');
             break;
           default:
-            setError(data.message || '입력한 회사 코드를 확인해주세요.');
+            setError(data?.message || '입력한 회사 코드를 확인해주세요.');
         }
-      } else if (error.response?.status === 401) {
+      } else if (isAxiosError(error) && error.response?.status === 401) {
         setError('로그인이 필요합니다.');
         setTimeout(() => router.push('/login'), 2000);
       } else {

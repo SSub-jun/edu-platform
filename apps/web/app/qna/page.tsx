@@ -46,7 +46,11 @@ export default function QnaPage() {
       const token = localStorage.getItem('accessToken');
       if (token) {
         try {
-          const payload = JSON.parse(atob(token.split('.')[1]));
+          const tokenParts = token.split('.');
+          if (tokenParts.length !== 3) {
+            throw new Error('Invalid JWT token format');
+          }
+          const payload = JSON.parse(atob(tokenParts[1]!));
           setUserRole(payload.role);
         } catch (e) {
           console.error('토큰 파싱 실패:', e);

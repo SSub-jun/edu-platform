@@ -56,13 +56,17 @@ export default function StepPhone({ onComplete, initialData }: StepPhoneProps) {
         });
       }, 1000);
 
-    } catch (error: any) {
+    } catch (error) {
       console.error('OTP 전송 실패:', error);
       
-      if (error.response?.status === 429) {
+      const isAxiosError = (err: unknown): err is { response?: { status?: number; data?: { message?: string; remainingSeconds?: number } } } => {
+        return typeof err === 'object' && err !== null && 'response' in err;
+      };
+      
+      if (isAxiosError(error) && error.response?.status === 429) {
         const data = error.response.data;
-        setError(data.message || '잠시 후 다시 시도해주세요');
-        if (data.remainingSeconds) {
+        setError(data?.message || '잠시 후 다시 시도해주세요');
+        if (data?.remainingSeconds) {
           setResendCountdown(data.remainingSeconds);
         }
       } else {
