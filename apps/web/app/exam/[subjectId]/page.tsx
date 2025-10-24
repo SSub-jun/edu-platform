@@ -73,7 +73,11 @@ export default function ExamPage() {
     const token = localStorage.getItem('accessToken');
     if (token) {
       try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
+        const tokenParts = token.split('.');
+        if (tokenParts.length !== 3) {
+          throw new Error('Invalid JWT token format');
+        }
+        const payload = JSON.parse(atob(tokenParts[1]!)); // JWT는 항상 3개 부분으로 구성
         const userRole = payload.role;
         
         if (userRole === 'instructor') {
