@@ -142,7 +142,8 @@ export default function LessonVideosManagePage() {
         xhr.addEventListener('abort', () => reject(new Error('Upload aborted')));
 
         const token = localStorage.getItem('accessToken');
-        xhr.open('POST', 'http://localhost:4000/media/videos/upload');
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+        xhr.open('POST', `${apiUrl}/media/videos/upload`);
         xhr.setRequestHeader('Authorization', `Bearer ${token}`);
         xhr.send(formData);
       });
@@ -546,7 +547,7 @@ export default function LessonVideosManagePage() {
                   {video.videoUrl && (
                     <div>
                       <a 
-                        href={`http://localhost:4000${video.videoUrl}`}
+                        href={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}${video.videoUrl}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{ color: '#0070f3', textDecoration: 'underline' }}
