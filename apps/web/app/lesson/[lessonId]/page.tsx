@@ -134,7 +134,7 @@ export default function LessonPage() {
   const displayProgressPercent = optimisticProgress?.progressPercent ?? progressPercent;
 
   // 비디오 URL 추출 (1개 레슨 = 1개 영상)
-  const videoUrl = videoParts && videoParts.length > 0 ? videoParts[0].videoUrl : undefined;
+  const videoUrl = videoParts?.[0]?.videoUrl;
   
   // videoDuration은 VideoPlayer가 비디오를 로드한 후 onProgress 콜백으로 제공됩니다
 
