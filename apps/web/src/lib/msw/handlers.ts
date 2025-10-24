@@ -54,22 +54,22 @@ const mockExamQuestions: StartExamResponse['data'] = {
   questions: [
     {
       id: 'question-1',
-      stem: '다음 중 변수를 선언하는 올바른 방법은?',
+      content: '다음 중 변수를 선언하는 올바른 방법은?',
       choices: [
-        { id: 'choice-1', text: 'var name = "홍길동"', order: 1 },
-        { id: 'choice-2', text: 'variable name = "홍길동"', order: 2 },
-        { id: 'choice-3', text: 'name = "홍길동"', order: 3 },
-        { id: 'choice-4', text: 'string name = "홍길동"', order: 4 },
+        'var name = "홍길동"',
+        'variable name = "홍길동"',
+        'name = "홍길동"',
+        'string name = "홍길동"',
       ],
     },
     {
       id: 'question-2',
-      stem: 'JavaScript에서 문자열을 나타내는 방법이 아닌 것은?',
+      content: 'JavaScript에서 문자열을 나타내는 방법이 아닌 것은?',
       choices: [
-        { id: 'choice-5', text: '"Hello World"', order: 1 },
-        { id: 'choice-6', text: "'Hello World'", order: 2 },
-        { id: 'choice-7', text: '`Hello World`', order: 3 },
-        { id: 'choice-8', text: '[Hello World]', order: 4 },
+        '"Hello World"',
+        "'Hello World'",
+        '`Hello World`',
+        '[Hello World]',
       ],
     },
   ],
