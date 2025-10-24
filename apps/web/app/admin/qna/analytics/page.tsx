@@ -4,6 +4,25 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { authClient } from '../../../../lib/auth';
 
+interface QnaUser {
+  username: string;
+  role: string;
+}
+
+interface QnaReply {
+  user: QnaUser;
+  createdAt: string;
+}
+
+interface QnaPost {
+  id: string;
+  title: string;
+  user: QnaUser;
+  replies?: QnaReply[];
+  repliesCount?: number;
+  createdAt: string;
+}
+
 interface QnaStats {
   totalPosts: number;
   totalReplies: number;
@@ -11,18 +30,12 @@ interface QnaStats {
   recentPosts: Array<{
     id: string;
     title: string;
-    user: {
-      username: string;
-      role: string;
-    };
+    user: QnaUser;
     repliesCount: number;
     createdAt: string;
   }>;
   topContributors: Array<{
-    user: {
-      username: string;
-      role: string;
-    };
+    user: QnaUser;
     postsCount: number;
     repliesCount: number;
   }>;
@@ -43,7 +56,7 @@ export default function AdminQnaAnalyticsPage() {
     try {
       // Q&A 게시글 목록을 가져와서 통계 계산
       const response = await authClient.getApi().get('/qna/posts');
-      const posts = Array.isArray(response.data) ? response.data : [];
+      const posts: QnaPost[] = Array.isArray(response.data) ? response.data : [];
 
       // 통계 계산
       const totalPosts = posts.length;
@@ -62,7 +75,12 @@ export default function AdminQnaAnalyticsPage() {
         }));
 
       // 기여도 분석 (게시글 + 답변)
-      const contributorMap = new Map();
+      interface Contributor {
+        user: QnaUser;
+        postsCount: number;
+        repliesCount: number;
+      }
+      const contributorMap = new Map<string, Contributor>();
       
       // 게시글 작성자
       posts.forEach(post => {
@@ -74,13 +92,16 @@ export default function AdminQnaAnalyticsPage() {
             repliesCount: 0
           });
         }
-        contributorMap.get(key).postsCount++;
+        const contributor = contributorMap.get(key);
+        if (contributor) {
+          contributor.postsCount++;
+        }
       });
 
       // 답변 작성자
       posts.forEach(post => {
         if (post.replies) {
-          post.replies.forEach(reply => {
+          post.replies.forEach((reply: QnaReply) => {
             const key = reply.user.username;
             if (!contributorMap.has(key)) {
               contributorMap.set(key, {
@@ -89,7 +110,10 @@ export default function AdminQnaAnalyticsPage() {
                 repliesCount: 0
               });
             }
-            contributorMap.get(key).repliesCount++;
+            const contributor = contributorMap.get(key);
+            if (contributor) {
+              contributor.repliesCount++;
+            }
           });
         }
       });
