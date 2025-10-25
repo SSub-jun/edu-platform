@@ -138,6 +138,13 @@ class AuthClient {
       async (error: AxiosError) => {
         const originalRequest = error.config as any;
 
+        console.log('[AUTH_CLIENT] Response error intercepted:', {
+          status: error.response?.status,
+          url: originalRequest?.url,
+          hasRetry: originalRequest?._retry,
+          isRefreshing: this.isRefreshing
+        });
+
         if (error.response?.status === 401 && !originalRequest._retry) {
           if (this.isRefreshing) {
             // 이미 갱신 중이면 큐에 추가

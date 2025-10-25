@@ -36,8 +36,17 @@ export default function CurriculumPage() {
   const loadCurriculum = async () => {
     try {
       // 과목 및 레슨 목록 조회
-      const response = await authClient.getApi().get('/me/curriculum');
-      const curriculumData = response.data.data || [];
+      // 임시: authClient 인터셉터 이슈 우회
+      const token = localStorage.getItem('accessToken');
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const rawResponse = await fetch(`${apiUrl}/me/curriculum`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        cache: 'no-store'
+      });
+      const response = await rawResponse.json();
+      const curriculumData = response.data || [];
 
       // 각 Subject에 대한 시험 응시 가능 여부 조회
       const eligibilityData: Record<string, any> = {};
