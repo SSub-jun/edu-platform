@@ -133,6 +133,23 @@ export class MediaController {
     };
   }
 
+  @Get('videos/debug')
+  @ApiOperation({ summary: '비디오 디렉토리 디버그 정보' })
+  async debugVideoDirectory() {
+    const { readdirSync } = require('fs');
+    const uploadsPath = join(process.cwd(), 'uploads');
+    const videosPath = join(process.cwd(), 'uploads', 'videos');
+    
+    return {
+      cwd: process.cwd(),
+      uploadsExists: existsSync(uploadsPath),
+      videosExists: existsSync(videosPath),
+      uploadsPath,
+      videosPath,
+      files: existsSync(videosPath) ? readdirSync(videosPath) : []
+    };
+  }
+
   @Get('videos/:filename')
   @ApiOperation({ summary: '영상 파일 스트리밍' })
   async streamVideo(
@@ -140,6 +157,13 @@ export class MediaController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<StreamableFile> {
     const filePath = join(process.cwd(), 'uploads', 'videos', filename);
+
+    console.log('[MEDIA] Streaming video:', {
+      filename,
+      filePath,
+      exists: existsSync(filePath),
+      cwd: process.cwd()
+    });
 
     if (!existsSync(filePath)) {
       throw new BadRequestException('파일을 찾을 수 없습니다.');
