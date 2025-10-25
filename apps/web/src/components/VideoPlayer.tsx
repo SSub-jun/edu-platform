@@ -36,6 +36,24 @@ export default function VideoPlayer({
   const videoDurationRef = useRef(videoDuration);
   const onProgressRef = useRef(onProgress); // ✅ onProgress를 ref로 관리
 
+  // ✅ maxReachedSeconds props 변경 시 ref 업데이트 + 플레이어 시작 위치 설정
+  useEffect(() => {
+    maxReachedRef.current = maxReachedSeconds;
+    console.log('🎯 [VideoPlayer] maxReachedSeconds updated:', maxReachedSeconds);
+    
+    // 플레이어가 이미 로드되어 있고, 현재 시점이 0초(처음)이면 maxReached로 이동
+    if (playerRef.current && maxReachedSeconds > 0) {
+      const currentTime = playerRef.current.currentTime();
+      const duration = playerRef.current.duration();
+      
+      // 현재 시점이 0초이고, maxReached가 유효한 범위 내이면 이동
+      if (currentTime === 0 && duration > 0 && maxReachedSeconds < duration) {
+        console.log('🎯 [VideoPlayer] Seeking to maxReached:', maxReachedSeconds);
+        playerRef.current.currentTime(maxReachedSeconds);
+      }
+    }
+  }, [maxReachedSeconds]);
+
   // ✅ onProgress를 항상 최신 값으로 유지
   useEffect(() => {
     onProgressRef.current = onProgress;

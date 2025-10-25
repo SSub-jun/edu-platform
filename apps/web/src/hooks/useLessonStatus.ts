@@ -23,7 +23,8 @@ export function useLessonStatus(lessonId: string) {
       return response.data;
     },
     enabled: !!lessonId,
-    staleTime: 30 * 1000, // 30초 (진도 변경이 자주 있을 수 있음)
+    staleTime: 0, // 항상 최신 데이터 fetch (페이지 재진입 시 진도율 최신화)
+    refetchOnMount: 'always', // 컴포넌트 마운트 시 항상 refetch
   });
 }
 
