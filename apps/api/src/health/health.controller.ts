@@ -7,6 +7,30 @@ import { PrismaService } from '../prisma/prisma.service';
 export class HealthController {
   constructor(private readonly prismaService: PrismaService) {}
 
+  @Get('ip')
+  @ApiOperation({ summary: '서버 외부 IP 확인 (SOLAPI IP 등록용)' })
+  async getServerIP() {
+    try {
+      const https = require('https');
+      return new Promise((resolve, reject) => {
+        https.get('https://api.ipify.org?format=json', (res: any) => {
+          let data = '';
+          res.on('data', (chunk: any) => data += chunk);
+          res.on('end', () => {
+            try {
+              const parsed = JSON.parse(data);
+              resolve({ ip: parsed.ip, note: 'Railway uses dynamic IPs - consider allowing all IPs (0.0.0.0/0) for SOLAPI' });
+            } catch (e) {
+              reject(e);
+            }
+          });
+        }).on('error', reject);
+      });
+    } catch (error) {
+      return { error: 'Failed to get IP', message: error.message };
+    }
+  }
+
   @Get()
   @ApiOperation({ 
     summary: '헬스 체크',
