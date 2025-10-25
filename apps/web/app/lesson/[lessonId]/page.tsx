@@ -134,7 +134,20 @@ export default function LessonPage() {
   const displayProgressPercent = optimisticProgress?.progressPercent ?? progressPercent;
 
   // 비디오 URL 추출 (1개 레슨 = 1개 영상)
-  const videoUrl: string | undefined = videoParts?.[0]?.videoUrl || undefined; // null을 undefined로 변환
+  const rawVideoUrl = videoParts?.[0]?.videoUrl;
+  
+  // videoUrl을 API 서버의 전체 URL로 변환
+  // DB: /uploads/videos/xxx.mp4 → API: /media/videos/xxx.mp4
+  const videoUrl: string | undefined = rawVideoUrl 
+    ? rawVideoUrl.startsWith('http') 
+      ? rawVideoUrl  // 이미 전체 URL
+      : (() => {
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+          // /uploads/videos/xxx.mp4 → /media/videos/xxx.mp4
+          const apiPath = rawVideoUrl.replace('/uploads/videos/', '/media/videos/');
+          return `${apiUrl}${apiPath}`;
+        })()
+    : undefined;
   
   // videoDuration은 VideoPlayer가 비디오를 로드한 후 onProgress 콜백으로 제공됩니다
 
