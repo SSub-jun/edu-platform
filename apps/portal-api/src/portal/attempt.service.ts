@@ -211,7 +211,7 @@ export class AttemptService {
     // 점수 계산 (빈 답안도 포함하여 전체 문제 수로 계산)
     const totalQuestions = attempt.session.questionCount;
     const score = Math.round((correctCount / totalQuestions) * 100);
-    const passingScore = parseInt(process.env.PORTAL_PASSING_SCORE || '60');
+    const passingScore = parseInt(process.env.PORTAL_PASSING_SCORE || '70');
     const passed = score >= passingScore;
 
     // 트랜잭션으로 답안 저장 및 시도 업데이트

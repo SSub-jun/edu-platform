@@ -18,7 +18,7 @@ export const envValidationSchema = Joi.object({
   // Portal Configuration
   PORTAL_BASE_URL: Joi.string().uri().required(),
   PORTAL_SESSION_CODE_LEN: Joi.number().min(6).max(10).default(8),
-  PORTAL_PASSING_SCORE: Joi.number().min(0).max(100).default(60),
+  PORTAL_PASSING_SCORE: Joi.number().min(0).max(100).default(70),
   PORTAL_DEFAULT_QUESTION_COUNT: Joi.number().min(1).max(100).default(20),
   PORTAL_MIN_CHOICES_PER_QUESTION: Joi.number().min(2).max(10).default(3),
   PORTAL_MAX_CHOICES_PER_QUESTION: Joi.number().min(3).max(20).default(10),
