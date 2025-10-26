@@ -28,13 +28,6 @@ export class CreateSessionDto {
   @Max(100)
   questionCount?: number;
 
-  @ApiProperty({ description: '제한시간(분)', required: false, default: 30 })
-  @IsOptional()
-  @IsInt()
-  @Min(5)
-  @Max(180)
-  timeLimitMinutes?: number;
-
   @ApiProperty({ description: '문제은행 ID (RANDOM 모드에서 필수)', required: false })
   @IsOptional()
   @IsString()

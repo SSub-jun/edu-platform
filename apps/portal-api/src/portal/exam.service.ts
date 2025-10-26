@@ -9,11 +9,10 @@ export class ExamService {
 
   // 세션 생성
   async createSession(dto: CreateSessionDto) {
-    const { title, sessionNo, mode, questionCount, timeLimitMinutes, bankId } = dto;
+    const { title, sessionNo, mode, questionCount, bankId } = dto;
     
     // 기본값 설정
     const finalQuestionCount = questionCount || parseInt(process.env.PORTAL_DEFAULT_QUESTION_COUNT || '20');
-    const finalTimeLimitMinutes = timeLimitMinutes || parseInt(process.env.PORTAL_DEFAULT_TIME_LIMIT || '30');
     
     // RANDOM 모드 검증
     if (mode === 'RANDOM') {
@@ -73,7 +72,6 @@ export class ExamService {
           code: code!,
           mode,
           questionCount: finalQuestionCount,
-          timeLimitMinutes: finalTimeLimitMinutes,
           bankId: mode === 'RANDOM' ? bankId : null,
         },
       });
