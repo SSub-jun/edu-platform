@@ -20,9 +20,8 @@ COPY tsconfig.json tsconfig.build.json nest-cli.json ./
 # Copy Prisma schema
 COPY prisma/schema.prisma ./prisma/schema.prisma
 
-# Generate Prisma client and build
-RUN DATABASE_URL=postgresql://placeholder:placeholder@localhost:5432/placeholder?sslmode=require pnpm exec prisma generate --schema prisma/schema.prisma
-RUN pnpm run build
+# Generate Prisma client and build (use build:docker script)
+RUN pnpm run build:docker
 
 # Production stage  
 FROM node:18-alpine AS production
