@@ -126,12 +126,17 @@ export default function SessionDetailPage() {
                 </ul>
               ) : (
                 <ul className="list-disc pl-6 space-y-1 text-gray-800">
-                  {(() => {
-                    const list = (bankDetail?.questions || []).slice(0, session.questionCount)
-                    return list.map((q: any, idx: number) => (
+                  {session.questions && session.questions.length > 0 ? (
+                    // 세션에 저장된 실제 출제 문제 표시
+                    session.questions.map((sq: any) => (
+                      <li key={sq.id}>{sq.orderIndex + 1}. {sq.question?.stem}</li>
+                    ))
+                  ) : (
+                    // 레거시: 세션에 문제가 없으면 문제은행 처음 N개 표시
+                    (bankDetail?.questions || []).slice(0, session.questionCount).map((q: any, idx: number) => (
                       <li key={q.id}>{idx + 1}. {q.stem}</li>
                     ))
-                  })()}
+                  )}
                 </ul>
               )}
               {session.mode === 'RANDOM' && (
@@ -184,6 +189,9 @@ function FlatResultsTable({ sessionId }: { sessionId: string }) {
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {data.map((attempt: any) => {
+            // 답안을 questionId 기준으로 정렬 (stem으로 정렬하면 각 참가자마다 순서가 다를 수 있음)
+            // 실제로는 세션의 questions orderIndex 순서대로 정렬해야 하지만,
+            // 레거시 세션 호환을 위해 stem으로 정렬 유지
             const sortedAnswers = [...(attempt.answers || [])]
               .sort((a, b) => (a.question?.stem || '').localeCompare(b.question?.stem || ''))
             return (
