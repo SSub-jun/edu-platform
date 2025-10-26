@@ -36,9 +36,7 @@ gcloud run deploy "${CLOUD_RUN_SERVICE}" \
   --min-instances 0 \
   --max-instances 2 \
   --concurrency 100 \
-  --set-secrets DATABASE_URL=projects/${GCP_PROJECT_ID}/secrets/portal-db-url:latest \
-                ADMIN_PASS=projects/${GCP_PROJECT_ID}/secrets/portal-admin-pass:latest \
-                JWT_SECRET=projects/${GCP_PROJECT_ID}/secrets/portal-jwt:latest
+  --set-secrets "DATABASE_URL=portal-db-url:latest,PORTAL_DATABASE_URL=portal-db-url:latest,PORTAL_ADMIN_PASS=portal-admin-pass:latest,PORTAL_JWT_SECRET=portal-jwt:latest"
 
 # URL 출력
 gcloud run services describe "${CLOUD_RUN_SERVICE}" \
