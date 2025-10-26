@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma.service';
 import { JoinSessionDto, SubmitAnswersDto } from '../common/dto';
-import { shuffleArray } from '../common/util/random';
 
 @Injectable()
 export class AttemptService {
@@ -121,13 +120,14 @@ export class AttemptService {
 
     // 세션에 저장된 문제들 사용 (RANDOM/MANUAL 모두 동일)
     // RANDOM 모드는 세션 생성 시 이미 문제가 선택되어 PortalSessionQuestion에 저장됨
+    // 선택지 순서도 고정 (모든 학생이 동일한 순서로 봄)
     const questions = session.questions.map(sq => ({
       id: sq.question.id,
       stem: sq.question.stem,
-      choices: shuffleArray(sq.question.choices.map(c => ({
+      choices: sq.question.choices.map(c => ({
         id: c.id,
         label: c.label
-      })))
+      }))
     }));
 
     // 시도 생성
