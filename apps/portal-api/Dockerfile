@@ -17,9 +17,8 @@ RUN pnpm install --frozen-lockfile
 COPY src/ ./src/
 COPY tsconfig.json tsconfig.build.json nest-cli.json ./
 
-# Copy and inline the Prisma schema (from root context)
-RUN mkdir -p prisma
-COPY packages/db/prisma/schema.prisma ./prisma/schema.prisma
+# Copy Prisma schema
+COPY prisma/schema.prisma ./prisma/schema.prisma
 
 # Generate Prisma client and build
 RUN DATABASE_URL=postgresql://placeholder:placeholder@localhost:5432/placeholder?sslmode=require pnpm exec prisma generate --schema prisma/schema.prisma
