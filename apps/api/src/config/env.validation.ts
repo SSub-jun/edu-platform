@@ -25,7 +25,6 @@ export const envValidationSchema = Joi.object({
   // SOLAPI 설정 (SMS_PROVIDER가 'solapi'일 때 필요)
   SOLAPI_API_KEY: Joi.string().optional(),
   SOLAPI_API_SECRET: Joi.string().optional(),
-  SOLAPI_FROM_NUMBER: Joi.string().optional(),
   
   // 인증 모드 설정
   AUTH_MODE: Joi.string().valid('mock', 'db').default('mock'),

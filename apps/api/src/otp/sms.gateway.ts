@@ -49,10 +49,10 @@ export class SmsGateway {
       
       const apiKey = this.config.get<string>('SOLAPI_API_KEY');
       const apiSecret = this.config.get<string>('SOLAPI_API_SECRET');
-      const fromNumber = this.config.get<string>('SOLAPI_FROM_NUMBER');
+      const fromNumber = this.config.get<string>('SMS_SENDER_ID');
 
       if (!apiKey || !apiSecret || !fromNumber) {
-        throw new Error('SOLAPI credentials are not configured. Please set SOLAPI_API_KEY, SOLAPI_API_SECRET, and SOLAPI_FROM_NUMBER environment variables.');
+        throw new Error('SOLAPI credentials are not configured. Please set SOLAPI_API_KEY, SOLAPI_API_SECRET, and SMS_SENDER_ID environment variables.');
       }
 
       const messageService = new SolapiMessageService(apiKey, apiSecret);

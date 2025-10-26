@@ -24,10 +24,10 @@ export async function sendSMS({ to, message }: SendSMSParams): Promise<SendSMSRe
   try {
     const apiKey = process.env.SOLAPI_API_KEY;
     const apiSecret = process.env.SOLAPI_API_SECRET;
-    const fromNumber = process.env.SOLAPI_FROM_NUMBER;
+    const fromNumber = process.env.SMS_SENDER_ID;
 
     if (!apiKey || !apiSecret || !fromNumber) {
-      throw new Error('SOLAPI credentials are not configured. Please set SOLAPI_API_KEY, SOLAPI_API_SECRET, and SOLAPI_FROM_NUMBER environment variables.');
+      throw new Error('SOLAPI credentials are not configured. Please set SOLAPI_API_KEY, SOLAPI_API_SECRET, and SMS_SENDER_ID environment variables.');
     }
 
     const messageService = new SolapiMessageService(apiKey, apiSecret);
