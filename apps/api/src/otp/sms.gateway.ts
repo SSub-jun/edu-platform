@@ -103,13 +103,16 @@ export class SmsGateway {
     // 숫자만 추출
     const digits = phone.replace(/\D/g, '');
     
-    // 한국 번호 형식 검증 및 변환
+    // 한국 번호 형식 검증 및 변환 (SOLAPI는 하이픈 형식 요구)
     if (digits.startsWith('010') && digits.length === 11) {
-      // 010으로 시작하는 11자리 -> 82로 시작하는 12자리
-      return `82${digits.substring(1)}`;
+      // 010-XXXX-XXXX 형식으로 변환
+      return `${digits.substring(0, 3)}-${digits.substring(3, 7)}-${digits.substring(7)}`;
     } else if (digits.startsWith('82') && digits.length === 12) {
-      // 이미 82로 시작하는 12자리
-      return digits;
+      // 82로 시작하는 경우 010으로 변환 후 하이픈 추가
+      return `010-${digits.substring(3, 7)}-${digits.substring(7)}`;
+    } else if (digits.length === 11) {
+      // 기타 11자리 번호 (010 외)
+      return `${digits.substring(0, 3)}-${digits.substring(3, 7)}-${digits.substring(7)}`;
     }
     
     // 기본적으로 입력된 형식 그대로 반환
