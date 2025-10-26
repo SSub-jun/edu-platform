@@ -96,7 +96,8 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
         inviteCode: formData.inviteCode || undefined,
       };
 
-      const response = await axios.post('http://localhost:4000/auth/register', registerData);
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const response = await axios.post(`${apiUrl}/auth/register`, registerData);
       
       const { accessToken, refreshToken, user } = response.data;
       

@@ -37,7 +37,8 @@ export default function StepPhone({ onComplete, initialData }: StepPhoneProps) {
     setError('');
 
     try {
-      await axios.post('http://localhost:4000/auth/phone/send-otp', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      await axios.post(`${apiUrl}/auth/phone/send-otp`, {
         phone,
         purpose: 'signup'
       });
@@ -110,7 +111,8 @@ export default function StepPhone({ onComplete, initialData }: StepPhoneProps) {
     setError('');
 
     try {
-      const response = await axios.post('http://localhost:4000/auth/phone/verify', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const response = await axios.post(`${apiUrl}/auth/phone/verify`, {
         phone,
         code: otpCode
       });
@@ -153,7 +155,8 @@ export default function StepPhone({ onComplete, initialData }: StepPhoneProps) {
     setOtp(['', '', '', '', '', '']);
 
     try {
-      await axios.post('http://localhost:4000/auth/phone/send-otp', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      await axios.post(`${apiUrl}/auth/phone/send-otp`, {
         phone,
         purpose: 'signup'
       });
