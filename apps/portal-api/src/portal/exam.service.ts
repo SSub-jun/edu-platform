@@ -64,16 +64,47 @@ export class ExamService {
       throw new BadRequestException('Failed to generate unique session code');
     }
 
-    return this.prisma.portalExamSession.create({
-      data: {
-        title,
-        sessionNo,
-        code: code!,
-        mode,
-        questionCount: finalQuestionCount,
-        timeLimitMinutes: finalTimeLimitMinutes,
-        bankId: mode === 'RANDOM' ? bankId : null,
-      },
+    // 세션 생성 및 RANDOM 모드일 경우 문제 자동 선택
+    return this.prisma.$transaction(async (tx) => {
+      const session = await tx.portalExamSession.create({
+        data: {
+          title,
+          sessionNo,
+          code: code!,
+          mode,
+          questionCount: finalQuestionCount,
+          timeLimitMinutes: finalTimeLimitMinutes,
+          bankId: mode === 'RANDOM' ? bankId : null,
+        },
+      });
+
+      // RANDOM 모드: 문제은행에서 랜덤하게 문제 선택
+      if (mode === 'RANDOM' && bankId) {
+        const bank = await tx.portalExamBank.findUnique({
+          where: { id: bankId },
+          include: { questions: true }
+        });
+
+        if (!bank) {
+          throw new NotFoundException('Bank not found');
+        }
+
+        // 랜덤 샘플링
+        const selectedQuestions = randomSample(bank.questions, finalQuestionCount);
+        
+        // PortalSessionQuestion에 저장
+        const sessionQuestions = selectedQuestions.map((question, index) => ({
+          sessionId: session.id,
+          questionId: question.id,
+          orderIndex: index,
+        }));
+
+        await tx.portalSessionQuestion.createMany({
+          data: sessionQuestions
+        });
+      }
+
+      return session;
     });
   }
 
