@@ -119,32 +119,16 @@ export class AttemptService {
       throw new NotFoundException('Session not found');
     }
 
-    let questions: any[] = [];
-
-    if (session.mode === 'RANDOM') {
-      // 랜덤 모드: 문제은행에서 랜덤 선택
-      const allQuestions = session.bank?.questions || [];
-      const selectedQuestions = allQuestions.slice(0, session.questionCount);
-      
-      questions = selectedQuestions.map(q => ({
-        id: q.id,
-        stem: q.stem,
-        choices: shuffleArray(q.choices.map(c => ({
-          id: c.id,
-          label: c.label
-        })))
-      }));
-    } else {
-      // 수동 모드: 선택된 문제들 사용
-      questions = session.questions.map(sq => ({
-        id: sq.question.id,
-        stem: sq.question.stem,
-        choices: shuffleArray(sq.question.choices.map(c => ({
-          id: c.id,
-          label: c.label
-        })))
-      }));
-    }
+    // 세션에 저장된 문제들 사용 (RANDOM/MANUAL 모두 동일)
+    // RANDOM 모드는 세션 생성 시 이미 문제가 선택되어 PortalSessionQuestion에 저장됨
+    const questions = session.questions.map(sq => ({
+      id: sq.question.id,
+      stem: sq.question.stem,
+      choices: shuffleArray(sq.question.choices.map(c => ({
+        id: c.id,
+        label: c.label
+      })))
+    }));
 
     // 시도 생성
     const attempt = await this.prisma.portalAttempt.create({
