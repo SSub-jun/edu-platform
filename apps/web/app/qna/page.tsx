@@ -143,27 +143,11 @@ export default function QnaPage() {
   if (!isAuthenticated) return null;
 
   return (
-    <div style={{ 
-      minHeight: '100vh', 
-      padding: '20px',
-      backgroundColor: '#f8f9fa'
-    }}>
-      <div style={{ 
-        maxWidth: '800px', 
-        margin: '0 auto'
-      }}>
+    <div className="min-h-screen p-6 bg-bg-primary">
+      <div className="max-w-4xl mx-auto">
         {/* 헤더 */}
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center',
-          marginBottom: '30px',
-          padding: '20px',
-          backgroundColor: 'white',
-          borderRadius: '8px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+        <div className="flex justify-between items-center mb-8 p-5 bg-surface border border-border rounded-xl">
+          <div className="flex items-center gap-4">
             <button
               onClick={() => {
                 // role에 따라 다른 페이지로 이동
@@ -175,21 +159,13 @@ export default function QnaPage() {
                   router.push('/curriculum');
                 }
               }}
-              style={{
-                padding: '8px 12px',
-                backgroundColor: '#6c757d',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '12px'
-              }}
+              className="px-3 py-2 bg-bg-primary text-text-secondary border border-border rounded-md text-xs font-medium cursor-pointer transition-all hover:bg-surface hover:text-text-primary hover:border-border-light"
             >
               {userRole === 'instructor' ? '← 강사 대시보드' : 
                userRole === 'admin' ? '← 관리자 대시보드' : 
                '← 커리큘럼'}
             </button>
-            <h1 style={{ fontSize: '24px', fontWeight: 'bold', margin: 0, color: '#000' }}>
+            <h1 className="text-2xl font-bold text-text-primary m-0">
               Q&A
             </h1>
           </div>
@@ -197,14 +173,7 @@ export default function QnaPage() {
             {userRole === 'student' && (
               <button
                 onClick={() => setShowQuestionForm(!showQuestionForm)}
-                style={{
-                  padding: '10px 20px',
-                  backgroundColor: '#007bff',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                }}
+                className="px-5 py-2.5 bg-info text-white border-0 rounded-md cursor-pointer font-medium transition-colors hover:bg-info/90"
               >
                 {showQuestionForm ? '취소' : '질문하기'}
               </button>
@@ -214,42 +183,17 @@ export default function QnaPage() {
 
         {/* 질문 작성 폼 (학생만) */}
         {showQuestionForm && userRole === 'student' && (
-          <div style={{
-            backgroundColor: 'white',
-            padding: '24px',
-            borderRadius: '12px',
-            marginBottom: '24px',
-            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-            border: '1px solid #e5e7eb'
-          }}>
-            <h3 style={{ 
-              margin: '0 0 20px 0', 
-              color: '#1f2937', 
-              fontSize: '18px',
-              fontWeight: '600'
-            }}>
+          <div className="bg-surface p-6 rounded-xl mb-6 border border-border">
+            <h3 className="m-0 mb-5 text-text-primary text-lg font-semibold">
               새 질문 작성
             </h3>
-            <form onSubmit={handleQuestionSubmit}>
+            <form onSubmit={handleQuestionSubmit} className="flex flex-col gap-4">
               <input
                 type="text"
                 placeholder="질문 제목을 입력하세요"
                 value={questionTitle}
                 onChange={(e) => setQuestionTitle(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  marginBottom: '16px',
-                  border: '2px solid #d1d5db',
-                  borderRadius: '8px',
-                  fontSize: '16px',
-                  backgroundColor: '#f9fafb',
-                  color: '#374151',
-                  outline: 'none',
-                  transition: 'border-color 0.2s ease'
-                }}
-                onFocus={(e) => (e.currentTarget as HTMLInputElement).style.borderColor = '#3b82f6'}
-                onBlur={(e) => (e.currentTarget as HTMLInputElement).style.borderColor = '#d1d5db'}
+                className="w-full px-4 py-3 bg-bg-primary border-2 border-border rounded-lg text-base text-text-primary placeholder:text-text-tertiary outline-none transition-all focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20"
                 required
               />
               <textarea
@@ -257,40 +201,12 @@ export default function QnaPage() {
                 value={questionBody}
                 onChange={(e) => setQuestionBody(e.target.value)}
                 rows={5}
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  marginBottom: '20px',
-                  border: '2px solid #d1d5db',
-                  borderRadius: '8px',
-                  fontSize: '16px',
-                  backgroundColor: '#f9fafb',
-                  color: '#374151',
-                  resize: 'vertical',
-                  outline: 'none',
-                  transition: 'border-color 0.2s ease',
-                  fontFamily: 'inherit',
-                  lineHeight: '1.5'
-                }}
-                onFocus={(e) => (e.currentTarget as HTMLTextAreaElement).style.borderColor = '#3b82f6'}
-                onBlur={(e) => (e.currentTarget as HTMLTextAreaElement).style.borderColor = '#d1d5db'}
+                className="w-full px-4 py-3 bg-bg-primary border-2 border-border rounded-lg text-base text-text-primary placeholder:text-text-tertiary resize-y outline-none transition-all leading-normal focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20"
                 required
               />
               <button
                 type="submit"
-                style={{
-                  padding: '12px 24px',
-                  backgroundColor: '#10b981',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontSize: '16px',
-                  fontWeight: '600',
-                  transition: 'background-color 0.2s ease'
-                }}
-                onMouseEnter={(e) => (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#059669'}
-                onMouseLeave={(e) => (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#10b981'}
+                className="px-6 py-3 bg-success text-white border-0 rounded-lg cursor-pointer text-base font-semibold transition-colors hover:bg-success/90 self-start"
               >
                 질문 등록
               </button>
@@ -299,59 +215,48 @@ export default function QnaPage() {
         )}
 
         {/* Q&A 목록 */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div className="flex flex-col gap-5">
           {loading ? (
-            <div style={{ textAlign: 'center', padding: '40px' }}>
-              로딩 중...
+            <div className="text-center py-10 bg-surface border border-border rounded-xl">
+              <div className="flex items-center justify-center gap-2 text-text-secondary">
+                <div className="w-5 h-5 border-2 border-text-tertiary/30 border-t-text-tertiary rounded-full animate-spin"></div>
+                로딩 중...
+              </div>
             </div>
           ) : posts.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '40px', backgroundColor: 'white', borderRadius: '8px' }}>
+            <div className="text-center py-10 bg-surface border border-border rounded-xl text-text-secondary">
               아직 질문이 없습니다.
             </div>
           ) : (
             posts.map((post) => (
               <div
                 key={post.id}
-                style={{
-                  backgroundColor: 'white',
-                  padding: '20px',
-                  borderRadius: '8px',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                }}
+                className="bg-surface p-5 rounded-xl border border-border"
               >
                 {/* 질문 */}
-                <div style={{ marginBottom: '15px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-                    <h3 style={{ 
-                      margin: 0, 
-                      fontSize: '18px', 
-                      color: '#000', 
-                      fontWeight: 'bold' 
-                    }}>
+                <div className="mb-4">
+                  <div className="flex justify-between items-start mb-2.5 gap-4">
+                    <h3 className="m-0 text-lg text-text-primary font-bold flex-1">
                       {post.title}
                     </h3>
-                    <div style={{ fontSize: '12px', color: '#666' }}>
+                    <div className="text-xs text-text-tertiary whitespace-nowrap">
                       {post.user.username} ({post.user.role === 'student' ? '학생' : '강사'}) | {new Date(post.createdAt).toLocaleString()}
                     </div>
                   </div>
-                  <p style={{ margin: 0, lineHeight: '1.6', color: '#333' }}>
+                  <p className="m-0 leading-relaxed text-text-secondary">
                     {post.body}
                   </p>
                 </div>
 
                 {/* 답변 목록 */}
                 {post.replies.length > 0 && (
-                  <div style={{
-                    marginLeft: '20px',
-                    borderLeft: '3px solid #e9ecef',
-                    paddingLeft: '15px'
-                  }}>
+                  <div className="ml-5 border-l-2 border-border pl-4">
                     {post.replies.map((reply) => (
-                      <div key={reply.id} style={{ marginBottom: '10px' }}>
-                        <div style={{ fontSize: '12px', color: '#666', marginBottom: '5px' }}>
+                      <div key={reply.id} className="mb-2.5">
+                        <div className="text-xs text-text-tertiary mb-1">
                           {reply.user.username} ({reply.user.role === 'instructor' ? '강사' : '학생'}) | {new Date(reply.createdAt).toLocaleString()}
                         </div>
-                        <p style={{ margin: 0, color: '#555' }}>
+                        <p className="m-0 text-text-secondary">
                           {reply.body}
                         </p>
                       </div>
@@ -361,46 +266,27 @@ export default function QnaPage() {
 
                 {/* 답변 작성 (강사만) */}
                 {userRole === 'instructor' && (
-                  <div style={{ marginTop: '15px' }}>
+                  <div className="mt-4">
                     {replyingTo === post.id ? (
-                      <form onSubmit={handleReplySubmit} style={{ display: 'flex', gap: '10px' }}>
+                      <form onSubmit={handleReplySubmit} className="flex gap-2.5">
                         <input
                           type="text"
                           placeholder="답변을 입력하세요"
                           value={replyBody}
                           onChange={(e) => setReplyBody(e.target.value)}
-                          style={{
-                            flex: 1,
-                            padding: '8px',
-                            border: '1px solid #ddd',
-                            borderRadius: '4px'
-                          }}
+                          className="flex-1 px-3 py-2 bg-bg-primary border border-border rounded-md text-text-primary placeholder:text-text-tertiary outline-none transition-all focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20"
                           required
                         />
                         <button
                           type="submit"
-                          style={{
-                            padding: '8px 16px',
-                            backgroundColor: '#28a745',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                          }}
+                          className="px-4 py-2 bg-success text-white border-0 rounded-md cursor-pointer font-medium transition-colors hover:bg-success/90"
                         >
                           답변
                         </button>
                         <button
                           type="button"
                           onClick={() => setReplyingTo(null)}
-                          style={{
-                            padding: '8px 16px',
-                            backgroundColor: '#6c757d',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                          }}
+                          className="px-4 py-2 bg-bg-primary text-text-secondary border border-border rounded-md cursor-pointer font-medium transition-all hover:bg-surface hover:text-text-primary hover:border-border-light"
                         >
                           취소
                         </button>
@@ -408,15 +294,7 @@ export default function QnaPage() {
                     ) : (
                       <button
                         onClick={() => setReplyingTo(post.id)}
-                        style={{
-                          padding: '6px 12px',
-                          backgroundColor: '#17a2b8',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                          fontSize: '12px'
-                        }}
+                        className="px-3 py-1.5 bg-info text-white border-0 rounded-md cursor-pointer text-xs font-medium transition-colors hover:bg-info/90"
                       >
                         답변하기
                       </button>

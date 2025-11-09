@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { SignupData } from './page';
-import styles from './page.module.css';
 
 interface StepAccountProps {
   onComplete: (data: Partial<SignupData>) => void;
@@ -154,72 +153,84 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
   };
 
   return (
-    <form onSubmit={handleSubmit} className={styles.form}>
-      <div className={styles.formGroup}>
-        <label className={styles.label}>이메일 (선택)</label>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-semibold text-text-primary uppercase tracking-wide">이메일 (선택)</label>
         <input
           type="email"
           value={formData.email}
           onChange={(e) => handleInputChange('email', e.target.value)}
           placeholder="example@email.com"
-          className={styles.input}
+          className="w-full h-12 px-4 bg-bg-primary border-2 border-border rounded-lg text-base text-text-primary placeholder:text-text-tertiary transition-all focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20 disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-surface"
           disabled={loading}
         />
       </div>
 
-      <div className={styles.formGroup}>
-        <label className={styles.label}>비밀번호 *</label>
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-semibold text-text-primary uppercase tracking-wide">비밀번호 *</label>
         <input
           type="password"
           value={formData.password}
           onChange={(e) => handleInputChange('password', e.target.value)}
           placeholder="비밀번호를 입력하세요"
-          className={`${styles.input} ${error && !isPasswordValid(formData.password) ? styles.inputError : ''}`}
+          className={`w-full h-12 px-4 bg-bg-primary border-2 rounded-lg text-base text-text-primary placeholder:text-text-tertiary transition-all focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20 disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-surface ${
+            error && !isPasswordValid(formData.password) ? 'border-error ring-2 ring-error/20' : 'border-border'
+          }`}
           disabled={loading}
           required
         />
         
         {formData.password && (
-          <div className={styles.passwordStrength}>
-            <div className={styles.strengthTitle}>비밀번호 조건</div>
-            <div className={styles.strengthItems}>
-              <div className={styles.strengthItem}>
-                <div className={`${styles.strengthCheck} ${passwordStrength.hasMinLength ? styles.strengthCheckValid : styles.strengthCheckInvalid}`}>
+          <div className="mt-2 p-3 bg-surface rounded-lg border border-border">
+            <div className="text-xs font-semibold text-text-tertiary mb-2 uppercase tracking-wide">비밀번호 조건</div>
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2 text-xs">
+                <div className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] transition-all ${
+                  passwordStrength.hasMinLength ? 'bg-success text-white' : 'bg-surface border border-border text-text-tertiary'
+                }`}>
                   {passwordStrength.hasMinLength ? '✓' : '○'}
                 </div>
-                <span style={{ color: passwordStrength.hasMinLength ? 'var(--success)' : 'var(--text-muted)' }}>
+                <span className={passwordStrength.hasMinLength ? 'text-success' : 'text-text-tertiary'}>
                   최소 8자 이상
                 </span>
               </div>
-              <div className={styles.strengthItem}>
-                <div className={`${styles.strengthCheck} ${passwordStrength.hasLowerCase ? styles.strengthCheckValid : styles.strengthCheckInvalid}`}>
+              <div className="flex items-center gap-2 text-xs">
+                <div className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] transition-all ${
+                  passwordStrength.hasLowerCase ? 'bg-success text-white' : 'bg-surface border border-border text-text-tertiary'
+                }`}>
                   {passwordStrength.hasLowerCase ? '✓' : '○'}
                 </div>
-                <span style={{ color: passwordStrength.hasLowerCase ? 'var(--success)' : 'var(--text-muted)' }}>
+                <span className={passwordStrength.hasLowerCase ? 'text-success' : 'text-text-tertiary'}>
                   소문자 포함
                 </span>
               </div>
-              <div className={styles.strengthItem}>
-                <div className={`${styles.strengthCheck} ${passwordStrength.hasUpperCase ? styles.strengthCheckValid : styles.strengthCheckInvalid}`}>
+              <div className="flex items-center gap-2 text-xs">
+                <div className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] transition-all ${
+                  passwordStrength.hasUpperCase ? 'bg-success text-white' : 'bg-surface border border-border text-text-tertiary'
+                }`}>
                   {passwordStrength.hasUpperCase ? '✓' : '○'}
                 </div>
-                <span style={{ color: passwordStrength.hasUpperCase ? 'var(--success)' : 'var(--text-muted)' }}>
+                <span className={passwordStrength.hasUpperCase ? 'text-success' : 'text-text-tertiary'}>
                   대문자 포함
                 </span>
               </div>
-              <div className={styles.strengthItem}>
-                <div className={`${styles.strengthCheck} ${passwordStrength.hasNumber ? styles.strengthCheckValid : styles.strengthCheckInvalid}`}>
+              <div className="flex items-center gap-2 text-xs">
+                <div className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] transition-all ${
+                  passwordStrength.hasNumber ? 'bg-success text-white' : 'bg-surface border border-border text-text-tertiary'
+                }`}>
                   {passwordStrength.hasNumber ? '✓' : '○'}
                 </div>
-                <span style={{ color: passwordStrength.hasNumber ? 'var(--success)' : 'var(--text-muted)' }}>
+                <span className={passwordStrength.hasNumber ? 'text-success' : 'text-text-tertiary'}>
                   숫자 포함
                 </span>
               </div>
-              <div className={styles.strengthItem}>
-                <div className={`${styles.strengthCheck} ${passwordStrength.hasSpecialChar ? styles.strengthCheckValid : styles.strengthCheckInvalid}`}>
+              <div className="flex items-center gap-2 text-xs">
+                <div className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] transition-all ${
+                  passwordStrength.hasSpecialChar ? 'bg-success text-white' : 'bg-surface border border-border text-text-tertiary'
+                }`}>
                   {passwordStrength.hasSpecialChar ? '✓' : '○'}
                 </div>
-                <span style={{ color: passwordStrength.hasSpecialChar ? 'var(--success)' : 'var(--text-muted)' }}>
+                <span className={passwordStrength.hasSpecialChar ? 'text-success' : 'text-text-tertiary'}>
                   특수문자 포함
                 </span>
               </div>
@@ -228,46 +239,48 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
         )}
       </div>
 
-      <div className={styles.formGroup}>
-        <label className={styles.label}>비밀번호 확인 *</label>
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-semibold text-text-primary uppercase tracking-wide">비밀번호 확인 *</label>
         <input
           type="password"
           value={formData.confirmPassword}
           onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
           placeholder="비밀번호를 다시 입력하세요"
-          className={`${styles.input} ${error && formData.password !== formData.confirmPassword ? styles.inputError : ''}`}
+          className={`w-full h-12 px-4 bg-bg-primary border-2 rounded-lg text-base text-text-primary placeholder:text-text-tertiary transition-all focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20 disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-surface ${
+            error && formData.password !== formData.confirmPassword ? 'border-error ring-2 ring-error/20' : 'border-border'
+          }`}
           disabled={loading}
           required
         />
       </div>
 
-      <div className={styles.formGroup}>
-        <label className={styles.label}>초대코드 (선택)</label>
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-semibold text-text-primary uppercase tracking-wide">초대코드 (선택)</label>
         <input
           type="text"
           value={formData.inviteCode}
           onChange={(e) => handleInputChange('inviteCode', e.target.value.toUpperCase())}
           placeholder="회사 초대코드를 입력하세요"
-          className={styles.input}
+          className="w-full h-12 px-4 bg-bg-primary border-2 border-border rounded-lg text-base text-text-primary placeholder:text-text-tertiary transition-all focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20 disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-surface"
           disabled={loading}
           maxLength={12}
         />
-        <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: '4px 0 0' }}>
+        <p className="text-xs text-text-tertiary mt-1">
           초대코드가 있으면 해당 회사로 자동 배정됩니다
         </p>
       </div>
 
       {error && (
-        <div className={styles.errorMessage}>
+        <div className="p-3 md:p-4 bg-error-bg border border-error rounded-lg text-error text-sm font-semibold animate-[slideDown_0.3s_ease-out]">
           {error}
         </div>
       )}
 
-      <div style={{ display: 'flex', gap: '12px' }}>
+      <div className="flex gap-3">
         <button
           type="button"
           onClick={onBack}
-          className={`${styles.button} ${styles.buttonSecondary}`}
+          className="w-full h-12 bg-bg-primary text-text-secondary border-2 border-border rounded-lg text-base font-semibold transition-all hover:bg-surface hover:text-text-primary hover:border-border-light disabled:opacity-60 disabled:cursor-not-allowed"
           disabled={loading}
         >
           이전
@@ -276,13 +289,13 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
         <button
           type="submit"
           disabled={loading || !formData.password || !formData.confirmPassword || !isPasswordValid(formData.password)}
-          className={styles.button}
+          className="w-full h-12 bg-primary text-text-primary rounded-lg text-base font-semibold transition-all hover:bg-primary-600 active:bg-primary-700 disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600 focus-visible:outline-offset-2"
         >
           {loading ? (
-            <div className={styles.loadingSpinner}>
-              <div className={styles.spinner}></div>
+            <span className="inline-flex items-center gap-2">
+              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
               회원가입 중...
-            </div>
+            </span>
           ) : (
             '회원가입 완료'
           )}

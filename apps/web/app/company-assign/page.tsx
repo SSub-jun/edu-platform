@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { authClient } from '../../lib/auth';
-import styles from './page.module.css';
 
 export default function CompanyAssignPage() {
   const [inviteCode, setInviteCode] = useState('');
@@ -131,43 +130,43 @@ export default function CompanyAssignPage() {
 
   if (success && assignedCompany) {
     return (
-      <div className={styles.container}>
-        <div className={styles.assignCard}>
-          <div className={styles.header}>
-            <div className={styles.icon}>🎉</div>
-            <h1 className={styles.title}>배정 완료!</h1>
-            <p className={styles.subtitle}>회사에 성공적으로 배정되었습니다</p>
+      <div className="min-h-screen flex items-center justify-center p-6 bg-bg-primary">
+        <div className="w-full max-w-md bg-surface border border-border rounded-xl overflow-hidden">
+          <div className="text-center px-10 py-10 pb-5 bg-surface border-b border-border">
+            <div className="text-6xl mb-4 animate-bounce">🎉</div>
+            <h1 className="text-[32px] font-bold text-text-primary mb-3">배정 완료!</h1>
+            <p className="text-base text-text-secondary font-medium">회사에 성공적으로 배정되었습니다</p>
           </div>
 
-          <div className={styles.content}>
-            <div className={styles.successCard}>
-              <div className={styles.successIcon}>✅</div>
+          <div className="p-10">
+            <div className="text-center">
+              <div className="text-5xl mb-4">✅</div>
               
-              <h2 className={styles.successTitle}>
+              <h2 className="text-2xl font-bold text-text-primary mb-2 bg-gradient-to-r from-success to-primary bg-clip-text text-transparent">
                 환영합니다!
               </h2>
               
-              <p className={styles.successMessage}>
+              <p className="text-base text-text-secondary mb-6">
                 이제 학습을 시작할 수 있습니다.
               </p>
 
-              <div className={styles.companyInfo}>
-                <div className={styles.companyName}>
+              <div className="bg-gradient-to-br from-surface to-bg-primary border border-border rounded-xl p-6 mb-6">
+                <div className="text-xl font-bold text-text-primary mb-1">
                   {assignedCompany.name}
                 </div>
-                <div className={styles.companyId}>
+                <div className="text-sm text-text-tertiary">
                   ID: {assignedCompany.id}
                 </div>
               </div>
 
-              <div className={styles.redirectInfo}>
-                <div className={styles.spinner}></div>
+              <div className="flex items-center justify-center gap-2 text-sm text-text-tertiary mb-6">
+                <div className="w-4 h-4 border-2 border-text-tertiary/30 border-t-text-tertiary rounded-full animate-spin"></div>
                 <span>3초 후 자동으로 학습 페이지로 이동합니다...</span>
               </div>
 
               <button
                 onClick={() => router.push('/curriculum')}
-                className={styles.button}
+                className="w-full h-12 bg-primary text-text-primary rounded-lg text-base font-semibold transition-all hover:bg-primary-600 active:bg-primary-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600 focus-visible:outline-offset-2"
               >
                 바로 시작하기
               </button>
@@ -179,61 +178,58 @@ export default function CompanyAssignPage() {
   }
 
   return (
-    <div className={styles.container}>
-      <div className={styles.assignCard}>
-        <div className={styles.header}>
-          <div className={styles.icon}>🏢</div>
-          <h1 className={styles.title}>회사 배정</h1>
-          <p className={styles.subtitle}>
+    <div className="min-h-screen flex items-center justify-center p-6 bg-bg-primary">
+      <div className="w-full max-w-md bg-surface border border-border rounded-xl overflow-hidden">
+        <div className="text-center px-10 py-10 pb-5 bg-surface border-b border-border">
+          <div className="text-6xl mb-4">🏢</div>
+          <h1 className="text-[32px] font-bold text-text-primary mb-3">회사 배정</h1>
+          <p className="text-base text-text-secondary font-medium mb-4">
             회사 코드를 입력하여<br />
             소속 회사를 등록해주세요
           </p>
-          <div className={styles.notice}>
+          <div className="bg-info-bg border border-info rounded-lg px-4 py-3 text-info text-sm font-medium">
             💡 회사 코드는 관리자로부터 받으실 수 있습니다
           </div>
         </div>
 
-        <div className={styles.content}>
-          <form onSubmit={handleSubmit} className={styles.form}>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>회사 코드</label>
+        <div className="p-10">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-semibold text-text-primary uppercase tracking-wide text-center">회사 코드</label>
               <input
                 type="text"
                 value={inviteCode}
                 onChange={(e) => handleInputChange(e.target.value)}
                 placeholder="COMPANY123"
-                className={`${styles.input} ${error ? styles.inputError : ''}`}
+                className={`w-full h-14 px-4 bg-bg-primary border-2 rounded-lg text-center text-xl font-bold text-text-primary placeholder:text-text-tertiary placeholder:font-normal transition-all focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20 disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-surface tracking-widest ${
+                  error ? 'border-error ring-2 ring-error/20' : 'border-border'
+                }`}
                 disabled={loading}
                 maxLength={6}
                 autoFocus
               />
-              <p style={{ 
-                fontSize: '12px', 
-                color: 'var(--text-muted)', 
-                margin: '4px 0 0',
-                textAlign: 'center'
-              }}>
+              <p className="text-xs text-text-tertiary text-center mt-1">
                 6자리 영문과 숫자 조합
               </p>
               
               {error && (
-                <div className={styles.errorMessage}>
+                <div className="mt-2 p-3 md:p-4 bg-error-bg border border-error rounded-lg text-error text-sm font-semibold animate-[slideDown_0.3s_ease-out]">
                   {error}
                 </div>
               )}
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div className="flex flex-col gap-3">
               <button
                 type="submit"
                 disabled={loading || !inviteCode}
-                className={styles.button}
+                className="w-full h-12 bg-primary text-text-primary rounded-lg text-base font-semibold transition-all hover:bg-primary-600 active:bg-primary-700 disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600 focus-visible:outline-offset-2"
               >
                 {loading ? (
-                  <div className={styles.loadingSpinner}>
-                    <div className={styles.spinner}></div>
+                  <span className="inline-flex items-center gap-2">
+                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
                     배정 중...
-                  </div>
+                  </span>
                 ) : (
                   '회사 배정하기'
                 )}
@@ -243,15 +239,7 @@ export default function CompanyAssignPage() {
                 type="button"
                 onClick={handleSkip}
                 disabled={loading}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: 'var(--text-muted)',
-                  fontSize: '14px',
-                  cursor: 'pointer',
-                  textDecoration: 'underline',
-                  padding: '8px',
-                }}
+                className="bg-transparent border-0 text-text-tertiary text-sm cursor-pointer underline py-2 transition-colors hover:text-text-secondary disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 나중에 배정하기 (로그아웃)
               </button>

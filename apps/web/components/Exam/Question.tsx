@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import styles from './Question.module.css';
 import type { ExamQuestion } from '../../lib/types';
 
 interface QuestionProps {
@@ -30,16 +29,16 @@ export default function Question({
   };
 
   return (
-    <div className={styles.questionContainer}>
+    <div className="max-w-3xl mx-auto p-6 md:p-8 bg-white rounded-xl shadow-md">
       {/* Question header */}
-      <div className={styles.questionHeader}>
-        <div className={styles.questionNumber}>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 pb-4 border-b-2 border-gray-100 gap-4">
+        <div className="text-base font-semibold text-info bg-info-bg px-4 py-2 rounded-full">
           문제 {questionNumber}/{totalQuestions}
         </div>
-        <div className={styles.questionProgress}>
-          <div className={styles.progressBar}>
+        <div className="flex-1 md:ml-6 w-full">
+          <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
             <div 
-              className={styles.progressFill}
+              className="h-full bg-info rounded-full transition-[width] duration-300 ease-linear"
               style={{ width: `${(questionNumber / totalQuestions) * 100}%` }}
             />
           </div>
@@ -47,14 +46,14 @@ export default function Question({
       </div>
 
       {/* Question stem */}
-      <div className={styles.questionStem}>
-        <h2 className={styles.stemText}>{question.stem}</h2>
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold text-gray-800 leading-relaxed">{question.stem}</h2>
       </div>
 
       {/* Answer choices */}
-      <div className={styles.choicesContainer}>
-        <fieldset className={styles.choicesFieldset}>
-          <legend className={styles.choicesLegend}>
+      <div className="mb-6">
+        <fieldset className="border-0 p-0 m-0">
+          <legend className="sr-only">
             답안을 선택하세요
           </legend>
           
@@ -66,13 +65,13 @@ export default function Question({
             return (
               <label
                 key={choiceId}
-                className={`${styles.choiceLabel} ${
-                  isSelected ? styles.selected : ''
-                } ${
-                  isHovered ? styles.hovered : ''
-                } ${
-                  disabled ? styles.disabled : ''
-                }`}
+                className={`flex items-center p-4 md:px-5 mb-3 border-2 rounded-lg cursor-pointer transition-all ${
+                  isSelected 
+                    ? 'border-info bg-info-bg' 
+                    : isHovered 
+                    ? 'border-info/60 bg-gray-50' 
+                    : 'border-gray-200 bg-white hover:border-info hover:bg-gray-50'
+                } ${disabled ? 'opacity-60 cursor-not-allowed' : ''}`}
                 onMouseEnter={() => setHoveredChoice(choiceId)}
                 onMouseLeave={() => setHoveredChoice(null)}
               >
@@ -83,21 +82,25 @@ export default function Question({
                   checked={isSelected}
                   onChange={() => handleChoiceClick(choiceId)}
                   disabled={disabled}
-                  className={styles.choiceInput}
+                  className="sr-only"
                   aria-describedby={`question-${question.id}-stem`}
                 />
                 
-                <div className={styles.choiceContent}>
-                  <div className={styles.choiceNumber}>
+                <div className="flex items-center flex-1 gap-4">
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold transition-all flex-shrink-0 ${
+                    isSelected || isHovered 
+                      ? 'bg-info text-white' 
+                      : 'bg-gray-100 text-gray-600'
+                  }`}>
                     {String.fromCharCode(65 + index)}
                   </div>
-                  <div className={styles.choiceText}>
+                  <div className="text-base text-gray-700 leading-normal">
                     {choice}
                   </div>
                 </div>
                 
-                <div className={styles.choiceIndicator}>
-                  {isSelected && <span className={styles.checkmark}>✓</span>}
+                <div className="w-6 h-6 flex items-center justify-center flex-shrink-0">
+                  {isSelected && <span className="text-info text-lg font-bold">✓</span>}
                 </div>
               </label>
             );
@@ -106,11 +109,11 @@ export default function Question({
       </div>
 
       {/* Selection status */}
-      <div className={styles.selectionStatus}>
+      <div className="text-center p-4 rounded-md text-sm font-medium">
         {selectedAnswer ? (
-          <span className={styles.answered}>✓ 답안 선택됨</span>
+          <span className="text-success bg-success-bg border border-success px-4 py-2 rounded-md">✓ 답안 선택됨</span>
         ) : (
-          <span className={styles.unanswered}>답안을 선택해주세요</span>
+          <span className="text-warning bg-warning-bg border border-warning px-4 py-2 rounded-md">답안을 선택해주세요</span>
         )}
       </div>
     </div>

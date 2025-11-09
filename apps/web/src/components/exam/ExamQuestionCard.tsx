@@ -29,15 +29,15 @@ export function ExamQuestionCard({
   const hasAnswer = selectedIndex !== undefined;
   
   return (
-    <Card className={`mb-6 ${showValidation && !hasAnswer ? 'border-red-300 bg-red-50' : ''}`}>
+    <Card className={`mb-6 ${showValidation && !hasAnswer ? 'border-error bg-error-bg' : ''}`}>
       <CardHeader>
-        <CardTitle className="text-lg font-semibold">
+        <CardTitle className="text-lg font-semibold text-text-primary">
           문제 {questionNumber}
         </CardTitle>
       </CardHeader>
       
       <CardContent className="space-y-4">
-        <div className="text-base leading-relaxed">
+        <div className="text-base leading-relaxed text-text-primary">
           {question.content}
         </div>
         
@@ -49,16 +49,16 @@ export function ExamQuestionCard({
           {question.choices.map((choice, index) => (
             <div 
               key={index} 
-              className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-gray-50 transition-colors"
+              className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-surface hover:border-border-light transition-colors"
             >
               <RadioGroupItem 
                 value={index.toString()} 
                 id={`${question.id}-${index}`}
-                className="text-blue-600"
+                className="text-primary"
               />
               <Label 
                 htmlFor={`${question.id}-${index}`}
-                className="flex-1 cursor-pointer text-sm leading-relaxed"
+                className="flex-1 cursor-pointer text-sm leading-relaxed text-text-primary"
               >
                 <span className="font-medium mr-2">{index + 1}.</span>
                 {choice}
@@ -68,7 +68,7 @@ export function ExamQuestionCard({
         </RadioGroup>
         
         {showValidation && !hasAnswer && (
-          <p className="text-sm text-red-600 mt-2">
+          <p className="text-sm text-error mt-2">
             ⚠️ 답을 선택해주세요
           </p>
         )}

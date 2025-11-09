@@ -140,53 +140,29 @@ export default function ExamPage() {
 
   if (loading) {
     return (
-      <div style={{ 
-        minHeight: '100vh', 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center' 
-      }}>
-        <div style={{ fontSize: '18px', color: '#666' }}>시험을 준비 중입니다...</div>
+      <div className="min-h-screen flex items-center justify-center bg-bg-primary">
+        <div className="flex items-center gap-2 text-lg text-text-secondary">
+          <div className="w-5 h-5 border-2 border-text-tertiary/30 border-t-text-tertiary rounded-full animate-spin"></div>
+          시험을 준비 중입니다...
+        </div>
       </div>
     );
   }
 
   if (submitted && result) {
     return (
-      <div style={{ 
-        minHeight: '100vh', 
-        padding: '40px 20px',
-        backgroundColor: '#f5f5f5'
-      }}>
-        <div style={{ 
-          maxWidth: '600px', 
-          margin: '0 auto',
-          backgroundColor: 'white',
-          borderRadius: '8px',
-          padding: '40px',
-          textAlign: 'center',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
-        }}>
-          <h1 style={{ 
-            fontSize: '32px', 
-            marginBottom: '30px',
-            color: result.passed ? '#28a745' : '#dc3545'
-          }}>
+      <div className="min-h-screen py-10 px-5 bg-bg-primary">
+        <div className="max-w-2xl mx-auto bg-surface border border-border rounded-xl p-10 text-center">
+          <h1 className={`text-[32px] mb-8 font-bold ${result.passed ? 'text-success' : 'text-error'}`}>
             {result.passed ? '🎉 합격!' : '😔 불합격'}
           </h1>
           
-          <div style={{ 
-            display: 'flex', 
-            flexDirection: 'column',
-            gap: '20px',
-            marginBottom: '40px',
-            alignItems: 'center'
-          }}>
-            <div style={{ padding: '30px 50px', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
-              <div style={{ fontSize: '48px', fontWeight: 'bold', color: result.passed ? '#28a745' : '#dc3545' }}>
+          <div className="flex flex-col gap-5 mb-10 items-center">
+            <div className="py-8 px-12 bg-bg-primary rounded-xl border border-border">
+              <div className={`text-5xl font-bold ${result.passed ? 'text-success' : 'text-error'}`}>
                 {Math.round(result.examScore)}점
               </div>
-              <div style={{ fontSize: '16px', color: '#666', marginTop: '10px' }}>
+              <div className="text-base text-text-secondary mt-2.5">
                 {result.passed ? '합격 기준: 70점 이상' : '불합격 (70점 미만)'}
               </div>
             </div>
@@ -194,15 +170,7 @@ export default function ExamPage() {
 
           <button
             onClick={handleBackToDashboard}
-            style={{
-              padding: '15px 30px',
-              backgroundColor: '#0070f3',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              fontSize: '16px',
-              cursor: 'pointer'
-            }}
+            className="px-8 py-4 bg-primary text-text-primary border-0 rounded-lg text-base font-semibold cursor-pointer transition-colors hover:bg-primary-600"
           >
             커리큘럼으로 돌아가기
           </button>
@@ -213,93 +181,47 @@ export default function ExamPage() {
 
   if (!examData) {
     return (
-      <div style={{ 
-        minHeight: '100vh', 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center' 
-      }}>
-        <div style={{ fontSize: '18px', color: '#666' }}>시험 데이터를 불러올 수 없습니다.</div>
+      <div className="min-h-screen flex items-center justify-center bg-bg-primary">
+        <div className="text-lg text-text-secondary">시험 데이터를 불러올 수 없습니다.</div>
       </div>
     );
   }
 
   return (
-    <div style={{ 
-      minHeight: '100vh', 
-      padding: '40px 20px',
-      backgroundColor: '#f5f5f5'
-    }}>
-      <div style={{ 
-        maxWidth: '800px', 
-        margin: '0 auto',
-        backgroundColor: 'white',
-        borderRadius: '8px',
-        padding: '40px',
-        boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
-      }}>
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center',
-          marginBottom: '30px'
-        }}>
-          <h1 style={{ 
-            fontSize: '28px', 
-            fontWeight: 'bold',
-            color: '#333'
-          }}>
+    <div className="min-h-screen py-10 px-5 bg-bg-primary">
+      <div className="max-w-4xl mx-auto bg-surface border border-border rounded-xl p-8 md:p-10">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-[28px] font-bold text-text-primary">
             {subjectId === 'demo' ? '데모 시험' : `${subjectId} 시험`}
           </h1>
-          <div style={{ 
-            fontSize: '14px', 
-            color: '#666',
-            padding: '8px 16px',
-            backgroundColor: '#e9ecef',
-            borderRadius: '20px'
-          }}>
+          <div className="text-sm text-text-secondary px-4 py-2 bg-bg-primary rounded-full border border-border">
             {examData.questions.length}문제
           </div>
         </div>
 
-        <div style={{ marginBottom: '30px' }}>
+        <div className="mb-8">
           {examData.questions.map((question, index) => (
-            <div key={question.id} style={{
-              marginBottom: '30px',
-              padding: '25px',
-              border: '1px solid #e0e0e0',
-              borderRadius: '8px',
-              backgroundColor: '#f8f9fa'
-            }}>
-              <h3 style={{ 
-                fontSize: '18px', 
-                marginBottom: '20px',
-                color: '#333'
-              }}>
+            <div key={question.id} className="mb-8 p-6 border border-border rounded-xl bg-bg-primary">
+              <h3 className="text-lg mb-5 text-text-primary font-semibold">
                 {index + 1}. {question.stem}
               </h3>
               
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div className="flex flex-col gap-2.5">
                 {question.choices.map((choice, choiceIndex) => (
-                  <label key={choiceIndex} style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    padding: '12px',
-                    border: '1px solid #ddd',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    backgroundColor: answers[question.id] === choiceIndex ? '#e3f2fd' : 'white',
-                    transition: 'background-color 0.2s'
-                  }}>
+                  <label key={choiceIndex} className={`flex items-center px-4 py-3 border-2 rounded-lg cursor-pointer transition-all ${
+                    answers[question.id] === choiceIndex 
+                      ? 'border-info bg-info-bg' 
+                      : 'border-border bg-surface hover:border-border-light hover:bg-surface/80'
+                  }`}>
                     <input
                       type="radio"
                       name={question.id}
                       value={choiceIndex}
                       checked={answers[question.id] === choiceIndex}
                       onChange={() => handleAnswerChange(question.id, choiceIndex)}
-                      style={{ marginRight: '12px' }}
+                      className="mr-3 w-4 h-4"
                     />
-                    <span style={{ fontSize: '16px' }}>
+                    <span className="text-base text-text-primary">
                       {String.fromCharCode(65 + choiceIndex)}. {choice}
                     </span>
                   </label>
@@ -309,22 +231,10 @@ export default function ExamPage() {
           ))}
         </div>
 
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
+        <div className="flex justify-between items-center">
           <button
             onClick={handleBackToDashboard}
-            style={{
-              padding: '12px 24px',
-              backgroundColor: '#6c757d',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              fontSize: '16px',
-              cursor: 'pointer'
-            }}
+            className="px-6 py-3 bg-bg-primary text-text-secondary border border-border rounded-md text-base font-medium cursor-pointer transition-all hover:bg-surface hover:text-text-primary hover:border-border-light"
           >
             취소
           </button>
@@ -332,18 +242,16 @@ export default function ExamPage() {
           <button
             onClick={handleSubmit}
             disabled={submitting}
-            style={{
-              padding: '15px 30px',
-              backgroundColor: '#28a745',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              fontSize: '16px',
-              cursor: submitting ? 'not-allowed' : 'pointer',
-              opacity: submitting ? 0.6 : 1
-            }}
+            className="px-8 py-4 bg-success text-white border-0 rounded-md text-base font-semibold transition-all hover:bg-success/90 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {submitting ? '제출 중...' : '시험 제출'}
+            {submitting ? (
+              <span className="inline-flex items-center gap-2">
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                제출 중...
+              </span>
+            ) : (
+              '시험 제출'
+            )}
           </button>
         </div>
       </div>

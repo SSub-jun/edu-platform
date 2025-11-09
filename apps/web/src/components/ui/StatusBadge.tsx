@@ -1,5 +1,4 @@
 import React from 'react';
-import styles from './StatusBadge.module.css';
 
 export type BadgeStatus = 'locked' | 'available' | 'passed' | 'in-progress';
 
@@ -11,19 +10,19 @@ interface StatusBadgeProps {
 const statusConfig = {
   locked: {
     label: '잠금',
-    className: styles.locked,
+    className: 'bg-surface border-border text-text-tertiary',
   },
   available: {
     label: '시작 가능',
-    className: styles.available,
+    className: 'bg-info-bg border-info text-info',
   },
   'in-progress': {
     label: '진행 중',
-    className: styles.inProgress,
+    className: 'bg-warning-bg border-warning text-warning',
   },
   passed: {
     label: '완료',
-    className: styles.passed,
+    className: 'bg-success-bg border-success text-success',
   },
 };
 
@@ -31,11 +30,12 @@ export default function StatusBadge({ status, className = '' }: StatusBadgeProps
   const config = statusConfig[status];
   
   return (
-    <span className={`${styles.badge} ${config.className} ${className}`}>
+    <span className={`inline-flex items-center rounded-full border px-3 py-1 text-[13px] leading-5 font-normal transition-colors ${config.className} ${className}`}>
       {config.label}
     </span>
   );
 }
+
 
 
 

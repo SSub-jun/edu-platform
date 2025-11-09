@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation';
 import { useAuthGuard } from '../hooks/useAuthGuard';
 import { authClient } from '../../lib/auth';
 import { getErrorMessage } from '../../src/utils/errorMap';
-import styles from './page.module.css';
 
 interface Lesson {
   id: string;
@@ -36,17 +35,8 @@ export default function CurriculumPage() {
   const loadCurriculum = async () => {
     try {
       // 과목 및 레슨 목록 조회
-      // 임시: authClient 인터셉터 이슈 우회
-      const token = localStorage.getItem('accessToken');
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-      const rawResponse = await fetch(`${apiUrl}/me/curriculum`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-        cache: 'no-store'
-      });
-      const response = await rawResponse.json();
-      const curriculumData = response.data || [];
+      const response = await authClient.getApi().get('/me/curriculum');
+      const curriculumData = response.data.data || [];
 
       // 각 Subject에 대한 시험 응시 가능 여부 조회
       const eligibilityData: Record<string, any> = {};
@@ -115,22 +105,20 @@ export default function CurriculumPage() {
   // 인증 로딩 중
   if (authLoading) {
     return (
-      <div className={styles.container}>
-        <div className={styles.header}>
-          <div className={styles.headerTop}>
-            <div>
-              <h1 className={styles.title}>나의 커리큘럼</h1>
-            </div>
+      <div className="min-h-screen bg-bg-primary px-6 py-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex justify-between items-start mb-10">
+            <h1 className="text-[32px] font-bold text-text-primary">나의 커리큘럼</h1>
             <button
               onClick={logout}
-              className={styles.logoutButton}
+              className="bg-error text-white px-6 py-3 rounded-md text-sm font-semibold hover:bg-error/90 transition-colors"
             >
               로그아웃
             </button>
           </div>
         </div>
-        <div className={styles.loading}>
-          <div>인증 확인 중...</div>
+        <div className="flex justify-center items-center min-h-[400px]">
+          <div className="text-text-secondary">인증 확인 중...</div>
         </div>
       </div>
     );
@@ -143,12 +131,12 @@ export default function CurriculumPage() {
 
   if (loading) {
     return (
-      <div className={styles.container}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>나의 커리큘럼</h1>
+      <div className="min-h-screen bg-bg-primary px-6 py-8">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-[32px] font-bold text-text-primary mb-10">나의 커리큘럼</h1>
         </div>
-        <div className={styles.loading}>
-          <div>로딩 중...</div>
+        <div className="flex justify-center items-center min-h-[400px]">
+          <div className="text-text-secondary">로딩 중...</div>
         </div>
       </div>
     );
@@ -157,27 +145,27 @@ export default function CurriculumPage() {
   if (error) {
     const errorMessage = getErrorMessage(error);
     return (
-      <div className={styles.container}>
-        <div className={styles.header}>
-          <div className={styles.headerTop}>
-            <div>
-              <h1 className={styles.title}>나의 커리큘럼</h1>
-            </div>
+      <div className="min-h-screen bg-bg-primary px-6 py-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex justify-between items-start mb-10">
+            <h1 className="text-[32px] font-bold text-text-primary">나의 커리큘럼</h1>
             <button
               onClick={logout}
-              className={styles.logoutButton}
+              className="bg-error text-white px-6 py-3 rounded-md text-sm font-semibold hover:bg-error/90 transition-colors"
             >
               로그아웃
             </button>
           </div>
         </div>
-        <div className={styles.error}>
-          <div className={styles.errorCard}>
-            <h3 className={styles.errorTitle}>{errorMessage.title}</h3>
-            <p className={styles.errorDescription}>{errorMessage.description}</p>
+        <div className="flex justify-center items-center min-h-[400px]">
+          <div className="bg-surface border border-error rounded-xl p-10 text-center max-w-md w-full">
+            <h3 className="text-xl font-bold text-error mb-3">{errorMessage.title}</h3>
+            <p className="text-base text-text-secondary mb-6 leading-relaxed">
+              {errorMessage.description}
+            </p>
             {errorMessage.actionLabel && (
               <button 
-                className={styles.errorButton}
+                className="bg-error text-white px-6 py-3 rounded-md text-sm font-semibold hover:bg-error/90 transition-colors"
                 onClick={() => window.location.reload()}
               >
                 {errorMessage.actionLabel}
@@ -191,24 +179,22 @@ export default function CurriculumPage() {
 
   if (!subjects || subjects.length === 0) {
     return (
-      <div className={styles.container}>
-        <div className={styles.header}>
-          <div className={styles.headerTop}>
-            <div>
-              <h1 className={styles.title}>나의 커리큘럼</h1>
-            </div>
+      <div className="min-h-screen bg-bg-primary px-6 py-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex justify-between items-start mb-10">
+            <h1 className="text-[32px] font-bold text-text-primary">나의 커리큘럼</h1>
             <button
               onClick={logout}
-              className={styles.logoutButton}
+              className="bg-error text-white px-6 py-3 rounded-md text-sm font-semibold hover:bg-error/90 transition-colors"
             >
               로그아웃
             </button>
           </div>
         </div>
-        <div className={styles.empty}>
-          <div className={styles.emptyCard}>
-            <h3 className={styles.emptyTitle}>등록된 과목이 없습니다</h3>
-            <p className={styles.emptyDescription}>
+        <div className="flex justify-center items-center min-h-[400px]">
+          <div className="bg-surface border border-border rounded-xl p-10 text-center max-w-md w-full">
+            <h3 className="text-xl font-bold text-text-primary mb-3">등록된 과목이 없습니다</h3>
+            <p className="text-base text-text-secondary leading-relaxed">
               관리자에게 커리큘럼 등록을 요청해주세요.
             </p>
           </div>
@@ -218,44 +204,45 @@ export default function CurriculumPage() {
   }
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <div className={styles.headerTop}>
+    <div className="min-h-screen bg-bg-primary px-6 py-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="flex justify-between items-start mb-10 flex-wrap gap-4">
           <div>
-            <h1 className={styles.title}>나의 커리큘럼</h1>
-            <p className={styles.subtitle}>
+            <h1 className="text-[32px] font-bold text-text-primary mb-2">나의 커리큘럼</h1>
+            <p className="text-lg text-text-secondary font-medium">
               총 {subjects.reduce((acc, subject) => acc + subject.lessons.length, 0)}개 레슨
             </p>
           </div>
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <div className="flex gap-2">
             <button
               onClick={() => router.push('/qna')}
-              className={styles.qnaButton}
+              className="bg-info text-white px-6 py-3 rounded-md text-sm font-semibold hover:bg-info/90 transition-colors"
             >
               Q&A
             </button>
             <button
               onClick={logout}
-              className={styles.logoutButton}
+              className="bg-error text-white px-6 py-3 rounded-md text-sm font-semibold hover:bg-error/90 transition-colors"
             >
               로그아웃
             </button>
           </div>
         </div>
-      </div>
 
-      <div className={styles.content}>
+        {/* Content */}
+        <div className="flex flex-col gap-12">
         {subjects.map((subject) => {
           const eligibility = examEligibility[subject.id];
           const lessonProgress = eligibility?.lessonProgress || [];
           
           return (
-            <div key={subject.id} className={styles.subjectSection}>
-              <div className={styles.subjectHeader}>
-                <div>
-                  <h2 className={styles.subjectTitle}>{subject.name}</h2>
+            <div key={subject.id} className="bg-surface border border-border rounded-xl p-6">
+              <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 pb-4 border-b border-border">
+                <div className="flex-1">
+                  <h2 className="text-2xl font-bold text-text-primary mb-2">{subject.name}</h2>
                   {subject.description && (
-                    <p className={styles.subjectDescription}>
+                    <p className="text-base text-text-secondary leading-relaxed">
                       {subject.description}
                     </p>
                   )}
@@ -264,25 +251,15 @@ export default function CurriculumPage() {
                 <button
                   onClick={() => handleStartExam(subject.id)}
                   disabled={!eligibility?.eligible}
-                  style={{
-                    padding: '12px 24px',
-                    backgroundColor: eligibility?.eligible ? '#0070f3' : '#6c757d',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '6px',
-                    cursor: eligibility?.eligible ? 'pointer' : 'not-allowed',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: '4px',
-                    minWidth: '140px'
-                  }}
+                  className={`flex flex-col items-center gap-1 px-6 py-3 rounded-md text-sm font-semibold min-w-[140px] transition-colors ${
+                    eligibility?.eligible 
+                      ? 'bg-info text-white hover:bg-info/90 cursor-pointer' 
+                      : 'bg-text-tertiary text-white cursor-not-allowed opacity-60'
+                  }`}
                 >
                   <span>{eligibility?.eligible ? '✅ 시험 보기' : '🔒 시험 잠김'}</span>
                   {eligibility?.remainingAttempts !== undefined && (
-                    <span style={{ fontSize: '11px', opacity: 0.9 }}>
+                    <span className="text-[11px] opacity-90">
                       (남은 횟수: {eligibility.remainingAttempts}회)
                     </span>
                   )}
@@ -290,11 +267,7 @@ export default function CurriculumPage() {
               </div>
 
               {/* 레슨 목록 */}
-              <div style={{
-                display: 'grid',
-                gap: '12px',
-                marginTop: '20px'
-              }}>
+              <div className="grid gap-3 mt-5">
                 {lessonProgress
                   .sort((a: any, b: any) => {
                     const lessonA = subject.lessons.find(l => l.id === a.lessonId);
@@ -312,75 +285,38 @@ export default function CurriculumPage() {
                       <div
                         key={lesson.id}
                         onClick={() => router.push(`/lesson/${lesson.id}`)}
-                        style={{
-                          padding: '16px 20px',
-                          backgroundColor: 'white',
-                          border: `2px solid ${isCompleted ? '#28a745' : '#e0e0e0'}`,
-                          borderRadius: '8px',
-                          cursor: 'pointer',
-                          transition: 'all 0.2s ease',
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
-                          e.currentTarget.style.transform = 'translateY(-2px)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.boxShadow = 'none';
-                          e.currentTarget.style.transform = 'translateY(0)';
-                        }}
+                        className={`p-4 md:px-5 bg-white rounded-lg cursor-pointer transition-all hover:shadow-lg hover:-translate-y-0.5 flex justify-between items-center gap-4 ${
+                          isCompleted 
+                            ? 'border-2 border-success' 
+                            : 'border-2 border-gray-200'
+                        }`}
                       >
-                        <div style={{ flex: 1 }}>
-                          <div style={{
-                            fontSize: '16px',
-                            fontWeight: 'bold',
-                            color: '#333',
-                            marginBottom: '8px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '10px'
-                          }}>
-                            <span>📹 {progress.lessonTitle || lesson.title}</span>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2.5 mb-2">
+                            <span className="text-base font-bold text-gray-800">
+                              📹 {progress.lessonTitle || lesson.title}
+                            </span>
                             {isCompleted && (
-                              <span style={{
-                                fontSize: '12px',
-                                backgroundColor: '#28a745',
-                                color: 'white',
-                                padding: '2px 8px',
-                                borderRadius: '12px'
-                              }}>
+                              <span className="text-[12px] bg-success text-white px-2 py-0.5 rounded-full">
                                 ✓ 완료
                               </span>
                             )}
                           </div>
                           
                           {/* 진도율 바 */}
-                          <div style={{
-                            width: '100%',
-                            height: '8px',
-                            backgroundColor: '#e9ecef',
-                            borderRadius: '4px',
-                            overflow: 'hidden'
-                          }}>
-                            <div style={{
-                              width: `${progressPercent}%`,
-                              height: '100%',
-                              backgroundColor: isCompleted ? '#28a745' : '#0070f3',
-                              transition: 'width 0.3s ease'
-                            }} />
+                          <div className="w-full h-2 bg-gray-100 rounded overflow-hidden">
+                            <div 
+                              className={`h-full transition-[width] duration-300 ease-linear ${
+                                isCompleted ? 'bg-success' : 'bg-info'
+                              }`}
+                              style={{ width: `${progressPercent}%` }}
+                            />
                           </div>
                         </div>
 
-                        <div style={{
-                          marginLeft: '20px',
-                          fontSize: '18px',
-                          fontWeight: 'bold',
-                          color: isCompleted ? '#28a745' : '#666',
-                          minWidth: '60px',
-                          textAlign: 'right'
-                        }}>
+                        <div className={`ml-5 text-lg font-bold min-w-[60px] text-right ${
+                          isCompleted ? 'text-success' : 'text-gray-600'
+                        }`}>
                           {Math.round(progressPercent)}%
                         </div>
                       </div>
@@ -390,21 +326,14 @@ export default function CurriculumPage() {
 
               {/* 시험 응시 불가 메시지 */}
               {!eligibility?.eligible && eligibility?.reason && (
-                <div style={{
-                  marginTop: '15px',
-                  padding: '12px 16px',
-                  backgroundColor: '#fff3cd',
-                  border: '1px solid #ffc107',
-                  borderRadius: '6px',
-                  color: '#856404',
-                  fontSize: '14px'
-                }}>
+                <div className="mt-4 p-3 md:p-4 bg-warning-bg border border-warning rounded-md text-warning text-sm">
                   ⚠️ {eligibility.reason}
                 </div>
               )}
             </div>
           );
         })}
+        </div>
       </div>
     </div>
   );

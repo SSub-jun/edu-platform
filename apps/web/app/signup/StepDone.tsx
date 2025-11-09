@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react';
 import { SignupData } from './page';
-import styles from './page.module.css';
 
 interface StepDoneProps {
   onComplete: () => void;
@@ -25,92 +24,55 @@ export default function StepDone({ onComplete, signupData }: StepDoneProps) {
   };
 
   return (
-    <div style={{ textAlign: 'center' }}>
-      <div className={styles.successIcon}>
+    <div className="text-center">
+      <div className="text-6xl mb-4 animate-bounce">
         🎉
       </div>
       
-      <h2 style={{ 
-        fontSize: '24px', 
-        fontWeight: '700', 
-        color: 'var(--text-primary)', 
-        margin: '0 0 16px 0',
-        background: 'linear-gradient(135deg, var(--success) 0%, var(--primary) 100%)',
-        backgroundClip: 'text',
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent',
-      }}>
+      <h2 className="text-2xl font-bold text-text-primary mb-4 bg-gradient-to-r from-success to-primary bg-clip-text text-transparent">
         회원가입이 완료되었습니다!
       </h2>
       
-      <p style={{ 
-        fontSize: '16px', 
-        color: 'var(--text-secondary)', 
-        margin: '0 0 32px 0',
-        lineHeight: 1.6 
-      }}>
+      <p className="text-base text-text-secondary mb-8 leading-relaxed">
         교육 플랫폼에 오신 것을 환영합니다.<br />
         이제 학습을 시작할 수 있습니다.
       </p>
 
-      <div style={{
-        background: 'linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-muted) 100%)',
-        border: '1px solid var(--border-muted)',
-        borderRadius: '12px',
-        padding: '24px',
-        marginBottom: '32px',
-      }}>
-        <h3 style={{ 
-          fontSize: '16px', 
-          fontWeight: '600', 
-          color: 'var(--text-primary)', 
-          margin: '0 0 16px 0' 
-        }}>
+      <div className="bg-gradient-to-br from-surface to-bg-primary border border-border rounded-xl p-6 mb-8">
+        <h3 className="text-base font-semibold text-text-primary mb-4">
           가입 정보
         </h3>
         
-        <div style={{ 
-          display: 'flex', 
-          flexDirection: 'column', 
-          gap: '8px',
-          fontSize: '14px',
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span style={{ color: 'var(--text-muted)', fontWeight: '600' }}>휴대폰번호:</span>
-            <span style={{ color: 'var(--text-primary)', fontWeight: '500' }}>
+        <div className="flex flex-col gap-2 text-sm">
+          <div className="flex justify-between">
+            <span className="text-text-tertiary font-semibold">휴대폰번호:</span>
+            <span className="text-text-primary font-medium">
               {maskPhone(signupData.phone)}
             </span>
           </div>
           
           {signupData.username && (
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: 'var(--text-muted)', fontWeight: '600' }}>사용자명:</span>
-              <span style={{ color: 'var(--text-primary)', fontWeight: '500' }}>
+            <div className="flex justify-between">
+              <span className="text-text-tertiary font-semibold">사용자명:</span>
+              <span className="text-text-primary font-medium">
                 {signupData.username}
               </span>
             </div>
           )}
           
           {signupData.email && (
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: 'var(--text-muted)', fontWeight: '600' }}>이메일:</span>
-              <span style={{ color: 'var(--text-primary)', fontWeight: '500' }}>
+            <div className="flex justify-between">
+              <span className="text-text-tertiary font-semibold">이메일:</span>
+              <span className="text-text-primary font-medium">
                 {signupData.email}
               </span>
             </div>
           )}
           
           {signupData.inviteCode && (
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: 'var(--text-muted)', fontWeight: '600' }}>초대코드:</span>
-              <span style={{ 
-                color: 'var(--primary)', 
-                fontWeight: '600',
-                background: 'var(--info-light)',
-                padding: '2px 8px',
-                borderRadius: '4px',
-                border: '1px solid var(--primary)',
-              }}>
+            <div className="flex justify-between">
+              <span className="text-text-tertiary font-semibold">초대코드:</span>
+              <span className="text-primary font-semibold bg-info-bg px-2 py-0.5 rounded border border-primary">
                 {signupData.inviteCode}
               </span>
             </div>
@@ -118,33 +80,19 @@ export default function StepDone({ onComplete, signupData }: StepDoneProps) {
         </div>
       </div>
 
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '8px',
-        fontSize: '14px',
-        color: 'var(--text-muted)',
-        marginBottom: '24px',
-      }}>
-        <div className={styles.spinner} style={{ width: '16px', height: '16px' }}></div>
+      <div className="flex items-center justify-center gap-2 text-sm text-text-tertiary mb-6">
+        <div className="w-4 h-4 border-2 border-text-tertiary/30 border-t-text-tertiary rounded-full animate-spin"></div>
         <span>3초 후 자동으로 학습 페이지로 이동합니다...</span>
       </div>
 
       <button
         onClick={onComplete}
-        className={styles.button}
-        style={{ maxWidth: '200px', margin: '0 auto' }}
+        className="w-full max-w-[200px] h-12 bg-primary text-text-primary rounded-lg text-base font-semibold transition-all hover:bg-primary-600 active:bg-primary-700 mx-auto"
       >
         바로 시작하기
       </button>
 
-      <p style={{ 
-        fontSize: '12px', 
-        color: 'var(--text-light)', 
-        margin: '24px 0 0 0',
-        lineHeight: 1.5 
-      }}>
+      <p className="text-xs text-text-tertiary mt-6 leading-normal">
         문제가 있으시거나 도움이 필요하시면<br />
         언제든지 고객지원팀에 문의해주세요.
       </p>

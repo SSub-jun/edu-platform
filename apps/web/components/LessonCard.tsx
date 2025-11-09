@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import styles from './LessonCard.module.css';
 import type { CurriculumLesson } from '../lib/types';
 
 interface LessonCardProps {
@@ -22,65 +21,72 @@ export default function LessonCard({ lesson, subjectTitle }: LessonCardProps) {
   const getStatusBadge = () => {
     switch (status) {
       case 'locked':
-        return <span className={`${styles.badge} ${styles.locked}`}>🔒 잠금</span>;
+        return <span className="inline-flex items-center px-3 py-1 rounded-full text-[13px] leading-5 bg-surface border border-border text-text-tertiary">🔒 잠금</span>;
       case 'available':
         return progressPercent >= 90 
-          ? <span className={`${styles.badge} ${styles.examReady}`}>📝 시험 가능</span>
-          : <span className={`${styles.badge} ${styles.inProgress}`}>📚 학습 중</span>;
+          ? <span className="inline-flex items-center px-3 py-1 rounded-full text-[13px] leading-5 bg-success-bg border border-success text-success">📝 시험 가능</span>
+          : <span className="inline-flex items-center px-3 py-1 rounded-full text-[13px] leading-5 bg-info-bg border border-info text-info">📚 학습 중</span>;
       case 'passed':
-        return <span className={`${styles.badge} ${styles.passed}`}>✅ 완료</span>;
+        return <span className="inline-flex items-center px-3 py-1 rounded-full text-[13px] leading-5 bg-success-bg border border-success text-success">✅ 완료</span>;
       default:
         return null;
     }
   };
 
   const getProgressBarColor = () => {
-    if (status === 'passed') return styles.progressPassed;
-    if (progressPercent >= 90) return styles.progressReady;
-    return styles.progressDefault;
+    if (status === 'passed') return 'bg-success';
+    if (progressPercent >= 90) return 'bg-success';
+    return 'bg-primary';
   };
 
   const canTakeExam = status === 'available' && progressPercent >= 90;
   const canStudy = status === 'available' || status === 'passed';
 
   return (
-    <div className={styles.card}>
-      <div className={styles.header}>
-        <h3 className={styles.title}>{lessonTitle}</h3>
+    <div className="bg-surface border border-border rounded-xl p-4 md:p-6 transition-all hover:border-border-light">
+      {/* Header */}
+      <div className="flex justify-between items-start mb-2">
+        <h3 className="text-xl font-semibold text-text-primary flex-1 mr-3">{lessonTitle}</h3>
         {getStatusBadge()}
       </div>
 
-      <div className={styles.subjectName}>{subjectTitle}</div>
+      {/* Subject Name */}
+      <div className="text-[13px] text-text-secondary mb-4">{subjectTitle}</div>
 
-      <div className={styles.progressSection}>
-        <div className={styles.progressHeader}>
-          <span className={styles.progressLabel}>진행률</span>
-          <span className={styles.progressValue}>{Math.round(progressPercent)}%</span>
+      {/* Progress Section */}
+      <div className="mb-4">
+        <div className="flex justify-between items-center mb-1.5">
+          <span className="text-sm text-text-secondary">진행률</span>
+          <span className="text-sm font-semibold text-text-primary">{Math.round(progressPercent)}%</span>
         </div>
-        <div className={styles.progressBar}>
+        <div className="w-full h-2 bg-surface border border-border rounded-md overflow-hidden">
           <div 
-            className={`${styles.progressFill} ${getProgressBarColor()}`}
+            className={`h-full rounded-md transition-[width] duration-300 ease-linear ${getProgressBarColor()}`}
             style={{ width: `${progressPercent}%` }}
           />
         </div>
       </div>
 
-      <div className={styles.metadata}>
-        <div className={styles.metaItem}>
-          <span className={styles.metaLabel}>남은 시도</span>
-          <span className={styles.metaValue}>{remainingTries}회</span>
+      {/* Metadata */}
+      <div className="grid grid-cols-2 gap-3 mb-5 p-3 bg-bg-primary rounded-lg border border-border">
+        <div className="flex flex-col gap-1">
+          <span className="text-[13px] text-text-tertiary font-normal">남은 시도</span>
+          <span className="text-sm font-semibold text-text-primary">{remainingTries}회</span>
         </div>
-        <div className={styles.metaItem}>
-          <span className={styles.metaLabel}>남은 기간</span>
-          <span className={styles.metaValue}>{remainDays}일</span>
+        <div className="flex flex-col gap-1">
+          <span className="text-[13px] text-text-tertiary font-normal">남은 기간</span>
+          <span className="text-sm font-semibold text-text-primary">{remainDays}일</span>
         </div>
       </div>
 
-      <div className={styles.actions}>
+      {/* Actions */}
+      <div className="grid grid-cols-2 gap-3">
         <Link 
           href={`/lesson/${lessonId}`}
-          className={`${styles.button} ${styles.studyButton} ${
-            !canStudy ? styles.disabled : ''
+          className={`inline-flex items-center justify-center h-10 px-6 rounded-btn text-[14px] leading-5 font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600 focus-visible:outline-offset-2 ${
+            canStudy 
+              ? 'bg-transparent border border-border text-text-secondary hover:bg-surface' 
+              : 'opacity-60 cursor-not-allowed pointer-events-none bg-surface text-text-tertiary'
           }`}
           aria-disabled={!canStudy}
         >
@@ -89,8 +95,10 @@ export default function LessonCard({ lesson, subjectTitle }: LessonCardProps) {
 
         <Link
           href={`/exam/lesson/${lessonId}`}
-          className={`${styles.button} ${styles.examButton} ${
-            !canTakeExam ? styles.disabled : ''
+          className={`inline-flex items-center justify-center h-10 px-6 rounded-btn text-[14px] leading-5 font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600 focus-visible:outline-offset-2 ${
+            canTakeExam 
+              ? 'bg-primary text-text-primary hover:bg-primary-600 active:bg-primary-700' 
+              : 'opacity-60 cursor-not-allowed pointer-events-none bg-surface text-text-tertiary'
           }`}
           aria-disabled={!canTakeExam}
           title={
@@ -105,14 +113,15 @@ export default function LessonCard({ lesson, subjectTitle }: LessonCardProps) {
         </Link>
       </div>
 
+      {/* Info Messages */}
       {status === 'locked' && (
-        <div className={styles.lockReason}>
+        <div className="mt-3 px-3 py-2 rounded-md text-[13px] text-center bg-warning-bg border border-warning text-warning">
           이전 레슨을 완료하면 해금됩니다
         </div>
       )}
 
       {status === 'available' && progressPercent < 90 && (
-        <div className={styles.progressRequired}>
+        <div className="mt-3 px-3 py-2 rounded-md text-[13px] text-center bg-info-bg border border-info text-info">
           시험 응시를 위해 진도율 90% 이상이 필요합니다
         </div>
       )}

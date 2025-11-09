@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import styles from './StatusBanner.module.css';
 
 export interface StatusBannerProps {
   type: 'error' | 'warning' | 'info' | 'success';
@@ -42,19 +41,26 @@ export default function StatusBanner({
     onClose?.();
   };
 
+  const typeStyles = {
+    error: 'border-l-error bg-error-bg text-error',
+    warning: 'border-l-warning bg-warning-bg text-warning',
+    info: 'border-l-info bg-info-bg text-info',
+    success: 'border-l-success bg-success-bg text-success',
+  };
+
   return (
     <div 
-      className={`${styles.banner} ${styles[type]}`}
+      className={`flex items-center px-4 py-3 rounded-lg mb-4 border-l-4 ${typeStyles[type]}`}
       role="alert"
       aria-live="polite"
     >
-      <div className={styles.content}>
-        <span className={styles.message}>{message}</span>
+      <div className="flex items-center justify-between w-full">
+        <span className="flex-1 text-sm font-medium">{message}</span>
         
-        <div className={styles.actions}>
+        <div className="flex items-center gap-2 ml-4">
           {actionLabel && onAction && (
             <button
-              className={styles.actionButton}
+              className="px-3 py-1.5 border border-current rounded text-[12px] font-medium transition-colors hover:bg-current hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
               onClick={onAction}
               type="button"
             >
@@ -64,7 +70,7 @@ export default function StatusBanner({
           
           {onClose && (
             <button
-              className={styles.closeButton}
+              className="flex items-center justify-center w-5 h-5 rounded-full transition-colors hover:bg-black/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
               onClick={handleClose}
               type="button"
               aria-label="배너 닫기"
