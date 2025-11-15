@@ -216,4 +216,35 @@ export class ExamController {
   ): Promise<DeleteExamAttemptResponseDto> {
     return await this.examService.deleteExamAttempt(attemptId);
   }
+
+  @Post('subjects/:subjectId/restart')
+  @Roles('student')
+  @ApiOperation({
+    summary: '다시 수강하기 (Subject 단위)',
+    description: '현재 사이클에서 3회 모두 시도했고 미수료한 경우, 모든 강의 진도를 0%로 리셋하고 새 사이클을 시작합니다.'
+  })
+  @ApiParam({ 
+    name: 'subjectId', 
+    description: '과목 ID'
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: '다시 수강하기 성공',
+    schema: {
+      properties: {
+        success: { type: 'boolean' },
+        message: { type: 'string' },
+        newCycle: { type: 'number' },
+        resetLessonCount: { type: 'number' }
+      }
+    }
+  })
+  @ApiResponse({ status: 403, description: '조건 미충족 (3회 미만 시도 또는 이미 수료)' })
+  @ApiResponse({ status: 404, description: '과목 진도 기록을 찾을 수 없음' })
+  async restartSubject(
+    @Param('subjectId') subjectId: string,
+    @Request() req: any
+  ) {
+    return await this.examService.restartSubject(req.user.sub, subjectId);
+  }
 }
