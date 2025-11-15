@@ -12,6 +12,16 @@ interface Question {
 interface ExamData {
   attemptId: string;
   questions: Question[];
+  subjectName?: string;
+  attemptNumber?: number;
+  remainingTries?: number;
+}
+
+interface SubjectStatus {
+  progressPercent: number;
+  examAttemptCount: number;
+  remainingTries: number;
+  canTakeExam: boolean;
 }
 
 export default function ExamPage() {
@@ -20,6 +30,7 @@ export default function ExamPage() {
   const subjectId = params.subjectId as string;
   
   const [examData, setExamData] = useState<ExamData | null>(null);
+  const [subjectStatus, setSubjectStatus] = useState<SubjectStatus | null>(null);
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -33,10 +44,53 @@ export default function ExamPage() {
       return;
     }
 
-    startExam();
+    loadSubjectStatus();
   }, [subjectId, router]);
 
-  const startExam = async () => {
+  const loadSubjectStatus = async () => {
+    try {
+      // 먼저 Subject 상태 확인
+      const statusResponse = await fetch(`http://localhost:4000/me/curriculum`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      });
+
+      if (!statusResponse.ok) {
+        throw new Error('과목 상태 조회 실패');
+      }
+
+      const curriculum = await statusResponse.json();
+      const subject = curriculum.subjects?.find((s: any) => s.id === subjectId);
+      
+      if (!subject) {
+        throw new Error('과목을 찾을 수 없습니다');
+      }
+
+      if (!subject.canTakeExam) {
+        alert('시험 응시 조건을 만족하지 않습니다.\n모든 강의를 90% 이상 수강해주세요.');
+        router.push('/curriculum');
+        return;
+      }
+
+      setSubjectStatus({
+        progressPercent: subject.progressPercent,
+        examAttemptCount: subject.examAttemptCount || 0,
+        remainingTries: subject.remainingTries || 3,
+        canTakeExam: subject.canTakeExam,
+      });
+
+      // 시험 시작
+      await startExam(subject.name);
+    } catch (error) {
+      alert('시험을 준비할 수 없습니다.');
+      console.error(error);
+      router.push('/curriculum');
+      setLoading(false);
+    }
+  };
+
+  const startExam = async (subjectName?: string) => {
     try {
       const response = await fetch(`http://localhost:4000/exam/subjects/${subjectId}/start`, {
         method: 'POST',
@@ -51,7 +105,10 @@ export default function ExamPage() {
       }
 
       const data = await response.json();
-      setExamData(data);
+      setExamData({
+        ...data,
+        subjectName,
+      });
     } catch (error) {
       alert('시험을 시작할 수 없습니다.');
       console.error(error);
@@ -128,8 +185,9 @@ export default function ExamPage() {
       }
 
       const data = await response.json();
-      setResult(data);
-      setSubmitted(true);
+      
+      // Subject 기반 결과 페이지로 이동
+      router.push(`/exam/result?subjectId=${subjectId}&attemptId=${examData.attemptId}&score=${data.examScore}&finalScore=${data.finalScore || 0}&passed=${data.passed || false}&progressPercent=${subjectStatus?.progressPercent || 0}&remainingTries=${(subjectStatus?.remainingTries || 3) - 1}`);
     } catch (error) {
       alert('시험 제출 중 오류가 발생했습니다.');
       console.error(error);
@@ -149,38 +207,6 @@ export default function ExamPage() {
     );
   }
 
-  if (submitted && result) {
-    return (
-      <div className="min-h-screen py-10 px-5 bg-bg-primary">
-        <div className="max-w-2xl mx-auto bg-surface border border-border rounded-xl p-10 text-center">
-          <h1 className={`text-[32px] mb-8 font-bold ${result.passed ? 'text-success' : 'text-error'}`}>
-            {result.passed ? '🎉 합격!' : '😔 불합격'}
-          </h1>
-          
-          <div className="flex flex-col gap-5 mb-10 items-center">
-            <div className="py-8 px-12 bg-bg-primary rounded-xl border border-border">
-              <div className={`text-5xl font-bold ${result.passed ? 'text-success' : 'text-error'}`}>
-                {Math.round(result.examScore)}점
-              </div>
-              <div className="text-base text-text-secondary mt-2.5">
-                {result.passed
-                  ? '수료 기준: 진도 20점 + 평가 80점, 총점 70점 이상'
-                  : '수료 기준 미달: 총점 70점 미만 또는 진도율 부족'}
-              </div>
-            </div>
-          </div>
-
-          <button
-            onClick={handleBackToDashboard}
-            className="px-8 py-4 bg-primary text-text-primary border-0 rounded-lg text-base font-semibold cursor-pointer transition-colors hover:bg-primary-600"
-          >
-            커리큘럼으로 돌아가기
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   if (!examData) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-bg-primary">
@@ -192,12 +218,42 @@ export default function ExamPage() {
   return (
     <div className="min-h-screen py-10 px-5 bg-bg-primary">
       <div className="max-w-4xl mx-auto bg-surface border border-border rounded-xl p-8 md:p-10">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-[28px] font-bold text-text-primary">
-            {subjectId === 'demo' ? '데모 시험' : `${subjectId} 시험`}
-          </h1>
-          <div className="text-sm text-text-secondary px-4 py-2 bg-bg-primary rounded-full border border-border">
-            {examData.questions.length}문제
+        {/* 시험 헤더 */}
+        <div className="mb-8">
+          <div className="flex justify-between items-start mb-4">
+            <div>
+              <h1 className="text-[28px] font-bold text-text-primary mb-2">
+                {examData.subjectName || '과목'} 시험
+              </h1>
+              <p className="text-sm text-text-secondary">
+                모든 문제에 답변한 후 제출해주세요
+              </p>
+            </div>
+            <div className="text-sm text-text-secondary px-4 py-2 bg-bg-primary rounded-full border border-border">
+              {examData.questions.length}문제
+            </div>
+          </div>
+          
+          {/* 시험 정보 카드 */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-bg-primary border border-border rounded-lg">
+            <div className="text-center">
+              <div className="text-xs text-text-tertiary mb-1">현재 진도율</div>
+              <div className="text-lg font-bold text-text-primary">
+                {Math.round(subjectStatus?.progressPercent || 0)}%
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="text-xs text-text-tertiary mb-1">시험 차수</div>
+              <div className="text-lg font-bold text-text-primary">
+                {(subjectStatus?.examAttemptCount || 0) + 1}회차
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="text-xs text-text-tertiary mb-1">남은 기회</div>
+              <div className="text-lg font-bold text-warning">
+                {subjectStatus?.remainingTries || 3}회
+              </div>
+            </div>
           </div>
         </div>
 

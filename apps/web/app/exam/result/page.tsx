@@ -5,35 +5,44 @@ export const dynamic = 'force-dynamic';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useNextAvailable } from '../../../src/hooks/useNextAvailable';
-import { useRetakeExam } from '../../../src/hooks/useExam';
-import { getErrorMessage } from '../../../src/utils/errorMap';
 
 export default function ExamResultPage() {
   const router = useRouter();
-  const [urlParams, setUrlParams] = useState<{ attemptId: string | null; score: string | null; passed: boolean; lessonId: string | null }>({
+  const [urlParams, setUrlParams] = useState<{ 
+    subjectId: string | null;
+    attemptId: string | null; 
+    score: string | null; 
+    finalScore: string | null;
+    passed: boolean; 
+    progressPercent: string | null;
+    remainingTries: string | null;
+  }>({
+    subjectId: null,
     attemptId: null,
     score: null,
+    finalScore: null,
     passed: false,
-    lessonId: null,
+    progressPercent: null,
+    remainingTries: null,
   });
   
   // URL 파라미터 파싱 (클라이언트 사이드)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     setUrlParams({
+      subjectId: params.get('subjectId'),
       attemptId: params.get('attemptId'),
       score: params.get('score'),
+      finalScore: params.get('finalScore'),
       passed: params.get('passed') === 'true',
-      lessonId: params.get('lessonId'),
+      progressPercent: params.get('progressPercent'),
+      remainingTries: params.get('remainingTries'),
     });
   }, []);
   
-  const { attemptId, score, passed, lessonId } = urlParams;
+  const { subjectId, attemptId, score, finalScore, passed, progressPercent, remainingTries } = urlParams;
   const [showDetails, setShowDetails] = useState(false);
-  
-  const { data: nextAvailable, isLoading: nextLoading } = useNextAvailable();
-  const retakeExamMutation = useRetakeExam();
+  const [restarting, setRestarting] = useState(false);
 
   // 파라미터 검증
   useEffect(() => {
@@ -42,27 +51,38 @@ export default function ExamResultPage() {
     }
   }, [attemptId, score, router]);
 
-  const handleRetakeExam = async () => {
-    if (!lessonId) return;
-    
-    try {
-      const result = await retakeExamMutation.mutateAsync(lessonId);
-      if (result.allowed) {
-        router.push(`/exam/lesson/${lessonId}`);
-      } else {
-        alert(result.message || '재응시할 수 없습니다.');
-      }
-    } catch (error) {
-      const errorMessage = getErrorMessage(error);
-      alert(`${errorMessage.title}: ${errorMessage.description}`);
-    }
+  const handleRetakeExam = () => {
+    if (!subjectId) return;
+    router.push(`/exam/${subjectId}`);
   };
 
-  const handleNextLesson = () => {
-    if (nextAvailable?.nextSubject) {
-      router.push(`/lesson/${nextAvailable.nextSubject.lessonId}`);
-    } else {
+  const handleRestartSubject = async () => {
+    if (!subjectId) return;
+    
+    if (!confirm('과목을 다시 수강하시겠습니까?\n모든 강의 진도가 0%로 초기화되고, 3회의 새로운 시험 기회가 주어집니다.')) {
+      return;
+    }
+
+    setRestarting(true);
+    try {
+      const response = await fetch(`http://localhost:4000/exam/subjects/${subjectId}/restart`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('다시 수강하기 실패');
+      }
+
+      alert('과목이 초기화되었습니다. 모든 강의를 다시 수강해주세요.');
       router.push('/curriculum');
+    } catch (error) {
+      alert('다시 수강하기 중 오류가 발생했습니다.');
+      console.error(error);
+    } finally {
+      setRestarting(false);
     }
   };
 
@@ -80,6 +100,9 @@ export default function ExamResultPage() {
   }
 
   const scoreNum = parseFloat(score);
+  const finalScoreNum = finalScore ? parseFloat(finalScore) : 0;
+  const progressNum = progressPercent ? parseFloat(progressPercent) : 0;
+  const remainingTriesNum = remainingTries ? parseInt(remainingTries) : 0;
   const isPass = passed;
 
   return (
@@ -91,35 +114,56 @@ export default function ExamResultPage() {
             {isPass ? '🎉' : '😔'}
           </div>
           <h1 className={`text-[32px] font-bold mb-3 ${isPass ? 'text-success' : 'text-error'}`}>
-            {isPass ? '축하합니다!' : '아쉽지만...'}
+            {isPass ? '과목 수료!' : '미수료'}
           </h1>
           <p className="text-lg text-text-secondary">
             {isPass 
-              ? '시험에 합격하셨습니다!' 
-              : '시험에 불합격하셨습니다. 다시 도전해보세요!'
+              ? '축하합니다! 과목을 수료하셨습니다!' 
+              : '아쉽지만 수료 기준에 미달했습니다.'
             }
           </p>
         </div>
 
         {/* 점수 정보 */}
         <div className="mb-8">
+          {/* 총점 */}
           <div className="bg-bg-primary border border-border rounded-xl p-8 text-center mb-4">
-            <div className={`text-5xl font-bold mb-2 ${isPass ? 'text-success' : 'text-error'}`}>
-              {Math.round(scoreNum)}점
+            <div className="text-sm text-text-tertiary mb-2">과목 총점</div>
+            <div className={`text-5xl font-bold mb-4 ${isPass ? 'text-success' : 'text-error'}`}>
+              {Math.round(finalScoreNum)}점
             </div>
-            <div className="text-base text-text-secondary mb-3">
-              시험 점수 (학습평가 80% 비중)
-            </div>
-            <div className="text-sm font-medium">
+            <div className="text-sm font-medium mb-4">
               {isPass ? (
                 <span className="text-success">
-                  ✅ 수료 기준 충족 (진도 20점 + 평가 80점, 총점 70점 이상)
+                  ✅ 수료 완료 (총점 70점 이상)
                 </span>
               ) : (
                 <span className="text-error">
-                  ❌ 수료 기준 미달 (총점 70점 미만 또는 진도율 부족)
+                  ❌ 수료 기준 미달 (총점 70점 미만)
                 </span>
               )}
+            </div>
+            
+            {/* 점수 구성 */}
+            <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-border">
+              <div>
+                <div className="text-xs text-text-tertiary mb-1">진도율 (20%)</div>
+                <div className="text-2xl font-bold text-text-primary">
+                  {Math.round(progressNum * 0.2)}점
+                </div>
+                <div className="text-xs text-text-secondary mt-1">
+                  ({Math.round(progressNum)}% 수강)
+                </div>
+              </div>
+              <div>
+                <div className="text-xs text-text-tertiary mb-1">시험 점수 (80%)</div>
+                <div className="text-2xl font-bold text-text-primary">
+                  {Math.round(scoreNum * 0.8)}점
+                </div>
+                <div className="text-xs text-text-secondary mt-1">
+                  (시험 {Math.round(scoreNum)}점)
+                </div>
+              </div>
             </div>
           </div>
 
@@ -141,9 +185,15 @@ export default function ExamResultPage() {
                 <span className="text-sm text-text-primary">{attemptId}</span>
               </div>
               <div className="flex justify-between py-2 border-b border-border">
-                <span className="text-sm font-medium text-text-tertiary">합격 기준</span>
+                <span className="text-sm font-medium text-text-tertiary">수료 기준</span>
                 <span className="text-sm text-text-primary">
                   진도 20점 + 평가 80점, 총점 70점 이상
+                </span>
+              </div>
+              <div className="flex justify-between py-2 border-b border-border">
+                <span className="text-sm font-medium text-text-tertiary">남은 시험 기회</span>
+                <span className="text-sm text-text-primary">
+                  {remainingTriesNum}회
                 </span>
               </div>
               <div className="flex justify-between py-2">
@@ -157,53 +207,71 @@ export default function ExamResultPage() {
         {/* 액션 버튼 */}
         <div className="mb-8">
           {isPass ? (
-            // 합격 시 액션
+            // 수료 시 액션
             <div className="flex flex-col gap-3">
-              {!nextLoading && nextAvailable?.nextSubject ? (
-                <button 
-                  className="w-full px-6 py-4 bg-primary text-text-primary rounded-lg font-semibold transition-colors hover:bg-primary-600"
-                  onClick={handleNextLesson}
-                >
-                  다음 레슨으로 이동
-                </button>
-              ) : (
-                <div className="text-center p-6 bg-bg-primary border border-border rounded-lg mb-3">
-                  <p className="text-lg font-semibold text-text-primary mb-4">🎊 모든 레슨을 완료하셨습니다!</p>
-                  <Link href="/curriculum" className="inline-block px-6 py-3 bg-primary text-text-primary rounded-lg font-semibold transition-colors hover:bg-primary-600">
-                    커리큘럼 확인
-                  </Link>
-                </div>
-              )}
+              <div className="text-center p-6 bg-success-bg border border-success rounded-lg mb-3">
+                <p className="text-lg font-semibold text-success mb-2">🎊 과목을 수료하셨습니다!</p>
+                <p className="text-sm text-text-secondary">
+                  다른 과목을 확인하거나 강의를 복습해보세요.
+                </p>
+              </div>
               
-              <Link href="/curriculum" className="w-full px-6 py-3 bg-bg-primary text-text-secondary border-2 border-border rounded-lg font-semibold text-center transition-all hover:bg-surface hover:text-text-primary hover:border-border-light">
+              <Link href="/curriculum" className="w-full px-6 py-4 bg-primary text-text-primary rounded-lg font-semibold text-center transition-colors hover:bg-primary-600">
                 커리큘럼으로 돌아가기
               </Link>
             </div>
           ) : (
-            // 불합격 시 액션
+            // 미수료 시 액션
             <div className="flex flex-col gap-3">
-              {lessonId && (
-                <button 
-                  className="w-full px-6 py-4 bg-primary text-text-primary rounded-lg font-semibold transition-all hover:bg-primary-600 disabled:opacity-60 disabled:cursor-not-allowed"
-                  onClick={handleRetakeExam}
-                  disabled={retakeExamMutation.isPending}
-                >
-                  {retakeExamMutation.isPending ? (
-                    <span className="inline-flex items-center gap-2">
-                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                      준비 중...
-                    </span>
-                  ) : (
-                    '재응시하기'
-                  )}
-                </button>
+              {/* 남은 시험 기회에 따른 안내 */}
+              {remainingTriesNum > 0 ? (
+                <>
+                  <div className="text-center p-4 bg-warning-bg border border-warning rounded-lg">
+                    <p className="text-sm font-medium text-warning">
+                      ⚠️ 남은 시험 기회: {remainingTriesNum}회
+                    </p>
+                  </div>
+                  
+                  <button 
+                    className="w-full px-6 py-4 bg-primary text-text-primary rounded-lg font-semibold transition-all hover:bg-primary-600"
+                    onClick={handleRetakeExam}
+                  >
+                    재응시하기
+                  </button>
+                </>
+              ) : (
+                <>
+                  <div className="text-center p-4 bg-error-bg border border-error rounded-lg">
+                    <p className="text-sm font-medium text-error mb-2">
+                      ❌ 시험 기회를 모두 사용했습니다
+                    </p>
+                    <p className="text-xs text-text-secondary">
+                      과목을 다시 수강하면 3회의 새로운 시험 기회가 주어집니다.
+                    </p>
+                  </div>
+                  
+                  <button 
+                    className="w-full px-6 py-4 bg-warning text-white rounded-lg font-semibold transition-all hover:bg-warning/90 disabled:opacity-60 disabled:cursor-not-allowed"
+                    onClick={handleRestartSubject}
+                    disabled={restarting}
+                  >
+                    {restarting ? (
+                      <span className="inline-flex items-center gap-2">
+                        <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                        초기화 중...
+                      </span>
+                    ) : (
+                      '🔄 다시 수강하기'
+                    )}
+                  </button>
+                </>
               )}
               
               <Link 
-                href={lessonId ? `/lesson/${lessonId}` : '/curriculum'} 
+                href="/curriculum"
                 className="w-full px-6 py-3 bg-bg-primary text-text-secondary border-2 border-border rounded-lg font-semibold text-center transition-all hover:bg-surface hover:text-text-primary hover:border-border-light"
               >
-                {lessonId ? '레슨으로 돌아가기' : '커리큘럼으로'}
+                커리큘럼으로 돌아가기
               </Link>
             </div>
           )}
@@ -216,23 +284,34 @@ export default function ExamResultPage() {
             {isPass ? (
               <>
                 <div className="flex items-start gap-3">
-                  <span className="text-2xl flex-shrink-0">📈</span>
-                  <span className="text-base text-text-secondary">다음 레슨에서 새로운 내용을 학습하세요</span>
+                  <span className="text-2xl flex-shrink-0">📚</span>
+                  <span className="text-base text-text-secondary">다른 과목을 수강하거나 강의를 복습하세요</span>
                 </div>
                 <div className="flex items-start gap-3">
                   <span className="text-2xl flex-shrink-0">📊</span>
-                  <span className="text-base text-text-secondary">진도율을 확인하고 전체 커리큘럼을 점검하세요</span>
+                  <span className="text-base text-text-secondary">커리큘럼에서 전체 진도를 확인하세요</span>
+                </div>
+              </>
+            ) : remainingTriesNum > 0 ? (
+              <>
+                <div className="flex items-start gap-3">
+                  <span className="text-2xl flex-shrink-0">📖</span>
+                  <span className="text-base text-text-secondary">강의 내용을 다시 복습해보세요</span>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="text-2xl flex-shrink-0">✍️</span>
+                  <span className="text-base text-text-secondary">남은 {remainingTriesNum}회의 기회로 재응시하세요</span>
                 </div>
               </>
             ) : (
               <>
                 <div className="flex items-start gap-3">
-                  <span className="text-2xl flex-shrink-0">📖</span>
-                  <span className="text-base text-text-secondary">레슨 내용을 다시 복습해보세요</span>
+                  <span className="text-2xl flex-shrink-0">🔄</span>
+                  <span className="text-base text-text-secondary">과목을 다시 수강하여 새로운 시험 기회를 받으세요</span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <span className="text-2xl flex-shrink-0">🔄</span>
-                  <span className="text-base text-text-secondary">재응시 기회를 활용해 다시 도전하세요</span>
+                  <span className="text-2xl flex-shrink-0">💪</span>
+                  <span className="text-base text-text-secondary">모든 강의를 90% 이상 수강하면 다시 시험을 볼 수 있습니다</span>
                 </div>
               </>
             )}
