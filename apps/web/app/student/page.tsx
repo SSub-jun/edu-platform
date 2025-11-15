@@ -2,181 +2,199 @@
 
 export const dynamic = 'force-dynamic';
 
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useAuthGuard } from '../hooks/useAuthGuard';
-import { useRouter } from 'next/navigation';
 import { authClient } from '../../lib/auth';
 
+interface Profile {
+  id: string;
+  username: string;
+  phone: string | null;
+  email: string | null;
+  role: 'student' | 'instructor' | 'admin';
+  isCompanyAssigned: boolean;
+  company: {
+    id: string;
+    name: string;
+    startDate: string;
+    endDate: string;
+    isActive: boolean;
+  } | null;
+  createdAt: string;
+}
+
+const roleLabel: Record<Profile['role'], string> = {
+  student: '학생',
+  instructor: '강사',
+  admin: '관리자',
+};
+
 export default function StudentPage() {
-  const { isAuthenticated } = useAuthGuard();
-  const router = useRouter();
+  const { isAuthenticated, isLoading, logout } = useAuthGuard();
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [loadingProfile, setLoadingProfile] = useState(false);
 
-  const handleLogout = async () => {
-    await authClient.logout();
-  };
+  useEffect(() => {
+    const loadProfile = async () => {
+      if (!isAuthenticated) return;
+      setLoadingProfile(true);
+      try {
+        const response = await authClient.getApi().get('/me/profile');
+        if (response.data?.success && response.data.data) {
+          setProfile(response.data.data as Profile);
+        }
+      } catch (e) {
+        console.error('[STUDENT_PAGE] Failed to load profile', e);
+      } finally {
+        setLoadingProfile(false);
+      }
+    };
 
-  if (!isAuthenticated) {
-    return <div>인증 중...</div>;
+    loadProfile();
+  }, [isAuthenticated]);
+
+  if (isLoading || !isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-bg-primary">
+        <div className="flex items-center gap-2 text-text-secondary">
+          <div className="w-5 h-5 border-2 border-text-tertiary/30 border-t-text-tertiary rounded-full animate-spin" />
+          <span>인증 중...</span>
+        </div>
+      </div>
+    );
   }
 
+  const company = profile?.company ?? null;
+
+  const formatDate = (value?: string | null) => {
+    if (!value) return '-';
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return value;
+    return d.toLocaleDateString('ko-KR');
+  };
+
   return (
-    <div style={{ 
-      minHeight: '100vh', 
-      padding: '20px',
-      backgroundColor: '#f5f5f5'
-    }}>
-      <div style={{ 
-        maxWidth: '1200px', 
-        margin: '0 auto',
-        backgroundColor: 'white',
-        padding: '30px',
-        borderRadius: '8px',
-        boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
-      }}>
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center',
-          marginBottom: '30px'
-        }}>
-          <h1 style={{ 
-            fontSize: '28px', 
-            fontWeight: 'bold',
-            color: '#333'
-          }}>
-            학생 대시보드
-          </h1>
+    <div className="min-h-screen bg-bg-primary px-4 py-8 md:py-10">
+      <div className="max-w-3xl mx-auto bg-surface border border-border rounded-xl px-6 py-8 md:px-10 md:py-10">
+        {/* 헤더 */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-text-primary mb-2">
+              내 정보
+            </h1>
+            <p className="text-sm md:text-base text-text-secondary">
+              계정 정보와 소속, 교육기간을 확인할 수 있습니다.
+            </p>
+          </div>
           <button
-            onClick={handleLogout}
-            style={{
-              padding: '10px 20px',
-              backgroundColor: '#dc3545',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '14px'
-            }}
+            onClick={logout}
+            className="px-4 py-2 rounded-lg bg-error text-white text-sm font-semibold transition-colors hover:bg-error/90"
           >
             로그아웃
           </button>
         </div>
 
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-          gap: '20px'
-        }}>
-          <div style={{
-            padding: '20px',
-            border: '1px solid #e0e0e0',
-            borderRadius: '8px',
-            backgroundColor: '#f8f9fa'
-          }}>
-            <h3 style={{ marginBottom: '15px', color: '#333' }}>학습하기</h3>
-            <p style={{ color: '#666', marginBottom: '15px' }}>강의 영상 시청 및 학습 진행</p>
-            <button 
-              onClick={() => router.push('/exam/demo')}
-              style={{
-                padding: '8px 16px',
-                backgroundColor: '#0070f3',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              시험 보기
-            </button>
+        {/* 본문 */}
+        {loadingProfile && !profile ? (
+          <div className="flex items-center gap-2 text-text-secondary">
+            <div className="w-4 h-4 border-2 border-text-tertiary/30 border-t-text-tertiary rounded-full animate-spin" />
+            <span>내 정보를 불러오는 중입니다...</span>
           </div>
+        ) : (
+          <div className="space-y-8">
+            {/* 기본 정보 */}
+            <section>
+              <h2 className="text-lg font-semibold text-text-primary mb-4">
+                기본 정보
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-bg-primary border border-border rounded-xl p-5">
+                <div>
+                  <div className="text-xs text-text-tertiary mb-1">이름 / 아이디</div>
+                  <div className="text-base font-medium text-text-primary">
+                    {profile?.username ?? '-'}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-xs text-text-tertiary mb-1">역할</div>
+                  <div className="text-base font-medium text-text-primary">
+                    {profile ? roleLabel[profile.role] : '-'}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-xs text-text-tertiary mb-1">휴대폰 번호</div>
+                  <div className="text-base text-text-primary">
+                    {profile?.phone ?? '-'}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-xs text-text-tertiary mb-1">이메일</div>
+                  <div className="text-base text-text-primary">
+                    {profile?.email ?? '-'}
+                  </div>
+                </div>
+              </div>
+            </section>
 
-          <div style={{
-            padding: '20px',
-            border: '1px solid #e0e0e0',
-            borderRadius: '8px',
-            backgroundColor: '#f8f9fa'
-          }}>
-            <h3 style={{ marginBottom: '15px', color: '#333' }}>진도 확인</h3>
-            <p style={{ color: '#666', marginBottom: '15px' }}>현재 학습 진도 및 성과 확인</p>
-            <button style={{
-              padding: '8px 16px',
-              backgroundColor: '#0070f3',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer'
-            }}>
-              진도 보기
-            </button>
-          </div>
+            {/* 소속 및 교육기간 */}
+            <section>
+              <h2 className="text-lg font-semibold text-text-primary mb-4">
+                소속 및 교육기간
+              </h2>
+              <div className="bg-bg-primary border border-border rounded-xl p-5 space-y-3">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                  <div>
+                    <div className="text-xs text-text-tertiary mb-1">소속 회사</div>
+                    <div className="text-base font-medium text-text-primary">
+                      {company?.name ?? (profile?.isCompanyAssigned ? '회사 정보 없음' : '미배정')}
+                    </div>
+                  </div>
+                  <div className="text-xs md:text-sm text-text-secondary">
+                    {company
+                      ? company.isActive
+                        ? '진행 중인 교육'
+                        : '비활성 회사'
+                      : '회사 배정 상태를 확인해주세요.'}
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <div className="text-xs text-text-tertiary mb-1">교육 시작일</div>
+                    <div className="text-base text-text-primary">
+                      {company ? formatDate(company.startDate) : '-'}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-text-tertiary mb-1">교육 종료일</div>
+                    <div className="text-base text-text-primary">
+                      {company ? formatDate(company.endDate) : '-'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
 
-          <div style={{
-            padding: '20px',
-            border: '1px solid #e0e0e0',
-            borderRadius: '8px',
-            backgroundColor: '#f8f9fa'
-          }}>
-            <h3 style={{ marginBottom: '15px', color: '#333' }}>Q&A</h3>
-            <p style={{ color: '#666', marginBottom: '15px' }}>질문 등록 및 답변 확인</p>
-            <button 
-              onClick={() => router.push('/qna')}
-              style={{
-                padding: '8px 16px',
-                backgroundColor: '#0070f3',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              Q&A 보기
-            </button>
+            {/* 기타 */}
+            <section>
+              <h2 className="text-lg font-semibold text-text-primary mb-4">
+                기타
+              </h2>
+              <div className="bg-bg-primary border border-border rounded-xl p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                <div className="text-sm text-text-secondary">
+                  강의실에서 학습 진도와 시험 결과를 확인하실 수 있습니다.
+                </div>
+                <Link
+                  href="/curriculum"
+                  className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold transition-colors hover:bg-primary-600"
+                >
+                  강의실로 이동
+                </Link>
+              </div>
+            </section>
           </div>
-
-          <div style={{
-            padding: '20px',
-            border: '1px solid #e0e0e0',
-            borderRadius: '8px',
-            backgroundColor: '#f8f9fa'
-          }}>
-            <h3 style={{ marginBottom: '15px', color: '#333' }}>🎯 시험 포털</h3>
-            <p style={{ color: '#666', marginBottom: '15px' }}>세션 코드로 실시간 시험 참여</p>
-            <button 
-              onClick={() => router.push('/portal/exam')}
-              style={{
-                padding: '8px 16px',
-                backgroundColor: '#28a745',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontWeight: 'bold'
-              }}
-            >
-              시험 참여
-            </button>
-          </div>
-
-          <div style={{
-            padding: '20px',
-            border: '1px solid #e0e0e0',
-            borderRadius: '8px',
-            backgroundColor: '#f8f9fa'
-          }}>
-            <h3 style={{ marginBottom: '15px', color: '#333' }}>내 정보</h3>
-            <p style={{ color: '#666', marginBottom: '15px' }}>개인정보 및 계정 설정</p>
-            <button style={{
-              padding: '8px 16px',
-              backgroundColor: '#0070f3',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer'
-            }}>
-              정보 수정
-            </button>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
 }
+

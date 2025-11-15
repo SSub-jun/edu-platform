@@ -145,40 +145,19 @@ export default function QnaPage() {
   return (
     <div className="min-h-screen p-6 bg-bg-primary">
       <div className="max-w-4xl mx-auto">
-        {/* 헤더 */}
-        <div className="flex justify-between items-center mb-8 p-5 bg-surface border border-border rounded-xl">
-          <div className="flex items-center gap-4">
+        {/* 상단 영역: 간단한 타이틀 + 질문하기 버튼 */}
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-text-primary">
+            Q&A
+          </h1>
+          {userRole === 'student' && (
             <button
-              onClick={() => {
-                // role에 따라 다른 페이지로 이동
-                if (userRole === 'instructor') {
-                  router.push('/instructor');
-                } else if (userRole === 'admin') {
-                  router.push('/admin');
-                } else {
-                  router.push('/curriculum');
-                }
-              }}
-              className="px-3 py-2 bg-bg-primary text-text-secondary border border-border rounded-md text-xs font-medium cursor-pointer transition-all hover:bg-surface hover:text-text-primary hover:border-border-light"
+              onClick={() => setShowQuestionForm(!showQuestionForm)}
+              className="px-5 py-2.5 bg-info text-white border-0 rounded-md cursor-pointer font-medium transition-colors hover:bg-info/90"
             >
-              {userRole === 'instructor' ? '← 강사 대시보드' : 
-               userRole === 'admin' ? '← 관리자 대시보드' : 
-               '← 커리큘럼'}
+              {showQuestionForm ? '취소' : '질문하기'}
             </button>
-            <h1 className="text-2xl font-bold text-text-primary m-0">
-              Q&A
-            </h1>
-          </div>
-          <div>
-            {userRole === 'student' && (
-              <button
-                onClick={() => setShowQuestionForm(!showQuestionForm)}
-                className="px-5 py-2.5 bg-info text-white border-0 rounded-md cursor-pointer font-medium transition-colors hover:bg-info/90"
-              >
-                {showQuestionForm ? '취소' : '질문하기'}
-              </button>
-            )}
-          </div>
+          )}
         </div>
 
         {/* 질문 작성 폼 (학생만) */}

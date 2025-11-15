@@ -115,17 +115,6 @@ export default function CurriculumPage() {
   if (authLoading) {
     return (
       <div className="min-h-screen bg-bg-primary px-6 py-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex justify-between items-start mb-10">
-            <h1 className="text-[32px] font-bold text-text-primary">나의 커리큘럼</h1>
-            <button
-              onClick={logout}
-              className="bg-error text-white px-6 py-3 rounded-md text-sm font-semibold hover:bg-error/90 transition-colors"
-            >
-              로그아웃
-            </button>
-          </div>
-        </div>
         <div className="flex justify-center items-center min-h-[400px]">
           <div className="text-text-secondary">인증 확인 중...</div>
         </div>
@@ -141,9 +130,6 @@ export default function CurriculumPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-bg-primary px-6 py-8">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-[32px] font-bold text-text-primary mb-10">나의 커리큘럼</h1>
-        </div>
         <div className="flex justify-center items-center min-h-[400px]">
           <div className="text-text-secondary">로딩 중...</div>
         </div>
@@ -155,17 +141,6 @@ export default function CurriculumPage() {
     const errorMessage = getErrorMessage(error);
     return (
       <div className="min-h-screen bg-bg-primary px-6 py-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex justify-between items-start mb-10">
-            <h1 className="text-[32px] font-bold text-text-primary">나의 커리큘럼</h1>
-            <button
-              onClick={logout}
-              className="bg-error text-white px-6 py-3 rounded-md text-sm font-semibold hover:bg-error/90 transition-colors"
-            >
-              로그아웃
-            </button>
-          </div>
-        </div>
         <div className="flex justify-center items-center min-h-[400px]">
           <div className="bg-surface border border-error rounded-xl p-10 text-center max-w-md w-full">
             <h3 className="text-xl font-bold text-error mb-3">{errorMessage.title}</h3>
@@ -189,17 +164,6 @@ export default function CurriculumPage() {
   if (!subjects || subjects.length === 0) {
     return (
       <div className="min-h-screen bg-bg-primary px-6 py-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex justify-between items-start mb-10">
-            <h1 className="text-[32px] font-bold text-text-primary">나의 커리큘럼</h1>
-            <button
-              onClick={logout}
-              className="bg-error text-white px-6 py-3 rounded-md text-sm font-semibold hover:bg-error/90 transition-colors"
-            >
-              로그아웃
-            </button>
-          </div>
-        </div>
         <div className="flex justify-center items-center min-h-[400px]">
           <div className="bg-surface border border-border rounded-xl p-10 text-center max-w-md w-full">
             <h3 className="text-xl font-bold text-text-primary mb-3">등록된 과목이 없습니다</h3>
@@ -215,30 +179,6 @@ export default function CurriculumPage() {
   return (
     <div className="min-h-screen bg-bg-primary px-6 py-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex justify-between items-start mb-10 flex-wrap gap-4">
-          <div>
-            <h1 className="text-[32px] font-bold text-text-primary mb-2">나의 커리큘럼</h1>
-            <p className="text-lg text-text-secondary font-medium">
-              총 {subjects.reduce((acc, subject) => acc + subject.lessons.length, 0)}개 레슨
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <button
-              onClick={() => router.push('/qna')}
-              className="bg-info text-white px-6 py-3 rounded-md text-sm font-semibold hover:bg-info/90 transition-colors"
-            >
-              Q&A
-            </button>
-            <button
-              onClick={logout}
-              className="bg-error text-white px-6 py-3 rounded-md text-sm font-semibold hover:bg-error/90 transition-colors"
-            >
-              로그아웃
-            </button>
-          </div>
-        </div>
-
         {/* Content */}
         <div className="flex flex-col gap-12">
         {subjects.map((subject) => {
