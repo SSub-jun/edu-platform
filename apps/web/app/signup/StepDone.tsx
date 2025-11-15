@@ -51,20 +51,11 @@ export default function StepDone({ onComplete, signupData }: StepDoneProps) {
             </span>
           </div>
           
-          {signupData.username && (
+          {signupData.name && (
             <div className="flex justify-between">
-              <span className="text-text-tertiary font-semibold">사용자명:</span>
+              <span className="text-text-tertiary font-semibold">이름:</span>
               <span className="text-text-primary font-medium">
-                {signupData.username}
-              </span>
-            </div>
-          )}
-          
-          {signupData.email && (
-            <div className="flex justify-between">
-              <span className="text-text-tertiary font-semibold">이메일:</span>
-              <span className="text-text-primary font-medium">
-                {signupData.email}
+                {signupData.name}
               </span>
             </div>
           )}
