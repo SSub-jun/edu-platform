@@ -223,7 +223,7 @@ export class AuthService {
     phone: string,
     otpToken: string,
     password: string,
-    email?: string,
+    name: string,
     inviteCode?: string,
     req?: Request,
   ): Promise<LoginResponse> {
@@ -296,9 +296,9 @@ export class AuthService {
       data: {
         username: finalUsername,
         passwordHash,
+        name,
         phone,
         phoneVerifiedAt: new Date(),
-        email,
         companyId,
         role: 'student', // 기본 역할
       },

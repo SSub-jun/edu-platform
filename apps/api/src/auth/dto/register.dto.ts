@@ -30,16 +30,17 @@ export class RegisterDto {
   })
   password: string;
 
-  // username 필드 제거 - 학생 회원가입에서는 항상 휴대폰 번호가 ID가 됨
-
   @ApiProperty({
-    description: '이메일 주소 (선택사항)',
-    example: 'john@example.com',
-    required: false,
+    description: '이름 (실명)',
+    example: '홍길동',
   })
-  @IsOptional()
-  @IsEmail()
-  email?: string;
+  @IsString()
+  @Matches(/^\S.{0,48}\S$|^\S$/, {
+    message: '이름의 앞뒤 공백을 제거해 주세요.',
+  })
+  name: string;
+
+  // 이메일은 더 이상 수집하지 않음
 
   @ApiProperty({
     description: '회사 초대코드 (선택사항)',

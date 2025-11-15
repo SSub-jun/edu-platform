@@ -63,6 +63,7 @@ export class MeController {
       success: true,
       data: {
         id: user.id,
+        name: (user as any).name ?? null,
         username: user.username,
         phone: user.phone,
         email: user.email,

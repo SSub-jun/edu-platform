@@ -209,85 +209,85 @@ export default function ExamPage() {
             <div className="flex justify-between items-center mb-3">
               <h2 className="text-xl font-bold text-text-primary">레슨 {lessonId} 시험</h2>
               <div className="text-sm text-text-secondary font-medium">
-                {currentQuestionIndex + 1} / {examData.questions.length} 문항
-              </div>
-            </div>
-            <div className="w-full h-2 bg-bg-primary rounded-full overflow-hidden border border-border">
-              <div 
-                className="h-full bg-primary rounded-full transition-[width] duration-300 ease-linear"
-                style={{ width: `${((currentQuestionIndex + 1) / examData.questions.length) * 100}%` }}
-              />
+              {currentQuestionIndex + 1} / {examData.questions.length} 문항
             </div>
           </div>
+            <div className="w-full h-2 bg-bg-primary rounded-full overflow-hidden border border-border">
+            <div 
+                className="h-full bg-primary rounded-full transition-[width] duration-300 ease-linear"
+              style={{ width: `${((currentQuestionIndex + 1) / examData.questions.length) * 100}%` }}
+            />
+          </div>
+        </div>
 
           {/* 문제 카드 */}
-          <ExamQuestionCard
-            question={currentQuestion}
-            questionIndex={currentQuestionIndex}
-            totalQuestions={examData.questions.length}
-            selectedAnswer={selectedAnswer}
-            onAnswerSelect={handleAnswerSelect}
-          />
+        <ExamQuestionCard
+          question={currentQuestion}
+          questionIndex={currentQuestionIndex}
+          totalQuestions={examData.questions.length}
+          selectedAnswer={selectedAnswer}
+          onAnswerSelect={handleAnswerSelect}
+        />
 
           {/* 네비게이션 */}
           <div className="flex justify-between items-center gap-4 mt-6 bg-surface border border-border rounded-xl p-5">
-            <button 
+          <button 
               className="px-5 py-2.5 bg-bg-primary text-text-secondary border border-border rounded-md font-medium transition-all hover:bg-surface hover:text-text-primary hover:border-border-light disabled:opacity-40 disabled:cursor-not-allowed"
-              onClick={handlePrevQuestion}
-              disabled={currentQuestionIndex === 0}
-            >
-              이전 문제
-            </button>
+            onClick={handlePrevQuestion}
+            disabled={currentQuestionIndex === 0}
+          >
+            이전 문제
+          </button>
 
             <div className="text-sm font-medium text-text-secondary">
-              {answers.size}/{examData.questions.length} 문항 완료
-            </div>
+            {answers.size}/{examData.questions.length} 문항 완료
+          </div>
 
-            {currentQuestionIndex === examData.questions.length - 1 ? (
-              <button 
+          {currentQuestionIndex === examData.questions.length - 1 ? (
+            <button 
                 className={`px-5 py-2.5 rounded-md font-semibold transition-all ${
                   isAllAnswered 
                     ? 'bg-success text-white hover:bg-success/90 cursor-pointer' 
                     : 'bg-text-tertiary text-white cursor-not-allowed opacity-60'
                 }`}
-                onClick={handleSubmitExam}
-                disabled={!isAllAnswered}
-              >
-                제출하기
-              </button>
-            ) : (
-              <button 
+              onClick={handleSubmitExam}
+              disabled={!isAllAnswered}
+            >
+              제출하기
+            </button>
+          ) : (
+            <button 
                 className="px-5 py-2.5 bg-primary text-text-primary rounded-md font-semibold transition-all hover:bg-primary-600"
-                onClick={handleNextQuestion}
-              >
-                다음 문제
-              </button>
-            )}
-          </div>
+              onClick={handleNextQuestion}
+            >
+              다음 문제
+            </button>
+          )}
+        </div>
 
-          {/* 종료 확인 모달 */}
-          {showExitConfirm && (
+        {/* 종료 확인 모달 */}
+        {showExitConfirm && (
             <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
               <div className="bg-surface border border-border rounded-xl p-8 max-w-md w-full">
                 <h3 className="text-xl font-bold text-text-primary mb-3">시험을 종료하시겠습니까?</h3>
                 <p className="text-base text-text-secondary mb-6">진행 상황이 저장되지 않습니다.</p>
                 <div className="flex gap-3">
-                  <button 
+                <button 
                     className="flex-1 px-5 py-3 bg-bg-primary text-text-secondary border border-border rounded-lg font-semibold transition-all hover:bg-surface hover:text-text-primary hover:border-border-light"
-                    onClick={() => setShowExitConfirm(false)}
-                  >
-                    계속 진행
-                  </button>
-                  <button 
+                  onClick={() => setShowExitConfirm(false)}
+                >
+                  계속 진행
+                </button>
+                <button 
                     className="flex-1 px-5 py-3 bg-error text-white rounded-lg font-semibold transition-colors hover:bg-error/90"
-                    onClick={() => router.push(`/lesson/${lessonId}`)}
-                  >
-                    종료
-                  </button>
-                </div>
+                  onClick={() => router.push(`/lesson/${lessonId}`)}
+                >
+                  종료
+                </button>
               </div>
             </div>
-          )}
+          </div>
+        )}
         </div>
       </div>
     );

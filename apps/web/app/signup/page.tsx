@@ -11,8 +11,7 @@ export type SignupStep = 'phone' | 'account' | 'done';
 export interface SignupData {
   phone: string;
   otpToken: string;
-  username?: string;
-  email?: string;
+  name?: string;
   password: string;
   inviteCode?: string;
 }

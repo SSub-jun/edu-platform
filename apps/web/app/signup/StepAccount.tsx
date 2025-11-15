@@ -20,7 +20,7 @@ interface PasswordStrength {
 
 export default function StepAccount({ onComplete, onBack, initialData }: StepAccountProps) {
   const [formData, setFormData] = useState({
-    email: initialData.email || '',
+    name: initialData.name || '',
     password: '',
     confirmPassword: '',
     inviteCode: initialData.inviteCode || '',
@@ -73,11 +73,6 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
       return;
     }
 
-    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      setError('올바른 이메일 주소를 입력해주세요.');
-      return;
-    }
-
     if (formData.inviteCode && !/^[A-Z0-9]{6,12}$/.test(formData.inviteCode)) {
       setError('초대코드는 6-12자리 영대문자와 숫자 조합이어야 합니다.');
       return;
@@ -91,7 +86,7 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
         phone: initialData.phone,
         otpToken: initialData.otpToken,
         password: formData.password,
-        email: formData.email || undefined,
+        name: formData.name.trim(),
         inviteCode: formData.inviteCode || undefined,
       };
 
@@ -110,7 +105,7 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
 
       // 다음 단계로 진행
       onComplete({
-        email: formData.email,
+        name: formData.name.trim(),
         password: formData.password,
         inviteCode: formData.inviteCode,
       });
@@ -155,14 +150,15 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-semibold text-text-primary uppercase tracking-wide">이메일 (선택)</label>
+        <label className="text-sm font-semibold text-text-primary uppercase tracking-wide">이름 *</label>
         <input
-          type="email"
-          value={formData.email}
-          onChange={(e) => handleInputChange('email', e.target.value)}
-          placeholder="example@email.com"
+          type="text"
+          value={formData.name}
+          onChange={(e) => handleInputChange('name', e.target.value)}
+          placeholder="이름을 입력하세요"
           className="w-full h-12 px-4 bg-bg-primary border-2 border-border rounded-lg text-base text-text-primary placeholder:text-text-tertiary transition-all focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20 disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-surface"
           disabled={loading}
+          required
         />
       </div>
 
@@ -288,7 +284,13 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
         
         <button
           type="submit"
-          disabled={loading || !formData.password || !formData.confirmPassword || !isPasswordValid(formData.password)}
+          disabled={
+            loading ||
+            !formData.name.trim() ||
+            !formData.password ||
+            !formData.confirmPassword ||
+            !isPasswordValid(formData.password)
+          }
           className="w-full h-12 bg-primary text-text-primary rounded-lg text-base font-semibold transition-all hover:bg-primary-600 active:bg-primary-700 disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600 focus-visible:outline-offset-2"
         >
           {loading ? (

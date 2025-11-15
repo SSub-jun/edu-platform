@@ -148,16 +148,16 @@ export default function QnaPage() {
         {/* 상단 영역: 간단한 타이틀 + 질문하기 버튼 */}
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-text-primary">
-            Q&A
-          </h1>
-          {userRole === 'student' && (
-            <button
-              onClick={() => setShowQuestionForm(!showQuestionForm)}
+              Q&A
+            </h1>
+            {userRole === 'student' && (
+              <button
+                onClick={() => setShowQuestionForm(!showQuestionForm)}
               className="px-5 py-2.5 bg-info text-white border-0 rounded-md cursor-pointer font-medium transition-colors hover:bg-info/90"
-            >
-              {showQuestionForm ? '취소' : '질문하기'}
-            </button>
-          )}
+              >
+                {showQuestionForm ? '취소' : '질문하기'}
+              </button>
+            )}
         </div>
 
         {/* 질문 작성 폼 (학생만) */}
@@ -199,7 +199,7 @@ export default function QnaPage() {
             <div className="text-center py-10 bg-surface border border-border rounded-xl">
               <div className="flex items-center justify-center gap-2 text-text-secondary">
                 <div className="w-5 h-5 border-2 border-text-tertiary/30 border-t-text-tertiary rounded-full animate-spin"></div>
-                로딩 중...
+              로딩 중...
               </div>
             </div>
           ) : posts.length === 0 ? (

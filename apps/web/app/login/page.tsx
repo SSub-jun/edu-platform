@@ -132,70 +132,70 @@ export default function LoginPage() {
           </div> */}
 
           {/* Error Message */}
-          {error && (
+        {error && (
             <div className="mb-6 p-4 bg-error-bg border border-error rounded-lg text-error text-sm font-semibold animate-[slideDown_0.3s_ease-out]">
-              {error}
-            </div>
-          )}
+            {error}
+          </div>
+        )}
 
           {/* Form */}
           <form onSubmit={handleLogin} className="flex flex-col gap-6">
             <div className="flex flex-col gap-2">
               <label className="text-sm font-semibold text-text-primary">
                 휴대폰 번호
-              </label>
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="학생: 01012345678 / 관리자·강사: admin001"
+            </label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="학생: 01012345678 / 관리자·강사: admin001"
                 className="w-full h-12 px-4 bg-bg-primary border-2 border-border rounded-lg text-base text-text-primary placeholder:text-text-tertiary transition-all focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20 disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-surface"
-                disabled={loading}
-              />
-            </div>
-            
+              disabled={loading}
+            />
+          </div>
+          
             <div className="flex flex-col gap-2">
               <label className="text-sm font-semibold text-text-primary">
-                비밀번호
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="비밀번호를 입력하세요"
+              비밀번호
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="비밀번호를 입력하세요"
                 className="w-full h-12 px-4 bg-bg-primary border-2 border-border rounded-lg text-base text-text-primary placeholder:text-text-tertiary transition-all focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20 disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-surface"
-                disabled={loading}
-              />
-            </div>
-
-            <button
-              type="submit"
               disabled={loading}
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
               className="w-full h-12 bg-primary-600 text-white rounded-lg text-base font-semibold transition-all hover:bg-primary active:bg-primary-700 disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600 focus-visible:outline-offset-2"
-            >
-              {loading ? (
+          >
+            {loading ? (
                 <span className="inline-flex items-center gap-2">
                   <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                  로그인 중...
+                로그인 중...
                 </span>
-              ) : (
-                '로그인'
-              )}
-            </button>
-          </form>
+            ) : (
+              '로그인'
+            )}
+          </button>
+        </form>
 
           {/* Signup Section */}
           <div className="mt-6 p-5 text-center bg-bg-primary rounded-lg border border-border">
             <p className="text-sm text-text-secondary font-medium mb-3">계정이 없으신가요?</p>
-            <button
-              type="button"
-              onClick={() => router.push('/signup')}
+          <button
+            type="button"
+            onClick={() => router.push('/signup')}
               className="w-full h-10 bg-success text-white rounded-md text-sm font-semibold transition-all hover:bg-success/90 active:bg-success/80 disabled:opacity-60 disabled:cursor-not-allowed"
-              disabled={loading}
-            >
-              학생 회원가입
-            </button>
-          </div>
+            disabled={loading}
+          >
+            학생 회원가입
+          </button>
+        </div>
 
         </div>
       </div>

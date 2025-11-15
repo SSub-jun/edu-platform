@@ -9,6 +9,7 @@ import { authClient } from '../../lib/auth';
 
 interface Profile {
   id: string;
+  name: string | null;
   username: string;
   phone: string | null;
   email: string | null;
@@ -82,7 +83,7 @@ export default function StudentPage() {
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-text-primary mb-2">
               내 정보
-            </h1>
+          </h1>
             <p className="text-sm md:text-base text-text-secondary">
               계정 정보와 소속, 교육기간을 확인할 수 있습니다.
             </p>
@@ -110,7 +111,13 @@ export default function StudentPage() {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-bg-primary border border-border rounded-xl p-5">
                 <div>
-                  <div className="text-xs text-text-tertiary mb-1">이름 / 아이디</div>
+                  <div className="text-xs text-text-tertiary mb-1">이름</div>
+                  <div className="text-base font-medium text-text-primary">
+                    {profile?.name ?? '-'}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-xs text-text-tertiary mb-1">아이디</div>
                   <div className="text-base font-medium text-text-primary">
                     {profile?.username ?? '-'}
                   </div>
@@ -125,12 +132,6 @@ export default function StudentPage() {
                   <div className="text-xs text-text-tertiary mb-1">휴대폰 번호</div>
                   <div className="text-base text-text-primary">
                     {profile?.phone ?? '-'}
-                  </div>
-                </div>
-                <div>
-                  <div className="text-xs text-text-tertiary mb-1">이메일</div>
-                  <div className="text-base text-text-primary">
-                    {profile?.email ?? '-'}
                   </div>
                 </div>
               </div>
@@ -171,7 +172,7 @@ export default function StudentPage() {
                     </div>
                   </div>
                 </div>
-              </div>
+          </div>
             </section>
 
             {/* 기타 */}
@@ -182,14 +183,14 @@ export default function StudentPage() {
               <div className="bg-bg-primary border border-border rounded-xl p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                 <div className="text-sm text-text-secondary">
                   강의실에서 학습 진도와 시험 결과를 확인하실 수 있습니다.
-                </div>
+          </div>
                 <Link
                   href="/curriculum"
                   className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold transition-colors hover:bg-primary-600"
                 >
                   강의실로 이동
                 </Link>
-              </div>
+          </div>
             </section>
           </div>
         )}

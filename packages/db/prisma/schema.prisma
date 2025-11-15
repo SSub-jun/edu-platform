@@ -46,6 +46,7 @@ model User {
   username        String    @unique
   passwordHash    String    // BCrypt 해시
   role            UserRole  @default(student)
+  name            String?   // 실명 (학생 필수, 기존 데이터 호환을 위해 nullable)
   phone           String?   @unique // 휴대폰 번호 (회원가입 시 필수)
   phoneVerifiedAt DateTime? // 휴대폰 인증 완료 시간
   email           String?   // 이메일 (선택사항)
