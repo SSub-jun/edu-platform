@@ -9,16 +9,47 @@ export class ExamService {
 
   /**
    * 과목 시험 응시 가능 여부 확인
-   *
-   * TODO: 현재 구현은 Subject 단위 시도 3회를 기준으로 remainingAttempts를 계산한다.
-   *       레슨 단위 사이클(cycle) 로직은 /exam/lessons/:id/start /retake 설계에 따라
-   *       별도 엔드포인트에서 구현 예정이며, 여기서는 기존 동작을 유지한다.
+   * - Subject 단위 시험
+   * - 현재 사이클 기준 최대 3회 응시 가능
+   * - 모든 Lesson 90% 이상 수강 필요
    */
   async checkEligibility(userId: string, subjectId: string) {
     // 회사 수강기간 체크
     await this.ensureWithinCompanyPeriod(userId);
 
-    // 1. 과목의 모든 레슨 조회
+    // 1. SubjectProgress 조회 또는 생성
+    let subjectProgress = await this.prisma.subjectProgress.findUnique({
+      where: {
+        userId_subjectId: {
+          userId,
+          subjectId
+        }
+      }
+    });
+
+    if (!subjectProgress) {
+      subjectProgress = await this.prisma.subjectProgress.create({
+        data: {
+          userId,
+          subjectId,
+          progressPercent: 0,
+          examAttemptCount: 0,
+          cycle: 1
+        }
+      });
+    }
+
+    // 2. 이미 수료한 경우
+    if (subjectProgress.passed) {
+      return {
+        eligible: false,
+        reason: '이미 수료한 과목입니다.',
+        remainingAttempts: 0,
+        lessonProgress: []
+      };
+    }
+
+    // 3. 과목의 모든 레슨 조회
     const lessons = await this.prisma.lesson.findMany({
       where: { subjectId, isActive: true },
       select: { id: true, title: true }
@@ -33,7 +64,7 @@ export class ExamService {
       };
     }
 
-    // 2. 각 레슨의 진도율 조회
+    // 4. 각 레슨의 진도율 조회
     const progressRecords = await this.prisma.progress.findMany({
       where: {
         userId,
@@ -50,7 +81,7 @@ export class ExamService {
       };
     });
 
-    // 3. 모든 레슨이 90% 이상인지 확인
+    // 5. 모든 레슨이 90% 이상인지 확인
     const allLessonsCompleted = lessonProgress.every(lp => lp.progressPercent >= 90);
 
     if (!allLessonsCompleted) {
@@ -62,17 +93,21 @@ export class ExamService {
       };
     }
 
-    // 4. 시도 횟수 확인 (최대 3회)
-    const attemptCount = await this.prisma.examAttempt.count({
-      where: { userId, subjectId }
+    // 6. 현재 사이클의 시도 횟수 확인 (최대 3회)
+    const currentCycleAttempts = await this.prisma.examAttempt.count({
+      where: { 
+        userId, 
+        subjectId,
+        cycle: subjectProgress.cycle
+      }
     });
 
-    const remainingAttempts = Math.max(0, 3 - attemptCount);
+    const remainingAttempts = Math.max(0, 3 - currentCycleAttempts);
 
     if (remainingAttempts === 0) {
       return {
         eligible: false,
-        reason: '최대 응시 횟수(3회)를 초과했습니다.',
+        reason: '현재 사이클의 최대 응시 횟수(3회)를 초과했습니다. 다시 수강하기를 통해 재도전할 수 있습니다.',
         remainingAttempts: 0,
         lessonProgress
       };
@@ -103,7 +138,21 @@ export class ExamService {
       throw new ForbiddenException(eligibility.reason);
     }
 
-    // 2. 문제은행 조회 (과목의 모든 활성 문제)
+    // 2. SubjectProgress 조회 (checkEligibility에서 이미 생성됨)
+    const subjectProgress = await this.prisma.subjectProgress.findUnique({
+      where: {
+        userId_subjectId: {
+          userId,
+          subjectId
+        }
+      }
+    });
+
+    if (!subjectProgress) {
+      throw new NotFoundException('SubjectProgress를 찾을 수 없습니다.');
+    }
+
+    // 3. 문제은행 조회 (과목의 모든 활성 문제)
     const questions = await this.prisma.question.findMany({
       where: { 
         subjectId,
@@ -120,21 +169,26 @@ export class ExamService {
       throw new UnprocessableEntityException(`문제은행이 부족합니다. 최소 10문항이 필요하지만 현재 ${questions.length}문항만 있습니다.`);
     }
 
-    // 3. 랜덤 10문항 선택
+    // 4. 랜덤 10문항 선택
     const selectedQuestions = selectRandom(questions, Math.min(10, questions.length));
     const questionIds = selectedQuestions.map(q => q.id);
 
-    // 4. 시도 번호 계산
-    const attemptCount = await this.prisma.examAttempt.count({
-      where: { userId, subjectId }
+    // 5. 현재 사이클의 시도 번호 계산
+    const currentCycleAttempts = await this.prisma.examAttempt.count({
+      where: { 
+        userId, 
+        subjectId,
+        cycle: subjectProgress.cycle
+      }
     });
-    const attemptNumber = attemptCount + 1;
+    const attemptNumber = currentCycleAttempts + 1;
 
-    // 5. ExamAttempt 생성
+    // 6. ExamAttempt 생성
     const attempt = await this.prisma.examAttempt.create({
       data: {
         userId,
         subjectId,
+        cycle: subjectProgress.cycle,
         attemptNumber,
         status: 'inProgress',
         questionIds: questionIds,
@@ -142,7 +196,7 @@ export class ExamService {
       }
     });
 
-    // 6. 응답 구성
+    // 7. 응답 구성
     const responseQuestions = selectedQuestions.map(q => ({
       id: q.id,
       content: q.stem,
@@ -214,13 +268,67 @@ export class ExamService {
     // 레슨 단위 수료 로직은 아래에서 별도로 Progress.finalScore / passed에 반영
     const passed = examScore >= 70;
 
-    // 4-A. 레슨 단위 수료 로직 (lessonId가 있는 경우에만 적용)
-    // - 진도율(progressPercent) 20% + 시험 점수 80% = 최종 점수(finalScore)
-    // - finalScore >= 70 && progressPercent >= 90일 때 해당 레슨을 수료로 간주
+    // 4-A. Subject 단위 수료 로직 (신규)
+    // - Lesson 평균 진도율 20% + 시험 점수 80% = 최종 점수(finalScore)
+    // - finalScore >= 70일 때 해당 과목 수료
+    if (attempt.subjectId) {
+      const subjectId = attempt.subjectId;
+
+      // Subject의 모든 Lesson 조회
+      const lessons = await this.prisma.lesson.findMany({
+        where: { subjectId, isActive: true },
+        select: { id: true }
+      });
+
+      // 각 Lesson의 진도율 조회
+      const progressRecords = await this.prisma.progress.findMany({
+        where: {
+          userId,
+          lessonId: { in: lessons.map(l => l.id) }
+        }
+      });
+
+      // Lesson 평균 수강률 계산
+      const totalLessons = lessons.length;
+      let sumProgressPercent = 0;
+
+      for (const lesson of lessons) {
+        const progress = progressRecords.find(p => p.lessonId === lesson.id);
+        const progressPercent = progress?.progressPercent ?? 0;
+        sumProgressPercent += progressPercent;
+      }
+
+      const avgProgressPercent = totalLessons > 0 ? sumProgressPercent / totalLessons : 0;
+
+      // Subject 총점 계산: 진도율 20% + 시험 점수 80%
+      const progressScore = avgProgressPercent * 0.2; // 100% 진도 시 20점
+      const examScoreComponent = examScore * 0.8;     // 시험 점수(0~100)를 80% 비중으로 반영
+      const finalScore = progressScore + examScoreComponent; // 0 ~ 100
+
+      const subjectPassed = finalScore >= 70;
+
+      // SubjectProgress 업데이트
+      await this.prisma.subjectProgress.update({
+        where: {
+          userId_subjectId: {
+            userId,
+            subjectId
+          }
+        },
+        data: {
+          progressPercent: avgProgressPercent,
+          finalScore,
+          passed: subjectPassed,
+          lastExamScore: examScore,
+          completedAt: subjectPassed ? new Date() : null
+        }
+      });
+    }
+
+    // 4-B. 레슨 단위 수료 로직 (구버전 호환용, lessonId가 있는 경우에만 적용)
     if (attempt.lessonId) {
       const lessonId = attempt.lessonId;
 
-      // 해당 레슨의 Progress 조회 (없을 수도 있으므로 upsert 형태로 처리)
       let progress = await this.prisma.progress.findUnique({
         where: {
           userId_lessonId: {
@@ -231,8 +339,6 @@ export class ExamService {
       });
 
       if (!progress) {
-        // 이론상 시험 응시 전에는 항상 Progress가 존재해야 하지만,
-        // 방어적으로 기본 레코드를 생성해 둔다.
         progress = await this.prisma.progress.create({
           data: {
             userId,
@@ -248,9 +354,9 @@ export class ExamService {
       const rawProgressPercent = progress.progressPercent ?? 0;
       const clampedProgressPercent = Math.max(0, Math.min(100, rawProgressPercent));
 
-      const progressScore = clampedProgressPercent * 0.2; // 100% 진도 시 20점
-      const examScoreComponent = examScore * 0.8;         // 시험 점수(0~100)를 80% 비중으로 반영
-      const finalScore = progressScore + examScoreComponent; // 0 ~ 100
+      const progressScore = clampedProgressPercent * 0.2;
+      const examScoreComponent = examScore * 0.8;
+      const finalScore = progressScore + examScoreComponent;
 
       const lessonPassed = finalScore >= 70 && clampedProgressPercent >= 90;
 
@@ -264,13 +370,12 @@ export class ExamService {
         data: {
           finalScore,
           passed: lessonPassed,
-          // 이미 completedAt이 있는 경우는 유지, 새로 수료된 경우에만 완료 시점 기록
           completedAt: lessonPassed && !progress.completedAt ? new Date() : progress.completedAt
         }
       });
     }
 
-    // 4-B. 시험 시도 기록 저장 (과목/레슨 공통)
+    // 4-C. 시험 시도 기록 저장 (과목/레슨 공통)
     await this.prisma.examAttempt.update({
       where: { id: attemptId },
       data: {
@@ -758,6 +863,102 @@ export class ExamService {
         score: examAttempt.score || 0,
         attemptNumber: examAttempt.attemptNumber
       }
+    };
+  }
+
+  /**
+   * 다시 수강하기 (Subject 단위)
+   * - 조건: 현재 사이클에서 3회 모두 시도했고, 아직 수료하지 않은 경우
+   * - 동작:
+   *   1. 해당 Subject의 모든 Lesson 진도를 0%로 리셋
+   *   2. SubjectProgress의 cycle을 +1 증가
+   *   3. SubjectProgress의 progressPercent, finalScore, lastExamScore 초기화
+   */
+  async restartSubject(userId: string, subjectId: string) {
+    // 회사 수강기간 체크
+    await this.ensureWithinCompanyPeriod(userId);
+
+    // 1. SubjectProgress 조회
+    const subjectProgress = await this.prisma.subjectProgress.findUnique({
+      where: {
+        userId_subjectId: {
+          userId,
+          subjectId
+        }
+      }
+    });
+
+    if (!subjectProgress) {
+      throw new NotFoundException('과목 진도 기록을 찾을 수 없습니다.');
+    }
+
+    // 2. 이미 수료한 경우
+    if (subjectProgress.passed) {
+      throw new ForbiddenException('이미 수료한 과목은 다시 수강할 수 없습니다.');
+    }
+
+    // 3. 현재 사이클의 시도 횟수 확인
+    const currentCycleAttempts = await this.prisma.examAttempt.count({
+      where: {
+        userId,
+        subjectId,
+        cycle: subjectProgress.cycle
+      }
+    });
+
+    if (currentCycleAttempts < 3) {
+      throw new ForbiddenException('현재 사이클에서 3회 모두 시도한 후에만 다시 수강할 수 있습니다.');
+    }
+
+    // 4. Subject의 모든 Lesson 조회
+    const lessons = await this.prisma.lesson.findMany({
+      where: { subjectId, isActive: true },
+      select: { id: true }
+    });
+
+    // 5. 모든 Lesson의 진도를 0%로 리셋
+    await Promise.all(
+      lessons.map(lesson =>
+        this.prisma.progress.updateMany({
+          where: {
+            userId,
+            lessonId: lesson.id
+          },
+          data: {
+            progressPercent: 0,
+            maxReachedSeconds: 0,
+            status: 'inProgress',
+            finalScore: null,
+            passed: null,
+            completedAt: null
+          }
+        })
+      )
+    );
+
+    // 6. SubjectProgress 업데이트: cycle +1, 진도/점수 초기화
+    const updatedProgress = await this.prisma.subjectProgress.update({
+      where: {
+        userId_subjectId: {
+          userId,
+          subjectId
+        }
+      },
+      data: {
+        cycle: subjectProgress.cycle + 1,
+        progressPercent: 0,
+        finalScore: null,
+        lastExamScore: null,
+        examAttemptCount: 0,
+        completedAt: null
+      }
+    });
+
+    return {
+      success: true,
+      message: '다시 수강하기가 완료되었습니다. 모든 강의를 처음부터 다시 수강해주세요.',
+      newCycle: updatedProgress.cycle,
+      resetLessonCount: lessons.length
     };
   }
 }
