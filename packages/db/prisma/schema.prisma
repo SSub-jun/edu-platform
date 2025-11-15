@@ -21,8 +21,9 @@ model Company {
   updatedAt     DateTime @updatedAt
 
   // Relations
-  users         User[]
-  activeLessons CompanyLesson[]
+  users           User[]
+  activeLessons   CompanyLesson[]   // 구버전 호환용 (신규 로직에서는 사용 안 함)
+  activeSubjects  CompanySubject[]  // 신규: Subject 단위 배정
 
   @@map("companies")
 }
@@ -39,6 +40,21 @@ model CompanyLesson {
 
   @@unique([companyId, lessonId])
   @@map("company_lessons")
+}
+
+// 신규: 회사에 Subject(과목) 단위로 배정
+model CompanySubject {
+  id        String   @id @default(cuid())
+  companyId String
+  subjectId String
+  createdAt DateTime @default(now())
+
+  // Relations
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, subjectId])
+  @@map("company_subjects")
 }
 
 model User {
@@ -97,6 +113,7 @@ model Subject {
   subjectProgress  SubjectProgress[]
   examAttempts     ExamAttempt[]
   questions        Question[]
+  companySubjects  CompanySubject[]  // 신규: 회사 배정
 
   @@map("subjects")
 }
@@ -147,10 +164,17 @@ model SubjectProgress {
   id              String   @id @default(cuid())
   userId          String
   subjectId       String
-  progressPercent Float    @default(0) // 0.0 ~ 100.0
+  progressPercent Float    @default(0) // 0.0 ~ 100.0 (Lesson들의 평균 수강률)
   lastLessonId    String?
   lastPartId      String?
   lastPlayedMs    Int      @default(0)
+  // 신규: Subject 수료 관련 필드
+  finalScore      Float?   // Subject 총점 (진도 20% + 시험 80%)
+  passed          Boolean? // Subject 수료 여부
+  completedAt     DateTime? // Subject 수료 시각
+  examAttemptCount Int     @default(0) // 현재 사이클 기준 시험 시도 횟수 (캐시용)
+  lastExamScore   Float?   // 마지막 시험 점수 (캐시용)
+  cycle           Int      @default(1) // 재수강 사이클 (다시 수강하기 시 +1)
   updatedAt       DateTime @updatedAt
 
   // Relations
