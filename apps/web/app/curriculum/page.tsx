@@ -132,7 +132,9 @@ export default function CurriculumPage() {
     const item = curriculumData.find(d => d.subject.id === subjectId);
     if (item && item.lessons.length > 0) {
       const firstLesson = item.lessons.sort((a, b) => a.order - b.order)[0];
-      router.push(`/lesson/${firstLesson.id}`);
+      if (firstLesson) {
+        router.push(`/lesson/${firstLesson.id}`);
+      }
     }
   };
 
