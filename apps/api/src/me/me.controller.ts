@@ -118,7 +118,7 @@ export class MeController {
 
     // 신규: CompanySubject 기반 커리큘럼
     if (user.company.activeSubjects && user.company.activeSubjects.length > 0) {
-      const result = [];
+      const result: any[] = [];
 
       for (const cs of user.company.activeSubjects) {
         const subject = cs.subject;
@@ -126,7 +126,7 @@ export class MeController {
         // Subject 진도율 및 수료 상태 조회
         const subjectProgress = await this.progressService.getSubjectStatus(userId, subject.id);
         
-        const lessons = [];
+        const lessons: any[] = [];
         for (const lesson of subject.lessons) {
           try {
             const lessonStatus = await this.progressService.getLessonStatus(userId, lesson.id);
