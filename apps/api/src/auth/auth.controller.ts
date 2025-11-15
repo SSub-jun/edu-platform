@@ -181,7 +181,8 @@ export class AuthController {
       registerDto.phone,
       registerDto.otpToken,
       registerDto.password,
-      registerDto.inviteCode || undefined,
+      registerDto.name,
+      registerDto.inviteCode,
       req,
     );
   }
