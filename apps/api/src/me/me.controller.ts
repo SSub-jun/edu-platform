@@ -83,6 +83,19 @@ export class MeController {
       include: {
         company: {
           include: {
+            activeSubjects: {
+              include: {
+                subject: {
+                  include: {
+                    lessons: {
+                      where: { isActive: true },
+                      orderBy: { order: 'asc' }
+                    }
+                  }
+                }
+              }
+            },
+            // 구버전 호환용
             activeLessons: {
               include: {
                 lesson: {
@@ -99,30 +112,114 @@ export class MeController {
       return { success: true, data: [] };
     }
 
+    const now = new Date();
+    const end = user.company.endDate as Date;
+    const remainingDays = Math.max(0, Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+
+    // 신규: CompanySubject 기반 커리큘럼
+    if (user.company.activeSubjects && user.company.activeSubjects.length > 0) {
+      const result = [];
+
+      for (const cs of user.company.activeSubjects) {
+        const subject = cs.subject;
+        
+        // Subject 진도율 및 수료 상태 조회
+        const subjectProgress = await this.progressService.getSubjectStatus(userId, subject.id);
+        
+        const lessons = [];
+        for (const lesson of subject.lessons) {
+          try {
+            const lessonStatus = await this.progressService.getLessonStatus(userId, lesson.id);
+            
+            // Lesson 상태 결정
+            let status: 'locked' | 'available' | 'passed';
+            if (lessonStatus.completed) {
+              status = 'passed';
+            } else if (!lessonStatus.unlocked) {
+              status = 'locked';
+            } else {
+              status = 'available';
+            }
+            
+            lessons.push({
+              id: lesson.id,
+              title: lesson.title,
+              description: lesson.description,
+              order: lesson.order,
+              subjectId: lesson.subjectId,
+              progressPercent: lessonStatus.progressPercent,
+              status: status,
+              remainingTries: lessonStatus.remainingTries,
+              totalDurationMs: 0,
+            });
+          } catch (error) {
+            console.error(`Error getting lesson status for lesson ${lesson.id}:`, error);
+            lessons.push({
+              id: lesson.id,
+              title: lesson.title,
+              description: lesson.description,
+              order: lesson.order,
+              subjectId: lesson.subjectId,
+              progressPercent: 0,
+              status: 'available',
+              remainingTries: 3,
+              totalDurationMs: 0,
+            });
+          }
+        }
+
+        result.push({
+          subject: {
+            id: subject.id,
+            name: subject.name,
+            description: subject.description,
+            order: subject.order,
+            // Subject 수료 정보 추가
+            progressPercent: subjectProgress.progressPercent,
+            passed: subjectProgress.passed,
+            finalScore: subjectProgress.finalScore,
+            examAttemptCount: subjectProgress.examAttemptCount,
+            remainingTries: subjectProgress.remainingTries,
+            canTakeExam: subjectProgress.canTakeExam,
+            canRestart: subjectProgress.canRestart,
+          },
+          lessons,
+          remainingDays
+        });
+      }
+
+      return { success: true, data: result };
+    }
+
+    // 구버전 호환: CompanyLesson 기반 커리큘럼
     const activeLessons = user.company.activeLessons.map(cl => cl.lesson);
     const grouped = new Map<string, { subject: any; lessons: any[]; remainingDays: number }>();
     
     for (const lesson of activeLessons) {
       const subject = lesson.subject;
       if (!grouped.has(subject.id)) {
-        const now = new Date();
-        const end = user.company.endDate as Date;
-        const remainingDays = Math.max(0, Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
-        grouped.set(subject.id, { subject: { id: subject.id, name: subject.name, description: subject.description, order: subject.order }, lessons: [], remainingDays });
+        grouped.set(subject.id, { 
+          subject: { 
+            id: subject.id, 
+            name: subject.name, 
+            description: subject.description, 
+            order: subject.order 
+          }, 
+          lessons: [], 
+          remainingDays 
+        });
       }
       
-      // 실제 레슨 상태를 가져오기
       try {
         const lessonStatus = await this.progressService.getLessonStatus(userId, lesson.id);
         
-        // 상태 결정 로직: 합격 > 진행 중 > 사용 가능 > 잠김
         let status: 'locked' | 'available' | 'passed';
         if (lessonStatus.completed) {
-          status = 'passed';  // 시험 합격
+          status = 'passed';
         } else if (!lessonStatus.unlocked) {
-          status = 'locked';  // 이전 레슨 미완료
+          status = 'locked';
         } else {
-          status = 'available';  // 학습 가능
+          status = 'available';
         }
         
         grouped.get(subject.id)!.lessons.push({
@@ -134,10 +231,9 @@ export class MeController {
           progressPercent: lessonStatus.progressPercent,
           status: status,
           remainingTries: lessonStatus.remainingTries,
-          totalDurationMs: 0, // 임시로 0 유지
+          totalDurationMs: 0,
         });
       } catch (error) {
-        // 에러 발생 시 기본값 사용
         console.error(`Error getting lesson status for lesson ${lesson.id}:`, error);
         grouped.get(subject.id)!.lessons.push({
           id: lesson.id,

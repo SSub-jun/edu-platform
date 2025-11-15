@@ -533,4 +533,122 @@ export class ProgressService {
 
     return result._sum.durationMs || 0;
   }
+
+  /**
+   * Subject 진도율 및 시험 가능 여부 조회
+   */
+  async getSubjectStatus(userId: string, subjectId: string) {
+    // Subject 정보 및 Lesson 목록 조회
+    const subject = await this.prisma.subject.findUnique({
+      where: { id: subjectId },
+      include: {
+        lessons: {
+          where: { isActive: true },
+          orderBy: { order: 'asc' }
+        }
+      }
+    });
+
+    if (!subject) {
+      throw new NotFoundException('과목을 찾을 수 없습니다.');
+    }
+
+    // SubjectProgress 조회 또는 생성
+    let subjectProgress = await this.prisma.subjectProgress.findUnique({
+      where: {
+        userId_subjectId: {
+          userId,
+          subjectId
+        }
+      }
+    });
+
+    if (!subjectProgress) {
+      subjectProgress = await this.prisma.subjectProgress.create({
+        data: {
+          userId,
+          subjectId,
+          progressPercent: 0,
+          examAttemptCount: 0,
+          cycle: 1
+        }
+      });
+    }
+
+    // 각 Lesson의 진도율 조회
+    const lessonProgresses = await this.prisma.progress.findMany({
+      where: {
+        userId,
+        lessonId: { in: subject.lessons.map(l => l.id) }
+      }
+    });
+
+    // Lesson 평균 수강률 계산
+    const totalLessons = subject.lessons.length;
+    let sumProgressPercent = 0;
+    let allLessonsAbove90 = true;
+
+    for (const lesson of subject.lessons) {
+      const progress = lessonProgresses.find(p => p.lessonId === lesson.id);
+      const progressPercent = progress?.progressPercent ?? 0;
+      sumProgressPercent += progressPercent;
+
+      if (progressPercent < 90) {
+        allLessonsAbove90 = false;
+      }
+    }
+
+    const avgProgressPercent = totalLessons > 0 ? sumProgressPercent / totalLessons : 0;
+
+    // SubjectProgress의 progressPercent 업데이트
+    if (Math.abs(subjectProgress.progressPercent - avgProgressPercent) > 0.01) {
+      subjectProgress = await this.prisma.subjectProgress.update({
+        where: {
+          userId_subjectId: {
+            userId,
+            subjectId
+          }
+        },
+        data: {
+          progressPercent: avgProgressPercent
+        }
+      });
+    }
+
+    // 현재 사이클의 시험 시도 횟수 조회
+    const currentCycleAttempts = await this.prisma.examAttempt.count({
+      where: {
+        userId,
+        subjectId,
+        cycle: subjectProgress.cycle
+      }
+    });
+
+    // 시험 가능 여부 판정
+    // 1. 모든 Lesson이 90% 이상이어야 함
+    // 2. 현재 사이클에서 3회 미만 시도
+    // 3. 아직 수료하지 않았어야 함
+    const canTakeExam = allLessonsAbove90 && currentCycleAttempts < 3 && !subjectProgress.passed;
+
+    // 다시 수강하기 가능 여부
+    // 1. 수료하지 않았고
+    // 2. 현재 사이클에서 3회 모두 시도했을 때
+    const canRestart = !subjectProgress.passed && currentCycleAttempts >= 3;
+
+    // 남은 시험 횟수
+    const remainingTries = subjectProgress.passed ? 0 : Math.max(0, 3 - currentCycleAttempts);
+
+    return {
+      progressPercent: avgProgressPercent,
+      passed: subjectProgress.passed ?? false,
+      finalScore: subjectProgress.finalScore ?? null,
+      examAttemptCount: currentCycleAttempts,
+      remainingTries,
+      canTakeExam,
+      canRestart,
+      cycle: subjectProgress.cycle,
+      allLessonsAbove90,
+      completedAt: subjectProgress.completedAt ?? null
+    };
+  }
 }
