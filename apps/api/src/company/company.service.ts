@@ -9,9 +9,10 @@ export class CompanyService {
     name: string;
     startDate: Date;
     endDate: Date;
-    activeLessons: string[];
+    activeLessons?: string[];  // 구버전 호환용 (deprecated)
+    activeSubjects?: string[]; // 신규: Subject 단위 배정
   }) {
-    const { name, startDate, endDate, activeLessons } = createCompanyDto;
+    const { name, startDate, endDate, activeLessons, activeSubjects } = createCompanyDto;
 
     // 날짜 유효성 검사
     if (startDate >= endDate) {
@@ -34,41 +35,85 @@ export class CompanyService {
       );
     }
 
-    // 활성화할 레슨들이 존재하는지 확인
-    const lessons = await this.prisma.lesson.findMany({
-      where: {
-        id: { in: activeLessons },
-        isActive: true
-      }
-    });
+    // 신규: Subject 단위 배정 (우선순위)
+    if (activeSubjects && activeSubjects.length > 0) {
+      // Subject들이 존재하는지 확인
+      const subjects = await this.prisma.subject.findMany({
+        where: {
+          id: { in: activeSubjects },
+          isActive: true
+        }
+      });
 
-    if (lessons.length !== activeLessons.length) {
-      throw new BadRequestException('일부 레슨을 찾을 수 없습니다.');
+      if (subjects.length !== activeSubjects.length) {
+        throw new BadRequestException('일부 과목을 찾을 수 없습니다.');
+      }
+
+      // 회사 생성
+      const company = await this.prisma.company.create({
+        data: {
+          name,
+          startDate,
+          endDate,
+          isActive: true
+        }
+      });
+
+      // Subject 배정
+      await Promise.all(
+        activeSubjects.map(subjectId =>
+          this.prisma.companySubject.create({
+            data: {
+              companyId: company.id,
+              subjectId
+            }
+          })
+        )
+      );
+
+      return company;
     }
 
-    // 회사 생성
-    const company = await this.prisma.company.create({
-      data: {
-        name,
-        startDate,
-        endDate,
-        isActive: true
+    // 구버전 호환: Lesson 단위 배정 (deprecated, activeSubjects가 없을 때만 사용)
+    if (activeLessons && activeLessons.length > 0) {
+      const lessons = await this.prisma.lesson.findMany({
+        where: {
+          id: { in: activeLessons },
+          isActive: true
+        }
+      });
+
+      if (lessons.length !== activeLessons.length) {
+        throw new BadRequestException('일부 레슨을 찾을 수 없습니다.');
       }
-    });
 
-    // 활성화 레슨 연결
-    await Promise.all(
-      activeLessons.map(lessonId =>
-        this.prisma.companyLesson.create({
-          data: {
-            companyId: company.id,
-            lessonId
-          }
-        })
-      )
-    );
+      // 회사 생성
+      const company = await this.prisma.company.create({
+        data: {
+          name,
+          startDate,
+          endDate,
+          isActive: true
+        }
+      });
 
-    return company;
+      // 활성화 레슨 연결
+      await Promise.all(
+        activeLessons.map(lessonId =>
+          this.prisma.companyLesson.create({
+            data: {
+              companyId: company.id,
+              lessonId
+            }
+          })
+        )
+      );
+
+      return company;
+    }
+
+    // activeSubjects도 activeLessons도 없으면 에러
+    throw new BadRequestException('배정할 과목 또는 레슨을 지정해야 합니다.');
   }
 
   async assignStudents(companyId: string, userIds: string[]) {
@@ -106,6 +151,50 @@ export class CompanyService {
     return { message: `${users.length}명의 학생이 회사에 할당되었습니다.` };
   }
 
+  // 신규: Subject 단위 배정 업데이트
+  async updateActiveSubjects(companyId: string, activeSubjects: string[]) {
+    // 회사 존재 여부 확인
+    const company = await this.prisma.company.findUnique({
+      where: { id: companyId, isActive: true }
+    });
+
+    if (!company) {
+      throw new NotFoundException('회사를 찾을 수 없습니다.');
+    }
+
+    // Subject들이 존재하는지 확인
+    const subjects = await this.prisma.subject.findMany({
+      where: {
+        id: { in: activeSubjects },
+        isActive: true
+      }
+    });
+
+    if (subjects.length !== activeSubjects.length) {
+      throw new BadRequestException('일부 과목을 찾을 수 없습니다.');
+    }
+
+    // 기존 배정 삭제
+    await this.prisma.companySubject.deleteMany({
+      where: { companyId }
+    });
+
+    // 새로운 Subject 배정
+    await Promise.all(
+      activeSubjects.map(subjectId =>
+        this.prisma.companySubject.create({
+          data: {
+            companyId,
+            subjectId
+          }
+        })
+      )
+    );
+
+    return { message: '배정 과목이 업데이트되었습니다.' };
+  }
+
+  // 구버전 호환: Lesson 단위 배정 업데이트 (deprecated)
   async updateActiveLessons(companyId: string, activeLessons: string[]) {
     // 회사 존재 여부 확인
     const company = await this.prisma.company.findUnique({
@@ -160,6 +249,18 @@ export class CompanyService {
             createdAt: true
           }
         },
+        activeSubjects: {
+          include: {
+            subject: {
+              include: {
+                lessons: {
+                  where: { isActive: true },
+                  orderBy: { order: 'asc' }
+                }
+              }
+            }
+          }
+        },
         activeLessons: {
           include: {
             lesson: {
@@ -176,6 +277,30 @@ export class CompanyService {
       throw new NotFoundException('회사를 찾을 수 없습니다.');
     }
 
+    // 신규: Subject 단위 배정 정보 우선 반환
+    if (company.activeSubjects && company.activeSubjects.length > 0) {
+      return {
+        id: company.id,
+        name: company.name,
+        startDate: company.startDate,
+        endDate: company.endDate,
+        isActive: company.isActive,
+        studentCount: company.users.length,
+        activeSubjects: company.activeSubjects.map(cs => ({
+          subjectId: cs.subject.id,
+          subjectName: cs.subject.name,
+          subjectDescription: cs.subject.description,
+          lessonCount: cs.subject.lessons.length,
+          lessons: cs.subject.lessons.map(l => ({
+            lessonId: l.id,
+            lessonTitle: l.title,
+            lessonOrder: l.order
+          }))
+        }))
+      };
+    }
+
+    // 구버전 호환: Lesson 단위 배정 정보 반환
     return {
       id: company.id,
       name: company.name,
