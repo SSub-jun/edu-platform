@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import QueryProvider from "../src/components/QueryProvider";
+import { MainNav } from "../src/components/MainNav";
 import { Toaster } from 'react-hot-toast';
 
 const geistSans = localFont({
@@ -29,6 +30,7 @@ export default function RootLayout({
     <html lang="ko">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <QueryProvider>
+          <MainNav />
           {children}
           <Toaster
             position="top-right"

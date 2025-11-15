@@ -14,7 +14,6 @@ export default function SessionsPage() {
     title: '',
     mode: 'RANDOM' as 'RANDOM',
     questionCount: 20,
-    timeLimitMinutes: 30,
     bankId: ''
   })
 
@@ -70,7 +69,6 @@ export default function SessionsPage() {
         title: '',
         mode: 'RANDOM',
         questionCount: 20,
-        timeLimitMinutes: 30,
         bankId: ''
       })
       refetch()
@@ -99,7 +97,6 @@ export default function SessionsPage() {
       sessionNo: nextSessionNo,
       mode: 'RANDOM',
       questionCount: createForm.questionCount,
-      timeLimitMinutes: createForm.timeLimitMinutes,
       bankId: createForm.bankId,
     })
   }
@@ -216,7 +213,7 @@ export default function SessionsPage() {
                       {session.questionCount}문항
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {(session as any).timeLimitMinutes || 30}분
+                      30분
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {(() => {
@@ -289,18 +286,12 @@ export default function SessionsPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  제한시간 (분)
+                  제한시간
                 </label>
-                <input
-                  type="number"
-                  min="5"
-                  max="180"
-                  value={createForm.timeLimitMinutes}
-                  onChange={(e) => setCreateForm(prev => ({ ...prev, timeLimitMinutes: parseInt(e.target.value) }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-                <p className="text-xs text-gray-500 mt-1">5분 ~ 180분 (3시간) 범위 내에서 설정</p>
+                <div className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-600">
+                  30분 (고정)
+                </div>
+                <p className="text-xs text-gray-500 mt-1">모든 시험은 30분으로 고정됩니다</p>
               </div>
 
               {createForm.mode === 'RANDOM' && (

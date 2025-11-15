@@ -11,8 +11,14 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // CORS 설정
+  const allowedOrigins = [
+    'http://localhost:3100',
+    'https://portal-web-253826414567.asia-northeast3.run.app',
+    process.env.PORTAL_BASE_URL,
+  ].filter(Boolean);
+  
   app.enableCors({
-    origin: process.env.PORTAL_BASE_URL || 'http://localhost:3100',
+    origin: allowedOrigins,
     credentials: true,
   });
 

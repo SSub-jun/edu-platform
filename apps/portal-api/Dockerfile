@@ -1,6 +1,9 @@
 # Simple build for portal-api (standalone)
 FROM node:18-alpine AS base
 
+# Install OpenSSL and other dependencies for Prisma
+RUN apk add --no-cache openssl libc6-compat
+
 # Install pnpm
 RUN npm install -g pnpm
 
@@ -25,6 +28,9 @@ RUN pnpm run build:docker
 
 # Production stage  
 FROM node:18-alpine AS production
+
+# Install OpenSSL for Prisma in production stage
+RUN apk add --no-cache openssl libc6-compat
 
 WORKDIR /app
 

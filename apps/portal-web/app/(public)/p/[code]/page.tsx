@@ -98,7 +98,7 @@ export default function SessionPage() {
               </div>
               <div className="flex justify-between">
                 <span>합격 기준:</span>
-                <span>60점 이상</span>
+                <span>70점 이상</span>
               </div>
             </div>
           </div>

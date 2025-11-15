@@ -150,7 +150,7 @@ export default function ExamPage() {
           <div className="text-center mb-8">
             <h1 className="text-[28px] font-bold text-text-primary mb-3">레슨 {lessonId} 시험</h1>
             <p className="text-base text-text-secondary">
-              10문항의 객관식 문제가 출제됩니다. 70점 이상 시 합격입니다.
+              10문항의 객관식 문제가 출제됩니다. 진도 20점 + 학습평가 80점으로 총점을 계산하며, 총점 70점 이상이면 이 강의를 수료할 수 있습니다.
             </p>
           </div>
 
@@ -163,11 +163,15 @@ export default function ExamPage() {
               </div>
               <div className="flex items-center gap-3 text-text-secondary">
                 <span className="text-2xl">✅</span>
-                <span className="text-base">남은 시도: {lessonStatus.remainingTries}회</span>
+                <span className="text-base">
+                  남은 응시 기회: {lessonStatus.remainingTries}회 (최대 6회까지 응시 가능합니다)
+                </span>
               </div>
               <div className="flex items-center gap-3 text-text-secondary">
                 <span className="text-2xl">✅</span>
-                <span className="text-base">합격 기준: 70점 이상</span>
+                <span className="text-base">
+                  수료 기준: 진도율 90% 이상 + 총점 70점 이상
+                </span>
               </div>
             </div>
           </div>
@@ -179,7 +183,7 @@ export default function ExamPage() {
             <button 
               className="flex-1 px-6 py-3 bg-primary text-text-primary rounded-lg font-semibold transition-all hover:bg-primary-600 active:bg-primary-700 disabled:opacity-60 disabled:cursor-not-allowed"
               onClick={handleStartExam}
-              disabled={startExamMutation.isPending}
+              disabled={startExamMutation.isPending || lessonStatus.remainingTries === 0}
             >
               {startExamMutation.isPending ? (
                 <span className="inline-flex items-center gap-2">
@@ -187,7 +191,7 @@ export default function ExamPage() {
                   시험 준비 중...
                 </span>
               ) : (
-                '시험 시작'
+              lessonStatus.remainingTries === 0 ? '응시 기회 소진' : '시험 시작'
               )}
             </button>
           </div>

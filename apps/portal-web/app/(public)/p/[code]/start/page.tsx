@@ -37,11 +37,17 @@ export default function StartPage() {
     },
     onSuccess: (data) => {
       // 시험 데이터를 localStorage에 저장
-      localStorage.setItem('portal_exam_data', JSON.stringify({
+      const examDataWithSession = {
         ...data,
         sessionId: session?.id,
         sessionCode: code,
-      }))
+      }
+      localStorage.setItem('portal_exam_data', JSON.stringify(examDataWithSession))
+      
+      // 상태 즉시 업데이트
+      setExamData(examDataWithSession)
+      setHasExamData(true)
+      setBelongsToSession(true)
     }
   })
 
@@ -84,8 +90,14 @@ export default function StartPage() {
 
   // 타이머 효과
   useEffect(() => {
-    if (timeLeft <= 0) {
+    // timeLeft가 0이고 examData가 없으면 아직 시험이 시작되지 않은 것
+    if (timeLeft <= 0 && effectiveHasExamData) {
       handleSubmit(true) // 시간 만료 시 강제 제출
+      return
+    }
+
+    // timeLeft가 0이면 타이머를 시작하지 않음 (아직 초기화 전)
+    if (timeLeft <= 0) {
       return
     }
 
@@ -94,12 +106,13 @@ export default function StartPage() {
     }, 1000)
 
     return () => clearInterval(timer)
-  }, [timeLeft])
+  }, [timeLeft, effectiveHasExamData])
 
-  // 세션 시간 제한 설정
+  // 세션 시간 제한 설정 (기본값: 30분)
   useEffect(() => {
-    if (session && session.timeLimitMinutes && timeLeft === 0) {
-      setTimeLeft(session.timeLimitMinutes * 60) // 분을 초로 변환
+    if (session && timeLeft === 0) {
+      const defaultTimeLimit = 30 // 기본 30분
+      setTimeLeft(defaultTimeLimit * 60) // 분을 초로 변환
     }
   }, [session, timeLeft])
 
@@ -367,7 +380,7 @@ export default function StartPage() {
           {/* 제출 버튼 */}
           <div className="mt-8 text-center">
             <button
-              onClick={handleSubmit}
+              onClick={() => handleSubmit()}
               disabled={isSubmitting || submitMutation.isPending || answeredCount !== totalQuestions}
               className="bg-red-600 text-white py-3 px-8 rounded-lg hover:bg-red-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
             >

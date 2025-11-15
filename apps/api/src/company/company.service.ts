@@ -18,6 +18,22 @@ export class CompanyService {
       throw new BadRequestException('시작일은 종료일보다 이전이어야 합니다.');
     }
 
+    // 교육기간은 "임의의 시작일 기준 6개월 단위"로 운영
+    // - 고정 상/하반기(1~6월, 7~12월)가 아니라, 관리자가 설정한 startDate를 기준으로 정확히 6개월 뒤까지 허용
+    // - 6개월 정의: 동일한 일(day-of-month)을 기준으로 month를 +6 한 날짜
+    //   예) 2025-03-10 시작 → 2025-09-10 종료
+    const expectedEnd = new Date(startDate.getTime());
+    expectedEnd.setMonth(expectedEnd.getMonth() + 6);
+
+    const toDateKey = (d: Date) => d.toISOString().slice(0, 10); // YYYY-MM-DD 기준 비교
+    if (toDateKey(endDate) !== toDateKey(expectedEnd)) {
+      throw new BadRequestException(
+        `교육기간은 시작일 기준 6개월 단위로만 설정할 수 있습니다. (예: 시작일이 ${toDateKey(
+          startDate,
+        )}이면 종료일은 ${toDateKey(expectedEnd)}이어야 합니다.)`,
+      );
+    }
+
     // 활성화할 레슨들이 존재하는지 확인
     const lessons = await this.prisma.lesson.findMany({
       where: {

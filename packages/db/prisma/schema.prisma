@@ -169,6 +169,11 @@ model Progress {
   videoDuration      Float        @default(0) // 비디오 총 길이 (초 단위)
   status             ProgressStatus @default(inProgress)
   completedAt        DateTime?
+  // 강의(레슨) 단위 이수 판정을 위한 필드
+  // - finalScore: 진도 20% + 시험 80%가 반영된 최종 점수 (0.0 ~ 100.0)
+  // - passed: 해당 강의 이수 여부 (finalScore >= 70 && progressPercent >= 90 기준으로 활용 예정)
+  finalScore         Float?
+  passed             Boolean?
   createdAt          DateTime     @default(now())
   updatedAt          DateTime     @updatedAt
 
@@ -221,6 +226,10 @@ model ExamAttempt {
   userId        String
   subjectId     String        // Subject 단위 시험 (메인)
   lessonId      String?       // 옵션 (구버전 호환용)
+  // 사이클/시도 관리
+  // - cycle: 재학습 사이클 번호 (1사이클 당 최대 3회 응시, 3회 미통과 시 재학습 후 cycle+1)
+  // - attemptNumber: 해당 과목/강의에서의 시도 횟수 (1, 2, 3 ...)
+  cycle         Int           @default(1)
   attemptNumber Int           @default(1) // 시도 횟수 (1, 2, 3 - 최대 3회)
   status        ExamStatus    @default(inProgress)
   score         Float?        // 시험 점수 (0.0 ~ 100.0)

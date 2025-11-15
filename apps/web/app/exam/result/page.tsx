@@ -108,13 +108,17 @@ export default function ExamResultPage() {
               {Math.round(scoreNum)}점
             </div>
             <div className="text-base text-text-secondary mb-3">
-              시험 점수
+              시험 점수 (학습평가 80% 비중)
             </div>
             <div className="text-sm font-medium">
               {isPass ? (
-                <span className="text-success">✅ 합격 (70점 이상)</span>
+                <span className="text-success">
+                  ✅ 수료 기준 충족 (진도 20점 + 평가 80점, 총점 70점 이상)
+                </span>
               ) : (
-                <span className="text-error">❌ 불합격 (70점 미만)</span>
+                <span className="text-error">
+                  ❌ 수료 기준 미달 (총점 70점 미만 또는 진도율 부족)
+                </span>
               )}
             </div>
           </div>
@@ -138,7 +142,9 @@ export default function ExamResultPage() {
               </div>
               <div className="flex justify-between py-2 border-b border-border">
                 <span className="text-sm font-medium text-text-tertiary">합격 기준</span>
-                <span className="text-sm text-text-primary">70점 이상</span>
+                <span className="text-sm text-text-primary">
+                  진도 20점 + 평가 80점, 총점 70점 이상
+                </span>
               </div>
               <div className="flex justify-between py-2">
                 <span className="text-sm font-medium text-text-tertiary">총 문항 수</span>

@@ -92,6 +92,88 @@ export class ExamController {
     return await this.examService.submitExam(req.user.sub, attemptId, submitDto);
   }
 
+  @Post('lessons/:lessonId/start')
+  @Roles('student')
+  @ApiOperation({
+    summary: '레슨 단위 시험 시작',
+    description: '특정 레슨에 대한 시험을 시작합니다. 레슨 진도율이 90% 이상이어야 하며, 회사 수강기간/활성 레슨 여부를 검증합니다.'
+  })
+  @ApiParam({ name: 'lessonId', description: '레슨 ID' })
+  @ApiResponse({
+    status: 200,
+    description: '레슨 시험 시작 성공',
+    schema: {
+      properties: {
+        success: { type: 'boolean', example: true },
+        data: {
+          type: 'object',
+          properties: {
+            attemptId: { type: 'string' },
+            lessonId: { type: 'string' },
+            questions: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  id: { type: 'string' },
+                  content: { type: 'string' },
+                  choices: { type: 'array', items: { type: 'string' } }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  })
+  async startLessonExam(
+    @Param('lessonId') lessonId: string,
+    @Request() req: any
+  ) {
+    const data = await this.examService.startLessonExam(req.user.sub, lessonId);
+    return {
+      success: true,
+      data,
+    };
+  }
+
+  @Post('lessons/:lessonId/retake')
+  @Roles('student')
+  @ApiOperation({
+    summary: '레슨 단위 시험 재응시',
+    description: '특정 레슨 시험에 대해 재응시를 시도합니다. 총 2사이클 × 3회(최대 6회)까지 응시 가능하며, 결과는 allowed 플래그로 반환됩니다.'
+  })
+  @ApiParam({ name: 'lessonId', description: '레슨 ID' })
+  @ApiResponse({
+    status: 200,
+    description: '레슨 시험 재응시 결과',
+    schema: {
+      properties: {
+        success: { type: 'boolean', example: true },
+        data: {
+          type: 'object',
+          properties: {
+            allowed: { type: 'boolean' },
+            cycle: { type: 'number' },
+            tryIndex: { type: 'number' },
+            remainingTries: { type: 'number' },
+            message: { type: 'string', nullable: true }
+          }
+        }
+      }
+    }
+  })
+  async retakeLessonExam(
+    @Param('lessonId') lessonId: string,
+    @Request() req: any
+  ) {
+    const data = await this.examService.retakeLessonExam(req.user.sub, lessonId);
+    return {
+      success: true,
+      data,
+    };
+  }
+
   @Post('reset-attempts')
   @Roles('instructor')
   @ApiOperation({

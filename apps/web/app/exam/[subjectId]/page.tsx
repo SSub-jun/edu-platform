@@ -163,7 +163,9 @@ export default function ExamPage() {
                 {Math.round(result.examScore)}점
               </div>
               <div className="text-base text-text-secondary mt-2.5">
-                {result.passed ? '합격 기준: 70점 이상' : '불합격 (70점 미만)'}
+                {result.passed
+                  ? '수료 기준: 진도 20점 + 평가 80점, 총점 70점 이상'
+                  : '수료 기준 미달: 총점 70점 미만 또는 진도율 부족'}
               </div>
             </div>
           </div>

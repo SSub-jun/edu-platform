@@ -166,8 +166,31 @@ export class ProgressService {
       const subjectProgress = userProgress.filter(p => p.lesson.subjectId === subject.id);
       
       const totalLessons = subjectLessons.length;
-      const completedLessons = subjectProgress.filter(p => p.progressPercent >= 90).length;
-      const progressPercent = totalLessons > 0 ? (completedLessons / totalLessons) * 100 : 0;
+      if (totalLessons === 0) {
+        return {
+          subjectId: subject.id,
+          subjectName: subject.name,
+          progressPercent: 0,
+          completedLessons: 0,
+          totalLessons: 0
+        };
+      }
+
+      // ✅ 레슨 개수 기반이 아닌, 레슨 progressPercent 기반 평균 진도율로 계산
+      // - 각 레슨의 progressPercent(0~100)를 모두 합산 후, 레슨 수로 나눔
+      // - 일부 레슨만 조금씩 수강한 경우도 비례 반영
+      const sumProgressPercent = subjectLessons.reduce((sum, lesson) => {
+        const progress = subjectProgress.find(p => p.lessonId === lesson.id);
+        return sum + (progress?.progressPercent ?? 0);
+      }, 0);
+
+      const progressPercent = sumProgressPercent / totalLessons;
+
+      // 참고용: 90% 이상 완료된 레슨 수는 별도로 유지
+      const completedLessons = subjectLessons.filter(lesson => {
+        const progress = subjectProgress.find(p => p.lessonId === lesson.id);
+        return (progress?.progressPercent ?? 0) >= 90;
+      }).length;
 
       return {
         subjectId: subject.id,
@@ -439,33 +462,22 @@ export class ProgressService {
       }
     }
 
-    // Subject 시험 응시 가능 횟수 확인 (Subject 단위로 변경됨)
-    const subjectId = lesson.subjectId;
-    const passedAttempt = await this.prisma.examAttempt.findFirst({
+    // 레슨 단위 남은 응시 횟수 계산 (최대 2사이클 × 3회 = 6회)
+    const maxAttemptsPerCycle = 3;
+    const maxCycles = 2;
+    const maxAttempts = maxAttemptsPerCycle * maxCycles;
+
+    const totalAttemptsForLesson = await this.prisma.examAttempt.count({
       where: {
         userId,
-        subjectId,
-        passed: true
+        lessonId
       }
     });
 
-    let remainingTries = 0;
-    
-    if (passedAttempt) {
-      // 이미 합격했으면 0회
-      remainingTries = 0;
-    } else {
-      // Subject의 총 시도 횟수 확인 (최대 3회)
-      const totalAttempts = await this.prisma.examAttempt.count({
-        where: { 
-          userId, 
-          subjectId
-        }
-      });
-      
-      // 3 - 총 시도 횟수 = 남은 횟수
-      remainingTries = Math.max(0, 3 - totalAttempts);
-    }
+    const lessonPassed = !!progress?.passed;
+    const remainingTries = lessonPassed
+      ? 0
+      : Math.max(0, maxAttempts - totalAttemptsForLesson);
 
     return {
       lessonId,
@@ -474,10 +486,10 @@ export class ProgressService {
       maxReachedSeconds: progress?.maxReachedSeconds || 0,
       subjectId: lesson.subjectId,
       unlocked,
-      completed: !!passedAttempt,
+      completed: lessonPassed,
       remainingTries,
       blockers,
-      completedAt: passedAttempt ? new Date().toISOString() : null,
+      completedAt: progress?.completedAt ? progress.completedAt.toISOString() : null,
       videoParts: lesson.videoParts.map(vp => ({
         id: vp.id,
         title: vp.title,

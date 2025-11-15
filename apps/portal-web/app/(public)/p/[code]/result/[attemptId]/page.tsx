@@ -92,7 +92,7 @@ export default function ResultPage() {
                   ? 'bg-green-100 text-green-800' 
                   : 'bg-red-100 text-red-800'
               }`}>
-                {isPassed ? '합격' : '불합격'} (60점 이상 합격)
+                {isPassed ? '합격' : '불합격'} (70점 이상 합격)
               </div>
             </div>
           </div>
