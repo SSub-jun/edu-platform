@@ -20,7 +20,7 @@ export function MainNav() {
     if (typeof window === "undefined") return;
 
     const token = localStorage.getItem("accessToken");
-    if (!token) {
+    if (!token) { 
       setIsReady(true);
       setIsStudent(false);
       return;
@@ -79,7 +79,7 @@ export function MainNav() {
                 )}
                 <Link
                   href={item.href}
-                  className={`px-3 py-1.5 md:px-4 md:py-2 rounded-full font-medium transition-colors ${isActive
+                  className={`px-3 py-1.5 md:px-4 md:py-2 rounded font-medium transition-colors ${isActive
                       ? "bg-primary text-white"
                       : "text-text-secondary hover:text-text-primary hover:bg-bg-primary"
                     }`}
