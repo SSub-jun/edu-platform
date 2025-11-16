@@ -63,10 +63,10 @@ export default function AdminPage() {
 
         <div style={{ 
           display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
           gap: '25px'
         }}>
-          {/* 기관 관리 */}
+          {/* 회사 & 기수 관리 */}
           <div style={{
             padding: '25px',
             border: '1px solid #e0e0e0',
@@ -83,7 +83,7 @@ export default function AdminPage() {
               alignItems: 'center',
               gap: '8px'
             }}>
-              🏢 기관 관리
+              🏢 회사 & 기수 관리
             </h3>
             <p style={{ 
               color: '#666', 
@@ -91,7 +91,7 @@ export default function AdminPage() {
               fontSize: '14px',
               lineHeight: '1.5'
             }}>
-              교육기관/기업 생성, 초대코드 관리, 과목 배정
+              Cohort 기반 운영 화면을 준비 중입니다. 그 전까지는 기존 회사 관리 화면을 통해 기관 정보를 확인해주세요.
             </p>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -111,31 +111,23 @@ export default function AdminPage() {
                   gap: '8px'
                 }}
               >
-                🏢 기관 목록 관리
+                🏢 회사 목록 열기
               </button>
               
-              <button 
-                onClick={() => router.push('/admin/companies/assign')}
-                style={{
-                  padding: '12px 16px',
-                  backgroundColor: '#0070f3',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}
-              >
-                📚 과목 배정 관리
-              </button>
+              <div style={{
+                padding: '12px 16px',
+                backgroundColor: '#e9ecef',
+                color: '#5c636a',
+                borderRadius: '6px',
+                fontSize: '13px',
+                lineHeight: '1.5'
+              }}>
+                새 Cohort 관리 UI가 곧 제공될 예정입니다. 기존 회사/과목 배정 화면은 더 이상 노출하지 않습니다.
+              </div>
             </div>
           </div>
 
-          {/* 계정 관리 */}
+          {/* 콘텐츠 & 시험 관리 */}
           <div style={{
             padding: '25px',
             border: '1px solid #e0e0e0',
@@ -152,7 +144,7 @@ export default function AdminPage() {
               alignItems: 'center',
               gap: '8px'
             }}>
-              👤 계정 관리
+              📚 콘텐츠 & 시험 관리
             </h3>
             <p style={{ 
               color: '#666', 
@@ -160,255 +152,63 @@ export default function AdminPage() {
               fontSize: '14px',
               lineHeight: '1.5'
             }}>
-              강사, 학생, 관리자 계정 생성 및 삭제
+              과목/레슨/시험 문제 관리 화면을 새로 만들고 있습니다. 개편이 완료되면 여기에서 바로 접근할 수 있어요.
             </p>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <button 
-                onClick={() => router.push('/admin/users/instructors')}
-                style={{
-                  padding: '12px 16px',
-                  backgroundColor: '#0070f3',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}
-              >
-                👩‍🏫 강사 계정 관리
-              </button>
-              
-              <button 
-                onClick={() => router.push('/admin/users/students')}
-                style={{
-                  padding: '12px 16px',
-                  backgroundColor: '#0070f3',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}
-              >
-                👥 학생 계정 관리
-              </button>
+              <div style={{
+                padding: '12px 16px',
+                border: '1px dashed #adb5bd',
+                borderRadius: '6px',
+                color: '#495057',
+                backgroundColor: '#fff'
+              }}>
+                ✅ 목표<br />
+                - 과목 상세에서 레슨·영상·시험을 한 번에 관리<br />
+                - 문제 은행 / 보기 / 해설 / 미리보기 지원<br />
+                - 업로드 파이프라인 정리
+              </div>
             </div>
           </div>
 
-          {/* 교육 콘텐츠 관리 */}
+          {/* 운영 지원 안내 */}
           <div style={{
             padding: '25px',
             border: '1px solid #e0e0e0',
             borderRadius: '12px',
-            backgroundColor: '#f8f9fa',
+            backgroundColor: '#fff8e1',
             boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
           }}>
             <h3 style={{ 
               marginBottom: '10px', 
-              color: '#333',
+              color: '#8a6d3b',
               fontSize: '20px',
               fontWeight: 'bold',
               display: 'flex',
               alignItems: 'center',
               gap: '8px'
             }}>
-              📚 교육 콘텐츠 감독
+              🛠️ 운영 도구 개편 안내
             </h3>
             <p style={{ 
-              color: '#666', 
+              color: '#7a5d2f', 
               marginBottom: '20px',
               fontSize: '14px',
-              lineHeight: '1.5'
+              lineHeight: '1.6'
             }}>
-              전체 과목, 시험 문제, 학습 자료 품질 관리
+              계정 관리, 포털 시험, Q&A 통계 등 구버전 메뉴는 일시적으로 숨겼습니다. 필요 시 운영팀을 통해 직접 지원받아 주세요.
             </p>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <button 
-                onClick={() => router.push('/admin/subjects')}
-                style={{
-                  padding: '12px 16px',
-                  backgroundColor: '#0070f3',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}
-              >
-                📖 전체 과목 관리
-              </button>
-              
-              <button 
-                onClick={() => router.push('/admin/questions')}
-                style={{
-                  padding: '12px 16px',
-                  backgroundColor: '#0070f3',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}
-              >
-                📝 문제 은행 관리
-              </button>
-            </div>
-          </div>
-
-          {/* 포털 시험 관리 */}
-          <div style={{
-            padding: '25px',
-            border: '1px solid #e0e0e0',
-            borderRadius: '12px',
-            backgroundColor: '#f8f9fa',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
-          }}>
-            <h3 style={{ 
-              marginBottom: '10px', 
-              color: '#333',
-              fontSize: '20px',
-              fontWeight: 'bold',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
-            }}>
-              🎯 포털 시험 관리
-            </h3>
-            <p style={{ 
-              color: '#666', 
-              marginBottom: '20px',
+            <ul style={{ 
+              margin: 0, 
+              paddingLeft: '20px', 
+              color: '#7a5d2f', 
               fontSize: '14px',
-              lineHeight: '1.5'
+              lineHeight: '1.6'
             }}>
-              실시간 시험 세션, 문제 은행, 결과 분석
-            </p>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <button 
-                onClick={() => router.push('/admin/portal/sessions')}
-                style={{
-                  padding: '12px 16px',
-                  backgroundColor: '#0070f3',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}
-              >
-                🎮 시험 세션 관리
-              </button>
-              
-              <button 
-                onClick={() => router.push('/admin/portal/banks')}
-                style={{
-                  padding: '12px 16px',
-                  backgroundColor: '#0070f3',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}
-              >
-                🏦 문제 은행 관리
-              </button>
-            </div>
-          </div>
-
-          {/* Q&A 관리 */}
-          <div style={{
-            padding: '25px',
-            border: '1px solid #e0e0e0',
-            borderRadius: '12px',
-            backgroundColor: '#f8f9fa',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
-          }}>
-            <h3 style={{ 
-              marginBottom: '10px', 
-              color: '#333',
-              fontSize: '20px',
-              fontWeight: 'bold',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
-            }}>
-              💬 Q&A 관리
-            </h3>
-            <p style={{ 
-              color: '#666', 
-              marginBottom: '20px',
-              fontSize: '14px',
-              lineHeight: '1.5'
-            }}>
-              전체 질문 답변 모니터링 및 품질 관리
-            </p>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <button 
-                onClick={() => router.push('/qna')}
-                style={{
-                  padding: '12px 16px',
-                  backgroundColor: '#0070f3',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}
-              >
-                💭 질문 답변 관리
-              </button>
-              
-              <button 
-                onClick={() => router.push('/admin/qna/analytics')}
-                style={{
-                  padding: '12px 16px',
-                  backgroundColor: '#0070f3',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}
-              >
-                📊 Q&A 통계
-              </button>
-            </div>
+              <li>강사/학생 계정은 초대코드 기반 가입으로 전환</li>
+              <li>포털 시험 기능은 별도 프로젝트로 분리</li>
+              <li>Q&A 분석은 backend API 정리 후 재도입 예정</li>
+            </ul>
           </div>
         </div>
       </div>
