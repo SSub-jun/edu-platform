@@ -212,8 +212,8 @@ export default function CohortDashboardPage() {
     setSelectedCohort(cohort);
     setFormData({
       name: cohort.name,
-      startDate: formatDateForInput(cohort.startDate),
-      endDate: formatDateForInput(cohort.endDate),
+      startDate: formatDateForInput(cohort.startDate) || '',
+      endDate: formatDateForInput(cohort.endDate) || '',
       isActive: cohort.isActive,
     });
     setShowEditModal(true);
