@@ -264,19 +264,32 @@ export class ProgressService {
       }
     });
 
-    if (!user || !user.company) {
-      throw new ForbiddenException('회사에 소속되지 않은 사용자입니다.');
+    if (!user) {
+      throw new NotFoundException('사용자를 찾을 수 없습니다.');
     }
 
-    // 회사 수강기간 확인
-    const now = new Date();
-    if (user.company.startDate && user.company.endDate && (now < user.company.startDate || now > user.company.endDate)) {
-      throw new ForbiddenException('수강기간이 아닙니다.');
-    }
+    // 회사가 없는 경우 모든 활성 레슨 조회
+    let activeLessons: any[] = [];
+    
+    if (user.company) {
+      // 회사 수강기간 확인
+      const now = new Date();
+      if (user.company.startDate && user.company.endDate && (now < user.company.startDate || now > user.company.endDate)) {
+        throw new ForbiddenException('수강기간이 아닙니다.');
+      }
 
-    const activeLessons = user.company.activeLessons
-      .map(cl => cl.lesson)
-      .sort((a, b) => a.order - b.order);
+      activeLessons = user.company.activeLessons
+        .map(cl => cl.lesson)
+        .sort((a, b) => a.order - b.order);
+    } else {
+      // 회사가 없는 경우 모든 활성 레슨 조회 (테스트/개발용)
+      const allLessons = await this.prisma.lesson.findMany({
+        where: { isActive: true },
+        include: { subject: true },
+        orderBy: { order: 'asc' }
+      });
+      activeLessons = allLessons;
+    }
 
     if (activeLessons.length === 0) {
       return {
@@ -360,7 +373,7 @@ export class ProgressService {
   }
 
   async getLessonStatus(userId: string, lessonId: string): Promise<LessonStatusDto> {
-    // 사용자와 회사 정보 조회
+    // 사용자 정보 조회
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       include: {
@@ -380,20 +393,24 @@ export class ProgressService {
       }
     });
 
-    if (!user || !user.company) {
-      throw new ForbiddenException('회사에 소속되지 않은 사용자입니다.');
+    if (!user) {
+      throw new NotFoundException('사용자를 찾을 수 없습니다.');
     }
 
-    // 회사 수강기간 확인
-    const now = new Date();
-    if (user.company.startDate && user.company.endDate && (now < user.company.startDate || now > user.company.endDate)) {
-      throw new ForbiddenException('수강기간이 아닙니다.');
-    }
+    // 회사가 없는 경우 모든 레슨에 접근 가능 (테스트/개발용)
+    let isActiveLesson = true;
+    if (user.company) {
+      // 회사 수강기간 확인
+      const now = new Date();
+      if (user.company.startDate && user.company.endDate && (now < user.company.startDate || now > user.company.endDate)) {
+        throw new ForbiddenException('수강기간이 아닙니다.');
+      }
 
-    // 해당 레슨이 활성화 레슨인지 확인
-    const isActiveLesson = user.company.activeLessons.some(cl => cl.lessonId === lessonId);
-    if (!isActiveLesson) {
-      throw new ForbiddenException('해당 레슨에 접근할 권한이 없습니다.');
+      // 해당 레슨이 활성화 레슨인지 확인
+      isActiveLesson = user.company.activeLessons.some(cl => cl.lessonId === lessonId);
+      if (!isActiveLesson) {
+        throw new ForbiddenException('해당 레슨에 접근할 권한이 없습니다.');
+      }
     }
 
     // 레슨 정보 조회 (비디오 정보 포함)
