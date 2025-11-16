@@ -119,51 +119,42 @@ export default function VideoPlayer({
         watchedOverlay.style.width = `${Math.min(maxPct, 100)}%`;
       };
 
-      // 🔒 SeekBar 클램프 설정
+      // 🔒 SeekBar 클램프 설정 (seeking 이벤트 가로채기)
       const setupSeekBarClamp = () => {
-        const progressControl = player.controlBar.progressControl;
-        const seekBar = progressControl?.seekBar;
+        let isSeeking = false;
         
-        if (!seekBar) return;
-
-        // handleMouseDown 메서드 오버라이드 (클릭/드래그 시작)
-        const originalHandleMouseDown = seekBar.handleMouseDown.bind(seekBar);
-        
-        seekBar.handleMouseDown = function(event: MouseEvent | TouchEvent) {
+        // seeking 이벤트: 사용자가 시크를 시도할 때
+        player.on('seeking', () => {
+          const currentTime = player.currentTime() || 0;
           const duration = player.duration() || 0;
-          if (duration <= 0) {
-            return originalHandleMouseDown(event);
-          }
-
-          // 클릭 위치 계산
-          const rect = seekBar.el().getBoundingClientRect();
-          const clientX = 'touches' in event ? (event.touches[0]?.clientX ?? 0) : (event as MouseEvent).clientX;
-          const clickX = clientX - rect.left;
-          const clickRatio = Math.max(0, Math.min(1, clickX / rect.width));
-          const requestedTime = clickRatio * duration;
-
-          // maxReached 체크 (+ 0.5초 버퍼)
           const maxAllowedTime = maxReachedRef.current + 0.5;
           
-          if (requestedTime > maxAllowedTime) {
-            // 🔒 미수강 구간 클릭: maxReached로 이동
+          if (duration <= 0) return;
+          
+          // 미수강 구간으로 시크 시도
+          if (currentTime > maxAllowedTime) {
             console.log('🔒 [SeekBar] Blocked seek:', {
-              requested: requestedTime.toFixed(2),
+              requested: currentTime.toFixed(2),
               allowed: maxAllowedTime.toFixed(2),
+              maxReached: maxReachedRef.current.toFixed(2),
             });
+            
+            // 즉시 maxReached로 되돌림
+            isSeeking = true;
             player.currentTime(maxReachedRef.current);
-            event.preventDefault();
-            event.stopPropagation();
-            return;
+            
+            // 다음 프레임에서 플래그 해제
+            setTimeout(() => {
+              isSeeking = false;
+            }, 100);
+          } else if (!isSeeking) {
+            // 수강 구간으로 시크: 정상 처리
+            console.log('✅ [SeekBar] Allowed seek:', {
+              requested: currentTime.toFixed(2),
+              maxReached: maxReachedRef.current.toFixed(2),
+            });
           }
-
-          // ✅ 수강한 구간 클릭: 정상 처리
-          console.log('✅ [SeekBar] Allowed seek:', {
-            requested: requestedTime.toFixed(2),
-            maxReached: maxReachedRef.current.toFixed(2),
-          });
-          originalHandleMouseDown(event);
-        };
+        });
       };
 
       // ✅ Watched Overlay 생성 (진행바에 파란색 영역 표시)
