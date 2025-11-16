@@ -284,6 +284,7 @@ export default function VideoPlayer({
       <video
         ref={videoRef}
         className={styles.html5Video}
+        src={videoUrl}
         controls
         playsInline
         preload="metadata"
