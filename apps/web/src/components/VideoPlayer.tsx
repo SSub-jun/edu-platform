@@ -159,9 +159,17 @@ export default function VideoPlayer({
         return false;
       }
 
+      // ✅ 사용자가 수동으로 seeking 중이면 drift guard 비활성화
+      if (isUserSeekingRef.current) {
+        return false;
+      }
+
+      // ✅ drift guard는 오직 예상치 못한 0초 리셋만 감지
+      // 사용자가 뒤로 이동하는 것은 정상적인 동작
       const guardTarget = Math.max(resumeTimeRef.current, maxAllowedRef.current);
-      if (guardTarget > 0 && current + 0.3 < guardTarget) {
-        console.warn('⚠️ [VideoPlayer] Drift detected, restoring position', {
+      if (guardTarget > 5 && current < 1) {
+        // 예: 261초에서 갑자기 0초로 리셋되는 경우만 감지
+        console.warn('⚠️ [VideoPlayer] Unexpected reset detected, restoring position', {
           current: current.toFixed(2),
           guardTarget: guardTarget.toFixed(2),
         });
@@ -194,20 +202,14 @@ export default function VideoPlayer({
         return;
       }
 
-      // ✅ 일반 재생 시 위치 보정 (초기 sync 완료 후)
-      if (!isInitialSyncingRef.current) {
-        const guardTarget = Math.max(resumeTimeRef.current, maxAllowedRef.current);
-        const current = video.currentTime || 0;
-        if (guardTarget > 0 && current + 0.3 < guardTarget) {
-          forceSeek(guardTarget, 'play-ensure');
-        }
-      }
+      // ✅ 일반 재생 시에는 보정하지 않음 (사용자가 의도적으로 이동한 것)
+      // drift guard가 예상치 못한 리셋만 처리
     };
 
     const handleTimeUpdate = () => {
       const currentTime = video.currentTime || 0;
       const duration = video.duration || 0;
-      videoDurationRef.current = duration;
+        videoDurationRef.current = duration;
 
       if (isProgrammaticSeekRef.current) {
         previousTime = currentTime;
@@ -226,12 +228,12 @@ export default function VideoPlayer({
 
       if (!isUserSeekingRef.current && delta > 0 && delta < 5 && currentTime > maxAllowedRef.current) {
         maxAllowedRef.current = currentTime;
-        onProgressRef.current?.({
-          currentTime,
-          maxReachedSeconds: currentTime,
-          videoDuration: duration,
-        });
-      }
+          onProgressRef.current?.({
+            currentTime,
+            maxReachedSeconds: currentTime,
+            videoDuration: duration,
+          });
+        }
     };
 
     const handleSeeking = () => {
