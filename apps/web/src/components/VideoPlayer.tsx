@@ -32,19 +32,40 @@ export default function VideoPlayer({
 }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const playerRef = useRef<any>(null);
-  const maxReachedRef = useRef(maxReachedSeconds);
+  const nativeVideoRef = useRef<HTMLVideoElement | null>(null);
+
+  const resumeTimeRef = useRef(maxReachedSeconds || 0);
+  const maxAllowedRef = useRef(maxReachedSeconds || 0);
+  const lastSafeTimeRef = useRef(maxReachedSeconds || 0);
+  const seekStartRef = useRef(maxReachedSeconds || 0);
+
+  const isUserSeekingRef = useRef(false);
+  const isProgrammaticSeekRef = useRef(false);
+  const hasSyncedInitialTimeRef = useRef(false);
+
   const videoDurationRef = useRef(videoDuration);
   const onProgressRef = useRef(onProgress); // ✅ onProgress를 ref로 관리
 
   // ✅ maxReachedSeconds props 변경 시 ref 업데이트
   useEffect(() => {
-    maxReachedRef.current = maxReachedSeconds;
+    const resume = maxReachedSeconds || 0;
+    resumeTimeRef.current = resume;
+    if (resume > maxAllowedRef.current) {
+      maxAllowedRef.current = resume;
+    }
+    if (resume > lastSafeTimeRef.current) {
+      lastSafeTimeRef.current = resume;
+    }
     console.log('🎯 [VideoPlayer] Props received:', {
       maxReachedSeconds,
       videoDuration,
-      src: src?.substring(0, 50) + '...'
+      src: src?.substring(0, 50) + '...',
     });
   }, [maxReachedSeconds, videoDuration, src]);
+
+  useEffect(() => {
+    videoDurationRef.current = videoDuration;
+  }, [videoDuration]);
 
   // ✅ onProgress를 항상 최신 값으로 유지
   useEffect(() => {
@@ -77,27 +98,26 @@ export default function VideoPlayer({
   }
 
   useEffect(() => {
-    // SSR 환경에서는 실행하지 않음
     if (!videoRef.current || typeof window === 'undefined') return;
 
-    // Video.js를 동적으로 로드
     let player: any;
     let watchedOverlay: HTMLElement | null = null;
-    
+    let disposed = false;
+    let detachKeyboard: (() => void) | null = null;
+
     const initPlayer = async () => {
       const videojs = (await import('video.js')).default;
-      
-      if (!videoRef.current) return;
+      if (!videoRef.current || disposed) return;
 
-      // Video.js 플레이어 초기화
       player = videojs(videoRef.current, {
         controls: true,
         fluid: true,
         responsive: true,
-        playbackRates: [1.0], // 🔒 배속 고정
+        autoplay: autoPlay,
+        playbackRates: [1.0],
         userActions: {
-          hotkeys: false, // 🔒 키보드 단축키 비활성화
-          doubleClick: false, // 🔒 더블클릭 풀스크린 비활성화
+          hotkeys: false,
+          doubleClick: false,
         },
         sources: [
           {
@@ -108,258 +128,246 @@ export default function VideoPlayer({
       });
 
       playerRef.current = player;
+      const tech = player.tech?.(true);
+      nativeVideoRef.current =
+        (tech?.el() as HTMLVideoElement | null) ??
+        (player.el()?.querySelector('video') as HTMLVideoElement | null);
 
-      // Watched Overlay 업데이트 함수
+      const clampTimeToDuration = (time: number) => {
+        const duration = player.duration() || videoDurationRef.current || 0;
+        if (!duration || duration <= 0) return Math.max(time, 0);
+        return Math.min(Math.max(time, 0), Math.max(duration - 0.2, 0));
+      };
+
       const updateWatchedOverlay = () => {
         if (!watchedOverlay) return;
-        const duration = player.duration() || 0;
-        if (duration <= 0) return;
-
-        const maxPct = (maxReachedRef.current / duration) * 100;
+        const duration = player.duration() || videoDurationRef.current || 0;
+        if (!duration) return;
+        const maxPct = (maxAllowedRef.current / duration) * 100;
         watchedOverlay.style.width = `${Math.min(maxPct, 100)}%`;
       };
 
-      // 🎯 이어보기 위치 보장 함수
-      const ensureSeekToMaxReached = (reason: string) => {
-        if (!player || maxReachedRef.current <= 0) return;
+      const forceSeekBoth = (time: number, reason: string) => {
+        const playerInstance = playerRef.current;
+        const nativeVideo = nativeVideoRef.current;
+        if (!playerInstance || !nativeVideo) return;
+
+        const target = clampTimeToDuration(time);
+        isProgrammaticSeekRef.current = true;
+
+        try {
+          nativeVideo.currentTime = target;
+        } catch (err) {
+          console.warn('[VideoPlayer] Native seek failed', { reason, err });
+        }
+
+        try {
+          playerInstance.currentTime(target);
+        } catch (err) {
+          console.warn('[VideoPlayer] Player seek failed', { reason, err });
+        }
+
+        lastSafeTimeRef.current = target;
+
+        window.setTimeout(() => {
+          isProgrammaticSeekRef.current = false;
+        }, 80);
+      };
+
+      const applyInitialSeek = () => {
+        if (hasSyncedInitialTimeRef.current) return;
         const duration = player.duration() || 0;
-        if (duration <= 0) return;
+        if (!duration) return;
 
-        const target = Math.min(maxReachedRef.current, Math.max(duration - 0.5, 0));
-        let attempts = 0;
+        const resumeTarget = clampTimeToDuration(resumeTimeRef.current);
+        if (resumeTarget <= 0) {
+          hasSyncedInitialTimeRef.current = true;
+          return;
+        }
 
-        const applyCurrentTime = (time: number) => {
-          try {
-            player.currentTime(time);
-          } catch (err) {
-            console.warn('[VideoPlayer] Failed to set player.currentTime', err);
-          }
-
-          const nativeVideo = player.el()?.querySelector('video') as HTMLVideoElement | null;
-          if (nativeVideo) {
-            try {
-              if (nativeVideo.fastSeek) {
-                nativeVideo.fastSeek(time);
-              } else {
-                nativeVideo.currentTime = time;
-              }
-            } catch (err) {
-              console.warn('[VideoPlayer] Failed to set native video time, fallback currentTime', err);
-              try {
-                nativeVideo.currentTime = time;
-              } catch (innerErr) {
-                console.warn('[VideoPlayer] Native fallback also failed', innerErr);
-              }
-            }
-          }
-        };
-
-        const trySeek = () => {
-          attempts += 1;
-          applyCurrentTime(target);
-
-          setTimeout(() => {
-            const actual = player.currentTime() || 0;
-            const diff = Math.abs(actual - target);
-
-            if (diff > 0.5 && attempts < 6) {
-              console.log('⏳ [VideoPlayer] Seek mismatch, retrying...', {
-                reason,
-                attempt: attempts,
-                target: target.toFixed(2),
-                actual: actual.toFixed(2),
-                diff: diff.toFixed(2),
-              });
-              trySeek();
-            } else {
-              console.log(diff <= 0.5 ? '✅ [VideoPlayer] Seek confirmed:' : '⚠️ [VideoPlayer] Seek giving up:', {
-                reason,
-                attempt: attempts,
-                target: target.toFixed(2),
-                actual: actual.toFixed(2),
-                diff: diff.toFixed(2),
-              });
-            }
-          }, 160);
-        };
-
-        trySeek();
-      };
-
-      // 🔒 SeekBar 클램프 설정 (seeking 이벤트 가로채기)
-      const setupSeekBarClamp = () => {
-        let isCorrectingSeeking = false;
-        
-        // seeking 이벤트: 사용자가 시크를 시도할 때
-        player.on('seeking', () => {
-          // 우리가 수정 중이면 무시 (무한 루프 방지)
-          if (isCorrectingSeeking) {
-            return;
-          }
-          
-          const currentTime = player.currentTime() || 0;
-          const duration = player.duration() || 0;
-          const maxAllowedTime = maxReachedRef.current + 0.5;
-          
-          if (duration <= 0) return;
-          
-          // 미수강 구간으로 시크 시도
-          if (currentTime > maxAllowedTime) {
-            console.log('🔒 [SeekBar] Blocked seek:', {
-              requested: currentTime.toFixed(2),
-              maxReached: maxReachedRef.current.toFixed(2),
-              correcting: 'to maxReached'
-            });
-            
-            // 무한 루프 방지 플래그 설정
-            isCorrectingSeeking = true;
-            
-            // maxReached로 되돌림
-            ensureSeekToMaxReached('blocked-seek');
-            
-            // 플래그 해제
-            setTimeout(() => {
-              isCorrectingSeeking = false;
-            }, 150);
-          } else {
-            // 수강 구간으로 시크: 정상 처리
-            console.log('✅ [SeekBar] Allowed seek:', {
-              requested: currentTime.toFixed(2),
-              maxReached: maxReachedRef.current.toFixed(2),
-            });
-          }
+        console.log('🎯 [VideoPlayer] Initial seek requested:', {
+          target: resumeTarget.toFixed(2),
+          duration: duration.toFixed(2),
         });
+
+        forceSeekBoth(resumeTarget, 'initial');
+        maxAllowedRef.current = Math.max(maxAllowedRef.current, resumeTarget);
+        updateWatchedOverlay();
+        hasSyncedInitialTimeRef.current = true;
       };
 
-      // ✅ Watched Overlay 생성 (진행바에 파란색 영역 표시)
-      player.ready(() => {
-        const progressControl = player.controlBar.progressControl;
-        const progressHolder = progressControl?.el()?.querySelector('.vjs-progress-holder');
-        
-        if (progressHolder) {
-          watchedOverlay = videojs.dom.createEl('div', {
-            className: 'vjs-watched-overlay',
-          }) as HTMLElement;
-          
-          progressHolder.appendChild(watchedOverlay);
-          
-          // 초기 오버레이 업데이트
-          updateWatchedOverlay();
+      const guardDrift = (current: number) => {
+        const guardTarget = Math.max(resumeTimeRef.current, maxAllowedRef.current);
+        if (guardTarget > 0 && current + 0.3 < guardTarget) {
+          console.warn('⚠️ [VideoPlayer] Drift detected, restoring position', {
+            current: current.toFixed(2),
+            guardTarget: guardTarget.toFixed(2),
+          });
+          forceSeekBoth(guardTarget, 'drift-guard');
+          return true;
         }
-
-        // 🔒 SeekBar 클램프: 진행바 클릭/드래그 제한
-        setupSeekBarClamp();
-      });
-
-      // 🔒 키보드 이벤트 차단 (화살표, 숫자키)
-      const handleKeyDown = (e: Event) => {
-        const kbEvent = e as KeyboardEvent;
-        const blockedKeys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-        if (blockedKeys.includes(kbEvent.key)) {
-          kbEvent.preventDefault();
-          kbEvent.stopPropagation();
-        }
+        return false;
       };
 
-      player.el()?.addEventListener('keydown', handleKeyDown as EventListener, true);
+      let previousTime = resumeTimeRef.current || 0;
 
-      // 🔒 배속 강제 고정
-      player.on('ratechange', () => {
-        if (player.playbackRate() !== 1.0) {
-          player.playbackRate(1.0);
-        }
-      });
-
-      // 📊 Metadata 로드 완료
-      player.on('loadedmetadata', () => {
+      const handleTimeUpdate = () => {
+        const currentTime = player.currentTime() || 0;
         const duration = player.duration() || 0;
         videoDurationRef.current = duration;
-        console.log('📊 [VideoPlayer] Metadata loaded, duration:', duration.toFixed(2));
 
-        // Watched Overlay 업데이트
-        updateWatchedOverlay();
-      });
-
-      // 📊 이어보기: canplay 이벤트에서 시크 (비디오가 재생 가능한 상태)
-      let hasInitialSeek = false; // 초기 시크 플래그
-      
-      player.on('canplay', () => {
-        const duration = player.duration() || 0;
-        
-        // 이어보기: maxReached 위치로 이동 (한 번만)
-        if (!hasInitialSeek && maxReachedRef.current > 0 && maxReachedRef.current < duration) {
-          console.log('🎯 [VideoPlayer] Initial seek requested:', {
-            target: maxReachedRef.current.toFixed(2),
-            duration: duration.toFixed(2),
-          });
-          ensureSeekToMaxReached('initial-canplay');
-          hasInitialSeek = true;
+        if (isProgrammaticSeekRef.current) {
+          previousTime = currentTime;
+          lastSafeTimeRef.current = currentTime;
+          return;
         }
-      });
 
-      player.on('play', () => {
-        const currentTime = player.currentTime() || 0;
-        if (maxReachedRef.current > 0 && currentTime < maxReachedRef.current - 0.5) {
-          console.log('🎯 [VideoPlayer] Play ensure seek:', {
-            currentTime: currentTime.toFixed(2),
-            target: maxReachedRef.current.toFixed(2),
-          });
-          ensureSeekToMaxReached('play');
+        if (guardDrift(currentTime)) {
+          previousTime = currentTime;
+          return;
         }
-      });
 
-      // 📊 timeupdate: maxReached 갱신 (정상 재생 시에만)
-      let lastTime = 0;
-      let updateCount = 0;
+        const delta = currentTime - previousTime;
+        previousTime = currentTime;
+        lastSafeTimeRef.current = currentTime;
 
-      player.on('timeupdate', () => {
-        const currentTime = player.currentTime() || 0;
-        const duration = player.duration() || 0;
-
-        // ✅ 조건: 연속 재생 (5초 이내 점프) && currentTime > maxReached
-        const timeDiff = currentTime - lastTime;
-
-        // 조건 완화: 2초 → 5초 (초기 로딩/버퍼링 고려)
-        if (timeDiff > 0 && timeDiff < 5 && currentTime > maxReachedRef.current) {
-          const oldMax = maxReachedRef.current;
-          maxReachedRef.current = currentTime;
-          videoDurationRef.current = duration;
-
-          console.log('✅ [VideoPlayer] Progress updated:', {
-            from: oldMax.toFixed(2),
-            to: maxReachedRef.current.toFixed(2),
-            duration: duration.toFixed(2),
-            progressPercent: ((currentTime / duration) * 100).toFixed(2),
-          });
-
-          // Watched Overlay 업데이트
+        if (!isUserSeekingRef.current && delta > 0 && delta < 5 && currentTime > maxAllowedRef.current) {
+          maxAllowedRef.current = currentTime;
           updateWatchedOverlay();
-
-          // 🎯 서버에 진도율 전송 → LessonPage에서 즉시 로컬 상태 업데이트
           onProgressRef.current?.({
             currentTime,
             maxReachedSeconds: currentTime,
             videoDuration: duration,
           });
         }
+      };
 
-        lastTime = currentTime;
+      const setupSeekingGuards = () => {
+        const handleSeeking = () => {
+          if (isProgrammaticSeekRef.current) return;
+          isUserSeekingRef.current = true;
+          seekStartRef.current = lastSafeTimeRef.current;
+        };
+
+        const handleSeeked = () => {
+          const currentTime = player.currentTime() || 0;
+
+          if (isProgrammaticSeekRef.current) {
+            isUserSeekingRef.current = false;
+            lastSafeTimeRef.current = currentTime;
+            return;
+          }
+
+          const allowed = maxAllowedRef.current + 0.2;
+          if (currentTime <= allowed) {
+            lastSafeTimeRef.current = currentTime;
+            isUserSeekingRef.current = false;
+            return;
+          }
+
+          const rollback = Math.max(seekStartRef.current, maxAllowedRef.current);
+          console.warn('🔒 [VideoPlayer] Seek blocked beyond allowed progress', {
+            requested: currentTime.toFixed(2),
+            allowed: maxAllowedRef.current.toFixed(2),
+            rollback: rollback.toFixed(2),
+          });
+          forceSeekBoth(rollback, 'seek-guard');
+          isUserSeekingRef.current = false;
+        };
+
+        player.on('seeking', handleSeeking);
+        player.on('seeked', handleSeeked);
+      };
+
+      const attachKeyboardGuard = () => {
+        const handleKeyDown = (e: Event) => {
+          const kbEvent = e as KeyboardEvent;
+          const blockedKeys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+          if (blockedKeys.includes(kbEvent.key)) {
+            kbEvent.preventDefault();
+            kbEvent.stopPropagation();
+          }
+        };
+
+        player.el()?.addEventListener('keydown', handleKeyDown as EventListener, true);
+
+        return () => {
+          player.el()?.removeEventListener('keydown', handleKeyDown as EventListener, true);
+        };
+      };
+
+      detachKeyboard = attachKeyboardGuard();
+      player.on('ratechange', () => {
+        if (player.playbackRate() !== 1.0) {
+          player.playbackRate(1.0);
+        }
       });
+
+      player.on('loadedmetadata', () => {
+        const duration = player.duration() || 0;
+        videoDurationRef.current = duration;
+        updateWatchedOverlay();
+        applyInitialSeek();
+      });
+
+      player.on('canplay', applyInitialSeek);
+      player.one('play', applyInitialSeek);
+      player.on('play', () => {
+        const guardTarget = Math.max(resumeTimeRef.current, maxAllowedRef.current);
+        const current = player.currentTime() || 0;
+        if (guardTarget > 0 && current + 0.3 < guardTarget) {
+          forceSeekBoth(guardTarget, 'play-ensure');
+        }
+      });
+
+      player.on('timeupdate', handleTimeUpdate);
+      setupSeekingGuards();
+
+      player.ready(() => {
+        const progressControl = player.controlBar.progressControl;
+        const progressHolder = progressControl?.el()?.querySelector('.vjs-progress-holder');
+
+        if (progressHolder) {
+          watchedOverlay = videojs.dom.createEl('div', {
+            className: 'vjs-watched-overlay',
+          }) as HTMLElement;
+
+          progressHolder.appendChild(watchedOverlay);
+          updateWatchedOverlay();
+        }
+      });
+
+      if (disposed) {
+        if (watchedOverlay) {
+          watchedOverlay.remove();
+          watchedOverlay = null;
+        }
+        if (detachKeyboard) {
+          detachKeyboard();
+        }
+        if (player && !player.isDisposed?.()) {
+          player.dispose();
+        }
+      }
     };
 
     initPlayer();
 
-    // Cleanup
     return () => {
+      disposed = true;
       if (watchedOverlay) {
         watchedOverlay.remove();
         watchedOverlay = null;
+      }
+      if (detachKeyboard) {
+        detachKeyboard();
+        detachKeyboard = null;
       }
       if (player && !player.isDisposed?.()) {
         player.dispose();
       }
     };
-  }, [videoUrl]); // ✅ videoUrl만 의존성으로 설정 (불필요한 재초기화 방지)
+  }, [videoUrl, autoPlay]);
 
   return (
     <div data-vjs-player className={styles.playerWrapper}>
