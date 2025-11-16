@@ -92,6 +92,11 @@ export default function SubjectManagePage() {
     durationMs: 0,
   });
 
+  // 파일 업로드 상태
+  const [uploadingFile, setUploadingFile] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
   // 문제 폼
   const [questionForm, setQuestionForm] = useState({
     content: '',
@@ -353,8 +358,84 @@ export default function SubjectManagePage() {
     setShowVideoPartModal(true);
   };
 
+  const handleFileUpload = async () => {
+    if (!selectedLessonForVideos || !selectedFile) {
+      alert('파일을 선택해주세요.');
+      return;
+    }
+
+    if (!videoPartForm.title.trim()) {
+      alert('파트 제목을 입력해주세요.');
+      return;
+    }
+
+    setUploadingFile(true);
+    setUploadProgress(0);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+      formData.append('lessonId', selectedLessonForVideos.id);
+      formData.append('title', videoPartForm.title.trim());
+      if (videoPartForm.description.trim()) {
+        formData.append('description', videoPartForm.description.trim());
+      }
+      formData.append('order', videoPartForm.order.toString());
+
+      // XMLHttpRequest로 업로드 진행률 추적
+      await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+
+        xhr.upload.addEventListener('progress', (e) => {
+          if (e.lengthComputable) {
+            const percentComplete = Math.round((e.loaded / e.total) * 100);
+            setUploadProgress(percentComplete);
+          }
+        });
+
+        xhr.addEventListener('load', () => {
+          if (xhr.status === 200 || xhr.status === 201) {
+            resolve(JSON.parse(xhr.responseText));
+          } else {
+            reject(new Error(`Upload failed: ${xhr.statusText}`));
+          }
+        });
+
+        xhr.addEventListener('error', () => reject(new Error('Upload failed')));
+        xhr.addEventListener('abort', () => reject(new Error('Upload aborted')));
+
+        const token = localStorage.getItem('accessToken');
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+        xhr.open('POST', `${apiUrl}/media/videos/upload`);
+        xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+        xhr.send(formData);
+      });
+
+      alert('영상이 성공적으로 업로드되었습니다!');
+      setShowVideoPartModal(false);
+      setSelectedLessonForVideos(null);
+      setVideoPartForm({ title: '', description: '', order: 0, videoUrl: '', durationMs: 0 });
+      setSelectedFile(null);
+      loadLessons();
+    } catch (error: any) {
+      console.error('[ADMIN][VIDEO_UPLOAD] failed', error);
+      alert('영상 업로드에 실패했습니다: ' + (error.message || '알 수 없는 오류'));
+    } finally {
+      setUploadingFile(false);
+      setUploadProgress(0);
+    }
+  };
+
   const handleCreateVideoPart = async () => {
     if (!selectedLessonForVideos) return;
+    
+    // 파일이 선택된 경우 파일 업로드 사용
+    if (selectedFile) {
+      await handleFileUpload();
+      return;
+    }
+
+    // URL 직접 입력인 경우
     if (!videoPartForm.title.trim() || !videoPartForm.videoUrl.trim()) {
       alert('파트 제목과 영상 URL을 입력해주세요.');
       return;
@@ -1226,6 +1307,78 @@ export default function SubjectManagePage() {
               <h3 style={{ fontSize: '16px', marginBottom: '0' }}>
                 {editingVideoPart ? '영상 파트 수정' : '새 영상 파트 추가'}
               </h3>
+
+              {/* 파일 업로드 섹션 (새 파트 추가 시에만 표시) */}
+              {!editingVideoPart && (
+                <div style={{
+                  padding: '16px',
+                  backgroundColor: '#f8f9fa',
+                  borderRadius: '8px',
+                  border: '2px dashed #dee2e6'
+                }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600, color: '#495057' }}>
+                    📹 영상 파일 업로드
+                  </label>
+                  <input
+                    type="file"
+                    accept="video/mp4,video/webm,video/ogg,video/quicktime"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setSelectedFile(file);
+                        // 파일 선택 시 URL 필드 비우기
+                        setVideoPartForm({ ...videoPartForm, videoUrl: '' });
+                      }
+                    }}
+                    disabled={uploadingFile}
+                    style={{
+                      width: '100%',
+                      padding: '8px',
+                      fontSize: '14px',
+                      cursor: uploadingFile ? 'not-allowed' : 'pointer'
+                    }}
+                  />
+                  {selectedFile && (
+                    <div style={{ marginTop: '8px', fontSize: '13px', color: '#28a745' }}>
+                      ✓ 선택된 파일: {selectedFile.name} ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
+                    </div>
+                  )}
+                  {uploadingFile && (
+                    <div style={{ marginTop: '12px' }}>
+                      <div style={{ fontSize: '13px', marginBottom: '6px', color: '#0070f3' }}>
+                        업로드 중... {uploadProgress}%
+                      </div>
+                      <div style={{
+                        width: '100%',
+                        height: '8px',
+                        backgroundColor: '#e9ecef',
+                        borderRadius: '4px',
+                        overflow: 'hidden'
+                      }}>
+                        <div style={{
+                          width: `${uploadProgress}%`,
+                          height: '100%',
+                          backgroundColor: '#0070f3',
+                          transition: 'width 0.3s ease'
+                        }} />
+                      </div>
+                    </div>
+                  )}
+                  <div style={{ fontSize: '12px', color: '#6c757d', marginTop: '8px' }}>
+                    💡 지원 형식: MP4, WebM, OGG, MOV (최대 500MB)
+                  </div>
+                </div>
+              )}
+
+              {/* 구분선 */}
+              {!editingVideoPart && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: '8px 0' }}>
+                  <div style={{ flex: 1, height: '1px', backgroundColor: '#dee2e6' }} />
+                  <span style={{ fontSize: '13px', color: '#6c757d', fontWeight: 600 }}>또는</span>
+                  <div style={{ flex: 1, height: '1px', backgroundColor: '#dee2e6' }} />
+                </div>
+              )}
+
               <div>
                 <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600 }}>파트 제목 *</label>
                 <input
@@ -1233,12 +1386,14 @@ export default function SubjectManagePage() {
                   value={videoPartForm.title}
                   onChange={(e) => setVideoPartForm({ ...videoPartForm, title: e.target.value })}
                   placeholder="예: 1부 - 안전 기초"
+                  disabled={uploadingFile}
                   style={{
                     width: '100%',
                     padding: '10px',
                     border: '1px solid #ddd',
                     borderRadius: '4px',
-                    fontSize: '14px'
+                    fontSize: '14px',
+                    cursor: uploadingFile ? 'not-allowed' : 'text'
                   }}
                 />
               </div>
@@ -1249,13 +1404,15 @@ export default function SubjectManagePage() {
                   onChange={(e) => setVideoPartForm({ ...videoPartForm, description: e.target.value })}
                   rows={2}
                   placeholder="파트에 대한 간단한 설명"
+                  disabled={uploadingFile}
                   style={{
                     width: '100%',
                     padding: '10px',
                     border: '1px solid #ddd',
                     borderRadius: '4px',
                     fontSize: '14px',
-                    resize: 'vertical'
+                    resize: 'vertical',
+                    cursor: uploadingFile ? 'not-allowed' : 'text'
                   }}
                 />
               </div>
@@ -1266,12 +1423,14 @@ export default function SubjectManagePage() {
                     type="number"
                     value={videoPartForm.order}
                     onChange={(e) => setVideoPartForm({ ...videoPartForm, order: parseInt(e.target.value, 10) || 0 })}
+                    disabled={uploadingFile}
                     style={{
                       width: '100%',
                       padding: '10px',
                       border: '1px solid #ddd',
                       borderRadius: '4px',
-                      fontSize: '14px'
+                      fontSize: '14px',
+                      cursor: uploadingFile ? 'not-allowed' : 'text'
                     }}
                   />
                 </div>
@@ -1282,66 +1441,79 @@ export default function SubjectManagePage() {
                     value={Math.floor(videoPartForm.durationMs / 60000)}
                     onChange={(e) => setVideoPartForm({ ...videoPartForm, durationMs: (parseInt(e.target.value, 10) || 0) * 60000 })}
                     placeholder="예: 15"
+                    disabled={uploadingFile || !!selectedFile}
                     style={{
                       width: '100%',
                       padding: '10px',
                       border: '1px solid #ddd',
                       borderRadius: '4px',
-                      fontSize: '14px'
+                      fontSize: '14px',
+                      cursor: (uploadingFile || selectedFile) ? 'not-allowed' : 'text'
                     }}
                   />
                 </div>
               </div>
-              <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600 }}>영상 URL *</label>
-                <input
-                  type="text"
-                  value={videoPartForm.videoUrl}
-                  onChange={(e) => setVideoPartForm({ ...videoPartForm, videoUrl: e.target.value })}
-                  placeholder="https://example.com/video.mp4 또는 /uploads/videos/..."
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px',
-                    fontSize: '14px'
-                  }}
-                />
-                <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
-                  💡 로컬 업로드 또는 외부 URL을 입력하세요
+
+              {/* URL 입력 필드 (파일 선택 안 했을 때만 필수) */}
+              {!selectedFile && (
+                <div>
+                  <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600 }}>
+                    영상 URL {!editingVideoPart && '*'}
+                  </label>
+                  <input
+                    type="text"
+                    value={videoPartForm.videoUrl}
+                    onChange={(e) => setVideoPartForm({ ...videoPartForm, videoUrl: e.target.value })}
+                    placeholder="https://example.com/video.mp4 또는 /uploads/videos/..."
+                    disabled={uploadingFile}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '4px',
+                      fontSize: '14px',
+                      cursor: uploadingFile ? 'not-allowed' : 'text'
+                    }}
+                  />
+                  <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                    💡 외부 URL을 직접 입력하거나 위에서 파일을 업로드하세요
+                  </div>
                 </div>
-              </div>
+              )}
               <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '10px' }}>
                 <button
                   onClick={() => {
                     setShowVideoPartModal(false);
                     setEditingVideoPart(null);
                     setSelectedLessonForVideos(null);
+                    setSelectedFile(null);
                     setVideoPartForm({ title: '', description: '', order: 0, videoUrl: '', durationMs: 0 });
                   }}
+                  disabled={uploadingFile}
                   style={{
                     padding: '10px 20px',
-                    backgroundColor: '#6c757d',
+                    backgroundColor: uploadingFile ? '#adb5bd' : '#6c757d',
                     color: 'white',
                     border: 'none',
                     borderRadius: '4px',
-                    cursor: 'pointer'
+                    cursor: uploadingFile ? 'not-allowed' : 'pointer'
                   }}
                 >
                   닫기
                 </button>
                 <button
                   onClick={editingVideoPart ? handleUpdateVideoPart : handleCreateVideoPart}
+                  disabled={uploadingFile}
                   style={{
                     padding: '10px 20px',
-                    backgroundColor: '#17a2b8',
+                    backgroundColor: uploadingFile ? '#adb5bd' : '#17a2b8',
                     color: 'white',
                     border: 'none',
                     borderRadius: '4px',
-                    cursor: 'pointer'
+                    cursor: uploadingFile ? 'not-allowed' : 'pointer'
                   }}
                 >
-                  {editingVideoPart ? '수정' : '추가'}
+                  {uploadingFile ? '업로드 중...' : (editingVideoPart ? '수정' : (selectedFile ? '업로드' : '추가'))}
                 </button>
               </div>
             </div>
