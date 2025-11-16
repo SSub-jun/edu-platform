@@ -38,6 +38,7 @@ export default function VideoPlayer({
   const isUserSeekingRef = useRef(false);
   const isProgrammaticSeekRef = useRef(false);
   const hasSyncedInitialTimeRef = useRef(false);
+  const isInitialSyncingRef = useRef(false); // ✅ 초기 sync 중에는 drift guard 비활성화
 
   const videoDurationRef = useRef(videoDuration);
   const onProgressRef = useRef(onProgress); // ✅ onProgress를 ref로 관리
@@ -95,6 +96,7 @@ export default function VideoPlayer({
 
   useEffect(() => {
     hasSyncedInitialTimeRef.current = false;
+    isInitialSyncingRef.current = false;
   }, [videoUrl]);
 
   useEffect(() => {
@@ -110,15 +112,21 @@ export default function VideoPlayer({
     const forceSeek = (time: number, reason: string) => {
       const target = clampTimeToDuration(time);
       isProgrammaticSeekRef.current = true;
+      
+      console.log('🎬 [VideoPlayer] forceSeek request', {
+        reason,
+        target: target.toFixed(2),
+      });
+
       try {
         video.currentTime = target;
       } catch (err) {
         console.warn('[VideoPlayer] forceSeek failed', { reason, err });
       }
       lastSafeTimeRef.current = target;
-      window.setTimeout(() => {
-        isProgrammaticSeekRef.current = false;
-      }, 60);
+      
+      // ✅ seeked 이벤트에서 isProgrammaticSeekRef를 해제하도록 변경
+      // setTimeout 제거 - seeked 핸들러가 처리
     };
 
     const applyInitialSeek = (reason: string) => {
@@ -129,6 +137,7 @@ export default function VideoPlayer({
       const resumeTarget = clampTimeToDuration(resumeTimeRef.current);
       if (resumeTarget <= 0) {
         hasSyncedInitialTimeRef.current = true;
+        isInitialSyncingRef.current = false;
         return;
       }
 
@@ -138,12 +147,18 @@ export default function VideoPlayer({
         duration: duration.toFixed(2),
       });
 
-      forceSeek(resumeTarget, reason);
+      isInitialSyncingRef.current = true; // ✅ 초기 sync 시작
+      forceSeek(resumeTarget, `initial-${reason}`);
       maxAllowedRef.current = Math.max(maxAllowedRef.current, resumeTarget);
       hasSyncedInitialTimeRef.current = true;
     };
 
     const guardDrift = (current: number) => {
+      // ✅ 초기 sync 중에는 drift guard 비활성화
+      if (isInitialSyncingRef.current) {
+        return false;
+      }
+
       const guardTarget = Math.max(resumeTimeRef.current, maxAllowedRef.current);
       if (guardTarget > 0 && current + 0.3 < guardTarget) {
         console.warn('⚠️ [VideoPlayer] Drift detected, restoring position', {
@@ -219,8 +234,16 @@ export default function VideoPlayer({
       const currentTime = video.currentTime || 0;
 
       if (isProgrammaticSeekRef.current) {
+        // ✅ 프로그래밍 방식 seek 완료 - 플래그 해제
+        isProgrammaticSeekRef.current = false;
         isUserSeekingRef.current = false;
         lastSafeTimeRef.current = currentTime;
+        
+        // ✅ 초기 sync가 완료되었으면 플래그 해제
+        if (isInitialSyncingRef.current) {
+          isInitialSyncingRef.current = false;
+          console.log('✅ [VideoPlayer] Initial sync completed at', currentTime.toFixed(2));
+        }
         return;
       }
 
