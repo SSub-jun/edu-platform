@@ -122,54 +122,71 @@ export class MeController {
 
     // Cohort 기반 커리큘럼
     if (activeCohort.cohortSubjects && activeCohort.cohortSubjects.length > 0) {
+      // ✅ 최적화: 모든 subjectId와 lessonId를 미리 수집
+      const allSubjectIds = activeCohort.cohortSubjects.map(cs => cs.subject.id);
+      const allLessonIds = activeCohort.cohortSubjects.flatMap(cs => 
+        cs.subject.lessons.map(l => l.id)
+      );
+
+      // ✅ 최적화: 모든 진도율 데이터를 한 번에 조회
+      const [subjectProgressMap, lessonProgressMap, examAttemptsMap] = await Promise.all([
+        // Subject 진도율
+        this.prisma.subjectProgress.findMany({
+          where: { userId, subjectId: { in: allSubjectIds } }
+        }).then(data => new Map(data.map(sp => [sp.subjectId, sp]))),
+        
+        // Lesson 진도율
+        this.prisma.progress.findMany({
+          where: { userId, lessonId: { in: allLessonIds } }
+        }).then(data => new Map(data.map(p => [p.lessonId, p]))),
+        
+        // Exam 시도 횟수
+        this.prisma.examAttempt.groupBy({
+          by: ['subjectId'],
+          where: { userId, subjectId: { in: allSubjectIds } },
+          _count: { id: true }
+        }).then(data => new Map(data.map(e => [e.subjectId, e._count.id])))
+      ]);
+
       const result: any[] = [];
 
       for (const cs of activeCohort.cohortSubjects) {
         const subject = cs.subject;
+        const subjectProgress = subjectProgressMap.get(subject.id);
+        const examAttemptCount = examAttemptsMap.get(subject.id) || 0;
         
-        // Subject 진도율 및 수료 상태 조회
-        const subjectProgress = await this.progressService.getSubjectStatus(userId, subject.id);
+        // Subject 수료 상태 계산
+        const progressPercent = subjectProgress?.progressPercent || 0;
+        const passed = subjectProgress?.passed || false;
+        const finalScore = subjectProgress?.finalScore;
+        const remainingTries = Math.max(0, 3 - examAttemptCount);
+        const canTakeExam = progressPercent >= 90 && remainingTries > 0 && !passed;
+        const canRestart = examAttemptCount >= 3 && !passed;
         
         const lessons: any[] = [];
         for (const lesson of subject.lessons) {
-          try {
-            const lessonStatus = await this.progressService.getLessonStatus(userId, lesson.id);
-            
-            // Lesson 상태 결정
-            let status: 'locked' | 'available' | 'passed';
-            if (lessonStatus.completed) {
-              status = 'passed';
-            } else if (!lessonStatus.unlocked) {
-              status = 'locked';
-            } else {
-              status = 'available';
-            }
-            
-            lessons.push({
-              id: lesson.id,
-              title: lesson.title,
-              description: lesson.description,
-              order: lesson.order,
-              subjectId: lesson.subjectId,
-              progressPercent: lessonStatus.progressPercent,
-              status: status,
-              remainingTries: lessonStatus.remainingTries,
-              totalDurationMs: 0,
-            });
-          } catch (error) {
-            console.error(`Error getting lesson status for lesson ${lesson.id}:`, error);
-            lessons.push({
-              id: lesson.id,
-              title: lesson.title,
-              description: lesson.description,
-              order: lesson.order,
-              subjectId: lesson.subjectId,
-              progressPercent: 0,
-              status: 'available',
-              remainingTries: 3,
-              totalDurationMs: 0,
-            });
+          const lessonProgress = lessonProgressMap.get(lesson.id);
+          const lessonProgressPercent = lessonProgress?.progressPercent || 0;
+          
+          // Lesson 상태 결정 (간단화)
+          let status: 'locked' | 'available' | 'passed';
+          if (lessonProgressPercent >= 90) {
+            status = 'passed';
+          } else {
+            status = 'available';
           }
+          
+          lessons.push({
+            id: lesson.id,
+            title: lesson.title,
+            description: lesson.description,
+            order: lesson.order,
+            subjectId: lesson.subjectId,
+            progressPercent: lessonProgressPercent,
+            status: status,
+            remainingTries: 3,
+            totalDurationMs: 0,
+          });
         }
 
         result.push({
@@ -178,15 +195,13 @@ export class MeController {
             name: subject.name,
             description: subject.description,
             order: subject.order,
-            // Subject 수료 정보 추가
-            progressPercent: subjectProgress.progressPercent,
-            passed: subjectProgress.passed,
-            finalScore: subjectProgress.finalScore,
-            examAttemptCount: subjectProgress.examAttemptCount,
-            remainingTries: subjectProgress.remainingTries,
-            canTakeExam: subjectProgress.canTakeExam,
-            canRestart: subjectProgress.canRestart,
-            // Cohort 수강 기간 정보 추가
+            progressPercent,
+            passed,
+            finalScore,
+            examAttemptCount,
+            remainingTries,
+            canTakeExam,
+            canRestart,
             startDate: activeCohort.startDate,
             endDate: activeCohort.endDate,
           },
