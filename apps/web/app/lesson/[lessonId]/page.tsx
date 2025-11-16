@@ -129,6 +129,14 @@ export default function LessonPage() {
 
   const { progressPercent, unlocked, remainingTries, blockers, maxReachedSeconds, subjectId, videoParts } = lessonStatus;
   
+  // 🔍 디버깅: 서버에서 받은 데이터 확인
+  console.log('🔍 [LessonPage] lessonStatus:', {
+    lessonId,
+    progressPercent,
+    maxReachedSeconds,
+    videoParts: videoParts?.length
+  });
+  
   // 🎯 실제 표시할 진도율: 낙관적 상태 우선, 없으면 서버 상태
   const displayProgressPercent = optimisticProgress?.progressPercent ?? progressPercent;
 
@@ -199,7 +207,10 @@ export default function LessonPage() {
             title={`레슨 ${lessonId}`}
             maxReachedSeconds={maxReachedSeconds || 0}
             videoDuration={0} // VideoPlayer가 로드 후 실제 duration을 onProgress로 전달
-            onProgress={(data) => handleVideoProgress(data.maxReachedSeconds, data.videoDuration)}
+            onProgress={(data) => {
+              console.log('🎯 [LessonPage] VideoPlayer onProgress:', data);
+              handleVideoProgress(data.maxReachedSeconds, data.videoDuration);
+            }}
             autoPlay={false}
           />
             </div>

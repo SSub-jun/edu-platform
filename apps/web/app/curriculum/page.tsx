@@ -146,7 +146,7 @@ export default function CurriculumPage() {
       router.push(`/lesson/${inProgressLesson.id}`);
       return;
     }
-    
+
     // 2. 아직 시작 안 한 첫 번째 레슨 찾기 (progress === 0%)
     const notStartedLesson = sortedLessons.find(
       lesson => lesson.progressPercent === 0
@@ -156,7 +156,7 @@ export default function CurriculumPage() {
       router.push(`/lesson/${notStartedLesson.id}`);
       return;
     }
-    
+
     // 3. 모든 레슨이 완료된 경우 첫 번째 레슨으로 (복습용)
     if (sortedLessons[0]) {
       router.push(`/lesson/${sortedLessons[0].id}`);
@@ -244,15 +244,15 @@ export default function CurriculumPage() {
               <div className="flex items-center gap-2 text-text-secondary">
                 <span className="font-semibold">종료일:</span>
                 <span>{companyPeriod.endDate ? new Date(companyPeriod.endDate).toLocaleDateString('ko-KR') : '-'}</span>
-              </div>
+          </div>
               <div className="ml-auto flex items-center gap-2">
                 <span className={`text-lg font-bold ${companyPeriod.remainingDays > 30 ? 'text-success' : companyPeriod.remainingDays > 7 ? 'text-warning' : 'text-error'}`}>
                   D-{companyPeriod.remainingDays}
                 </span>
                 <span className="text-sm text-text-tertiary">남음</span>
-              </div>
-            </div>
           </div>
+        </div>
+      </div>
         )}
 
         {/* 과목 카드 그리드 (3열 → 2열 → 1열) */}
@@ -265,8 +265,8 @@ export default function CurriculumPage() {
             const canTakeExam = subject.canTakeExam || false;
             const canRestart = subject.canRestart || false;
             const remainingTries = subject.remainingTries ?? 0;
-
-            return (
+          
+          return (
               <div 
                 key={subject.id} 
                 className="bg-surface border border-border rounded-xl p-5 flex flex-col hover:shadow-lg transition-shadow"
@@ -277,27 +277,27 @@ export default function CurriculumPage() {
                     <h3 className="text-lg font-bold text-text-primary mb-1 line-clamp-2">
                       {subject.name}
                     </h3>
-                    {subject.description && (
+                  {subject.description && (
                       <p className="text-sm text-text-secondary line-clamp-2">
-                        {subject.description}
-                      </p>
-                    )}
-                  </div>
-                  
+                      {subject.description}
+                    </p>
+                  )}
+                </div>
+                
                   {/* 수료 상태 뱃지 */}
                   <div className="ml-3">
                     {isPassed ? (
                       <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-success text-white whitespace-nowrap">
                         ✓ 수료
-                      </span>
+                    </span>
                     ) : (
                       <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-warning text-white whitespace-nowrap">
                         미수료
-                      </span>
-                    )}
+                              </span>
+                            )}
                   </div>
-                </div>
-
+                          </div>
+                          
                 {/* 진도율 정보 */}
                 <div className="mb-4">
                   <div className="flex justify-between items-center mb-2">
@@ -311,13 +311,13 @@ export default function CurriculumPage() {
                       }`}
                       style={{ width: `${avgProgress}%` }}
                     />
-                  </div>
-                </div>
+                          </div>
+                        </div>
 
                 {/* 레슨 수 정보 */}
                 <div className="text-sm text-text-tertiary mb-4">
                   총 {lessons.length}개 강의
-                </div>
+                        </div>
 
                 {/* 액션 버튼들 */}
                 <div className="mt-auto space-y-2">
@@ -381,7 +381,7 @@ export default function CurriculumPage() {
                       </button>
                       <div className="text-xs text-text-tertiary text-center mt-1">
                         모든 강의 90% 이상 수강 시 시험 가능
-                      </div>
+              </div>
                     </>
                   )}
                 </div>
@@ -391,11 +391,11 @@ export default function CurriculumPage() {
                   <div className="mt-3 pt-3 border-t border-border text-center">
                     <span className="text-xs text-text-tertiary">최종 점수: </span>
                     <span className="text-sm font-bold text-success">{Math.round(subject.finalScore)}점</span>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                </div>
+              )}
+            </div>
+          );
+        })}
         </div>
       </div>
     </div>

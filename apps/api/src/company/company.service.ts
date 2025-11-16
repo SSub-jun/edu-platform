@@ -76,40 +76,40 @@ export class CompanyService {
 
     // 구버전 호환: Lesson 단위 배정 (deprecated, activeSubjects가 없을 때만 사용)
     if (activeLessons && activeLessons.length > 0) {
-      const lessons = await this.prisma.lesson.findMany({
-        where: {
-          id: { in: activeLessons },
-          isActive: true
-        }
-      });
-
-      if (lessons.length !== activeLessons.length) {
-        throw new BadRequestException('일부 레슨을 찾을 수 없습니다.');
+    const lessons = await this.prisma.lesson.findMany({
+      where: {
+        id: { in: activeLessons },
+        isActive: true
       }
+    });
 
-      // 회사 생성
-      const company = await this.prisma.company.create({
-        data: {
-          name,
-          startDate,
-          endDate,
-          isActive: true
-        }
-      });
+    if (lessons.length !== activeLessons.length) {
+      throw new BadRequestException('일부 레슨을 찾을 수 없습니다.');
+    }
 
-      // 활성화 레슨 연결
-      await Promise.all(
-        activeLessons.map(lessonId =>
-          this.prisma.companyLesson.create({
-            data: {
-              companyId: company.id,
-              lessonId
-            }
-          })
-        )
-      );
+    // 회사 생성
+    const company = await this.prisma.company.create({
+      data: {
+        name,
+        startDate,
+        endDate,
+        isActive: true
+      }
+    });
 
-      return company;
+    // 활성화 레슨 연결
+    await Promise.all(
+      activeLessons.map(lessonId =>
+        this.prisma.companyLesson.create({
+          data: {
+            companyId: company.id,
+            lessonId
+          }
+        })
+      )
+    );
+
+    return company;
     }
 
     // activeSubjects도 activeLessons도 없으면 에러

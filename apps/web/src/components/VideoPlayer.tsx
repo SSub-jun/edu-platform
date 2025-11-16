@@ -39,8 +39,12 @@ export default function VideoPlayer({
   // ✅ maxReachedSeconds props 변경 시 ref 업데이트
   useEffect(() => {
     maxReachedRef.current = maxReachedSeconds;
-    console.log('🎯 [VideoPlayer] maxReachedSeconds updated:', maxReachedSeconds);
-  }, [maxReachedSeconds]);
+    console.log('🎯 [VideoPlayer] Props received:', {
+      maxReachedSeconds,
+      videoDuration,
+      src: src?.substring(0, 50) + '...'
+    });
+  }, [maxReachedSeconds, videoDuration, src]);
 
   // ✅ onProgress를 항상 최신 값으로 유지
   useEffect(() => {
