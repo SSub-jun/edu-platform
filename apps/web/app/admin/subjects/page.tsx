@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { authClient } from '../../../lib/auth';
 
@@ -22,7 +22,7 @@ export default function AdminSubjectsPage() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [editingSubject, setEditingSubject] = useState<Subject | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
   const [newSubject, setNewSubject] = useState({
     name: '',
     description: '',
@@ -69,16 +69,8 @@ export default function AdminSubjectsPage() {
     }
   };
 
-  const handleUpdateSubject = async (subjectId: string, updates: Partial<Subject>) => {
-    try {
-      await authClient.getApi().put(`/instructor/subjects/${subjectId}`, updates);
-      alert('과목이 성공적으로 수정되었습니다.');
-      setEditingSubject(null);
-      loadSubjects();
-    } catch (error) {
-      console.error('과목 수정 실패:', error);
-      alert('과목 수정에 실패했습니다.');
-    }
+  const updateSubject = async (subjectId: string, updates: Partial<Subject>) => {
+    await authClient.getApi().put(`/instructor/subjects/${subjectId}`, updates);
   };
 
   const handleDeleteSubject = async (subjectId: string, subjectName: string) => {
@@ -97,14 +89,14 @@ export default function AdminSubjectsPage() {
   };
 
   const handleToggleActive = async (subject: Subject) => {
-    const newStatus = !subject.isActive;
-    const action = newStatus ? '활성화' : '비활성화';
-    
-    if (!confirm(`'${subject.name}' 과목을 ${action}하시겠습니까?`)) {
-      return;
+    const nextState = !subject.isActive;
+    try {
+      await updateSubject(subject.id, { isActive: nextState });
+      loadSubjects();
+    } catch (error) {
+      console.error('과목 상태 변경 실패:', error);
+      alert('상태 변경에 실패했습니다.');
     }
-
-    handleUpdateSubject(subject.id, { isActive: newStatus });
   };
 
   const formatDate = (dateString: string) => {
@@ -115,6 +107,15 @@ export default function AdminSubjectsPage() {
       day: 'numeric'
     });
   };
+
+  const filteredSubjects = useMemo(() => {
+    if (!searchTerm.trim()) return subjects;
+    const keyword = searchTerm.trim().toLowerCase();
+    return subjects.filter((subject) =>
+      subject.name.toLowerCase().includes(keyword) ||
+      (subject.description || '').toLowerCase().includes(keyword),
+    );
+  }, [subjects, searchTerm]);
 
   useEffect(() => {
     loadSubjects();
@@ -137,82 +138,113 @@ export default function AdminSubjectsPage() {
         {/* 헤더 */}
         <div style={{ 
           display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center',
-          marginBottom: '30px',
-          borderBottom: '2px solid #f0f0f0',
-          paddingBottom: '20px'
+          flexDirection: 'column',
+          gap: '18px',
+          marginBottom: '30px'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-            <button
-              onClick={() => router.push('/admin')}
-              style={{
-                padding: '8px 12px',
-                backgroundColor: '#6c757d',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '14px',
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
+            <div>
+              <button
+                onClick={() => router.push('/admin')}
+                style={{
+                  padding: '8px 12px',
+                  backgroundColor: '#6c757d',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  marginBottom: '10px'
+                }}
+              >
+                ← 관리자 대시보드
+              </button>
+              
+              <h1 style={{ 
+                fontSize: '28px', 
+                fontWeight: 'bold', 
+                color: '#333',
+                margin: 0,
                 display: 'flex',
                 alignItems: 'center',
-                gap: '6px'
-              }}
-            >
-              ← 관리자 대시보드
-            </button>
-            
-            <h1 style={{ 
-              fontSize: '28px', 
-              fontWeight: 'bold', 
-              color: '#333',
-              margin: 0,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px'
-            }}>
-              📖 전체 과목 관리
-            </h1>
+                gap: '10px'
+              }}>
+                📚 과목 · 레슨 · 시험 관리
+              </h1>
+              <p style={{ marginTop: '6px', color: '#666', fontSize: '14px' }}>
+                과목을 생성하고, Cohort에 배정할 커리큘럼 콘텐츠를 준비하세요.
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                onClick={() => router.push('/admin/questions')}
+                style={{
+                  padding: '10px 16px',
+                  backgroundColor: '#28a745',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }}
+              >
+                📝 문제 은행
+              </button>
+              
+              <button
+                onClick={() => setShowCreateForm(true)}
+                style={{
+                  padding: '12px 20px',
+                  backgroundColor: '#0070f3',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }}
+              >
+                ➕ 새 과목
+              </button>
+            </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button
-              onClick={() => router.push('/admin/questions')}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '2fr 1fr',
+            gap: '16px',
+            alignItems: 'center'
+          }}>
+            <input
+              type="text"
+              placeholder="과목명, 설명으로 검색"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               style={{
-                padding: '10px 16px',
-                backgroundColor: '#28a745',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
+                width: '100%',
+                padding: '12px 14px',
+                border: '1px solid #dee2e6',
+                borderRadius: '8px',
                 fontSize: '14px',
-                fontWeight: '500',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px'
+                boxSizing: 'border-box'
               }}
-            >
-              📝 문제 은행 관리
-            </button>
-            
-            <button
-              onClick={() => setShowCreateForm(true)}
-              style={{
-                padding: '12px 20px',
-                backgroundColor: '#0070f3',
-                color: 'white',
-                border: 'none',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: '500',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}
-            >
-              ➕ 새 과목 생성
-            </button>
+            />
+
+            <div style={{
+              padding: '12px 16px',
+              borderRadius: '8px',
+              backgroundColor: '#f8f9fa',
+              border: '1px solid #e0e0e0',
+              fontSize: '14px',
+              color: '#495057'
+            }}>
+              총 {subjects.length}개 과목 · 검색 결과 {filteredSubjects.length}개
+            </div>
           </div>
         </div>
 
@@ -343,247 +375,133 @@ export default function AdminSubjectsPage() {
           }}>
             로딩 중...
           </div>
-        ) : subjects.length === 0 ? (
+        ) : filteredSubjects.length === 0 ? (
           <div style={{ 
             textAlign: 'center', 
-            padding: '50px',
+            padding: '60px',
             color: '#666',
-            fontSize: '16px'
+            fontSize: '16px',
+            border: '1px dashed #d0d7de',
+            borderRadius: '10px',
+            backgroundColor: '#f8fafc'
           }}>
-            등록된 과목이 없습니다.
+            검색 조건에 해당하는 과목이 없습니다.
           </div>
         ) : (
-          <div style={{ 
-            display: 'grid', 
-            gap: '20px'
-          }}>
-            <div style={{ 
-              marginBottom: '15px',
-              fontSize: '16px',
-              color: '#666'
-            }}>
-              총 {subjects.length}개의 과목
-            </div>
-
-            {subjects.map((subject) => (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {filteredSubjects.map((subject) => (
               <div
                 key={subject.id}
                 style={{
-                  border: '1px solid #e0e0e0',
-                  borderRadius: '8px',
-                  padding: '25px',
-                  backgroundColor: subject.isActive ? '#fafafa' : '#f8f8f8',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-                  opacity: subject.isActive ? 1 : 0.7
+                  border: '1px solid #e6e9ec',
+                  borderRadius: '12px',
+                  padding: '24px',
+                  backgroundColor: '#fafafa',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.04)'
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <div style={{ flex: 1 }}>
-                    {editingSubject?.id === subject.id ? (
-                      // 편집 모드
-                      <div style={{ marginBottom: '20px' }}>
-                        <input
-                          type="text"
-                          value={editingSubject.name}
-                          onChange={(e) => setEditingSubject({ ...editingSubject, name: e.target.value })}
-                          style={{
-                            fontSize: '20px',
-                            fontWeight: 'bold',
-                            padding: '8px 12px',
-                            border: '1px solid #ddd',
-                            borderRadius: '4px',
-                            marginBottom: '10px',
-                            width: '100%',
-                            maxWidth: '400px',
-                            boxSizing: 'border-box'
-                          }}
-                        />
-                        <textarea
-                          value={editingSubject.description || ''}
-                          onChange={(e) => setEditingSubject({ ...editingSubject, description: e.target.value })}
-                          placeholder="과목 설명"
-                          rows={2}
-                          style={{
-                            width: '100%',
-                            maxWidth: '400px',
-                            padding: '8px 12px',
-                            border: '1px solid #ddd',
-                            borderRadius: '4px',
-                            fontSize: '14px',
-                            boxSizing: 'border-box',
-                            resize: 'vertical'
-                          }}
-                        />
-                      </div>
-                    ) : (
-                      // 조회 모드
-                      <>
-                        <h3 style={{ 
-                          margin: '0 0 10px 0',
-                          fontSize: '22px',
-                          fontWeight: 'bold',
-                          color: '#333',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '10px'
+                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
+                  <div style={{ flex: 1, minWidth: '240px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <h3 style={{ margin: 0, fontSize: '20px', fontWeight: 'bold', color: '#333' }}>
+                        {subject.name}
+                      </h3>
+                      {!subject.isActive && (
+                        <span style={{
+                          fontSize: '12px',
+                          color: '#dc3545',
+                          backgroundColor: '#f8d7da',
+                          padding: '2px 8px',
+                          borderRadius: '12px'
                         }}>
-                          {subject.name}
-                          {!subject.isActive && (
-                            <span style={{
-                              fontSize: '12px',
-                              color: '#dc3545',
-                              backgroundColor: '#f8d7da',
-                              padding: '2px 8px',
-                              borderRadius: '12px',
-                              fontWeight: 'normal'
-                            }}>
-                              비활성
-                            </span>
-                          )}
-                        </h3>
-                        
-                        {subject.description && (
-                          <p style={{ 
-                            margin: '0 0 15px 0',
-                            color: '#666',
-                            fontSize: '14px',
-                            lineHeight: '1.5'
-                          }}>
-                            {subject.description}
-                          </p>
-                        )}
-                      </>
+                          비활성
+                        </span>
+                      )}
+                    </div>
+                    {subject.description && (
+                      <p style={{
+                        margin: '6px 0 12px',
+                        color: '#666',
+                        fontSize: '14px',
+                        lineHeight: 1.5
+                      }}>
+                        {subject.description}
+                      </p>
                     )}
-
-                    <div style={{ 
-                      display: 'grid', 
-                      gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
-                      gap: '15px',
-                      color: '#666',
-                      fontSize: '14px'
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+                      gap: '12px',
+                      fontSize: '13px',
+                      color: '#555'
                     }}>
-                      <div>
-                        <strong>레슨:</strong> {subject.lessonsCount || 0}개
-                      </div>
-                      <div>
-                        <strong>문제:</strong> {subject.questionsCount || 0}개
-                      </div>
-                      <div>
-                        <strong>수강생:</strong> {subject.studentsCount || 0}명
-                      </div>
-                      <div>
-                        <strong>시험 응시:</strong> {subject.examAttemptsCount || 0}회
-                      </div>
-                      <div>
-                        <strong>생성일:</strong> {formatDate(subject.createdAt)}
-                      </div>
-                      <div>
-                        <strong>순서:</strong> {subject.order}
-                      </div>
+                      <div><strong>레슨</strong> {subject.lessonsCount || 0}개</div>
+                      <div><strong>문제</strong> {subject.questionsCount || 0}개</div>
+                      <div><strong>학생</strong> {subject.studentsCount || 0}명</div>
+                      <div><strong>응시</strong> {subject.examAttemptsCount || 0}회</div>
+                      <div><strong>순서</strong> {subject.order}</div>
+                      <div><strong>생성</strong> {formatDate(subject.createdAt)}</div>
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', gap: '8px', marginLeft: '20px', flexWrap: 'wrap' }}>
-                    {editingSubject?.id === subject.id ? (
-                      <>
-                        <button
-                          onClick={() => handleUpdateSubject(subject.id, editingSubject)}
-                          style={{
-                            padding: '6px 12px',
-                            backgroundColor: '#28a745',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            fontSize: '12px',
-                            fontWeight: '500'
-                          }}
-                        >
-                          ✓ 저장
-                        </button>
-                        <button
-                          onClick={() => setEditingSubject(null)}
-                          style={{
-                            padding: '6px 12px',
-                            backgroundColor: '#6c757d',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            fontSize: '12px',
-                            fontWeight: '500'
-                          }}
-                        >
-                          ✗ 취소
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <button
-                          onClick={() => router.push(`/admin/subjects/${subject.id}/questions`)}
-                          style={{
-                            padding: '6px 10px',
-                            backgroundColor: '#17a2b8',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            fontSize: '12px',
-                            fontWeight: '500'
-                          }}
-                        >
-                          📝 문제 관리
-                        </button>
-                        
-                        <button
-                          onClick={() => handleToggleActive(subject)}
-                          style={{
-                            padding: '6px 10px',
-                            backgroundColor: subject.isActive ? '#ffc107' : '#28a745',
-                            color: subject.isActive ? '#333' : 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            fontSize: '12px',
-                            fontWeight: '500'
-                          }}
-                        >
-                          {subject.isActive ? '⏸️ 비활성화' : '▶️ 활성화'}
-                        </button>
-                        
-                        <button
-                          onClick={() => setEditingSubject(subject)}
-                          style={{
-                            padding: '6px 10px',
-                            backgroundColor: '#0070f3',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            fontSize: '12px',
-                            fontWeight: '500'
-                          }}
-                        >
-                          ✏️ 편집
-                        </button>
-
-                        <button
-                          onClick={() => handleDeleteSubject(subject.id, subject.name)}
-                          style={{
-                            padding: '6px 10px',
-                            backgroundColor: '#dc3545',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            fontSize: '12px',
-                            fontWeight: '500'
-                          }}
-                        >
-                          🗑️ 삭제
-                        </button>
-                      </>
-                    )}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', minWidth: '200px' }}>
+                    <button
+                      onClick={() => router.push(`/admin/subjects/${subject.id}`)}
+                      style={{
+                        padding: '10px 16px',
+                        backgroundColor: '#0070f3',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                        fontWeight: '500'
+                      }}
+                    >
+                      📂 관리 페이지 열기
+                    </button>
+                    <button
+                      onClick={() => router.push('/admin/questions')}
+                      style={{
+                        padding: '10px 16px',
+                        backgroundColor: '#17a2b8',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontSize: '13px'
+                      }}
+                    >
+                      📝 문제 은행 바로가기
+                    </button>
+                    <button
+                      onClick={() => handleToggleActive(subject)}
+                      style={{
+                        padding: '10px 16px',
+                        backgroundColor: subject.isActive ? '#ffc107' : '#28a745',
+                        color: subject.isActive ? '#333' : 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontSize: '13px'
+                      }}
+                    >
+                      {subject.isActive ? '⏸️ 비활성화' : '▶️ 활성화'}
+                    </button>
+                    <button
+                      onClick={() => handleDeleteSubject(subject.id, subject.name)}
+                      style={{
+                        padding: '10px 16px',
+                        backgroundColor: '#dc3545',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontSize: '13px'
+                      }}
+                    >
+                      🗑️ 삭제
+                    </button>
                   </div>
                 </div>
               </div>
