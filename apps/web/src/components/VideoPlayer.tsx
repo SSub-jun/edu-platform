@@ -238,6 +238,32 @@ export default function VideoPlayer({
 
     const handleSeeking = () => {
       if (isProgrammaticSeekRef.current) return;
+      
+      const video = videoRef.current;
+      if (!video) return;
+
+      const currentTime = video.currentTime || 0;
+      const allowed = maxAllowedRef.current + 0.5;
+
+      // ✅ 사용자가 아직 안 본 부분으로 이동하려고 하면 즉시 차단
+      if (currentTime > allowed) {
+        const rollback = maxAllowedRef.current;
+        console.warn('🔒 [VideoPlayer] Seek blocked during seeking', {
+          requested: currentTime.toFixed(2),
+          maxAllowed: maxAllowedRef.current.toFixed(2),
+          rollback: rollback.toFixed(2),
+        });
+        
+        // 즉시 되돌림
+        isProgrammaticSeekRef.current = true;
+        video.currentTime = rollback;
+        lastSafeTimeRef.current = rollback;
+        
+        // seeked 이벤트에서 플래그 해제
+        return;
+      }
+
+      // 허용된 범위 내 seek
       isUserSeekingRef.current = true;
       seekStartRef.current = lastSafeTimeRef.current;
     };
@@ -259,29 +285,26 @@ export default function VideoPlayer({
         return;
       }
 
-      // ✅ 이미 본 부분(maxAllowed 이하)은 자유롭게 이동 가능
-      // ✅ 아직 안 본 부분(maxAllowed 초과)은 막음
-      const allowed = maxAllowedRef.current + 0.5; // 약간의 여유 (0.5초)
+      // ✅ seeking에서 이미 차단했으므로 여기서는 정상 완료 처리만
+      const allowed = maxAllowedRef.current + 0.5;
       if (currentTime <= allowed) {
-        // 허용된 범위 내 - 정상 seek
         lastSafeTimeRef.current = currentTime;
         isUserSeekingRef.current = false;
-        console.log('✅ [VideoPlayer] Seek allowed within watched area', {
-          requested: currentTime.toFixed(2),
+        console.log('✅ [VideoPlayer] Seek completed within watched area', {
+          currentTime: currentTime.toFixed(2),
           maxAllowed: maxAllowedRef.current.toFixed(2),
         });
-        return;
+      } else {
+        // ✅ 만약 seeking에서 놓친 경우를 위한 fallback (이중 안전장치)
+        const rollback = maxAllowedRef.current;
+        console.warn('🔒 [VideoPlayer] Fallback: Seek blocked in seeked event', {
+          requested: currentTime.toFixed(2),
+          maxAllowed: maxAllowedRef.current.toFixed(2),
+          rollback: rollback.toFixed(2),
+        });
+        forceSeek(rollback, 'seek-guard-fallback');
+        isUserSeekingRef.current = false;
       }
-
-      // 허용된 범위 초과 - seek 차단하고 되돌림
-      const rollback = Math.max(seekStartRef.current, maxAllowedRef.current);
-      console.warn('🔒 [VideoPlayer] Seek blocked beyond watched area', {
-        requested: currentTime.toFixed(2),
-        maxAllowed: maxAllowedRef.current.toFixed(2),
-        rollback: rollback.toFixed(2),
-      });
-      forceSeek(rollback, 'seek-guard');
-      isUserSeekingRef.current = false;
     };
 
     const handlePause = () => {
