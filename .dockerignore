@@ -50,13 +50,13 @@ test
 !.env.example
 
 # Completely exclude other apps (we only need api + db)
-apps/docs/**
-apps/web/**
-apps/portal-web/**
-apps/portal-api/**
-packages/ui/**
-packages/eslint-config/**
-packages/typescript-config/**
+apps/docs
+apps/web
+apps/portal-web
+apps/portal-api
+packages/ui
+packages/eslint-config
+packages/typescript-config
 
 # Scripts and docs
 scripts/**

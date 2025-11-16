@@ -1,0 +1,20 @@
+[phases.setup]
+nixPkgs = ['nodejs_20', 'pnpm']
+
+[phases.install]
+cmds = [
+  'pnpm install --frozen-lockfile --filter @edu-platform/db --filter api'
+]
+
+[phases.build]
+cmds = [
+  'cd packages/db && npx prisma generate',
+  'cd apps/api && pnpm build'
+]
+
+[start]
+cmd = 'cd apps/api && node dist/main.js'
+
+[variables]
+NODE_ENV = 'production'
+
