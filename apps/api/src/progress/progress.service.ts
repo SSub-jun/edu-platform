@@ -556,10 +556,9 @@ export class ProgressService {
     // SubjectProgress 조회 또는 생성
     let subjectProgress = await this.prisma.subjectProgress.findUnique({
       where: {
-        userId_subjectId_cohortId: {
+        userId_subjectId: {
           userId,
-          subjectId,
-          cohortId: null as any
+          subjectId
         }
       }
     });
@@ -605,10 +604,9 @@ export class ProgressService {
     if (Math.abs(subjectProgress.progressPercent - avgProgressPercent) > 0.01) {
       subjectProgress = await this.prisma.subjectProgress.update({
         where: {
-          userId_subjectId_cohortId: {
+          userId_subjectId: {
             userId,
-            subjectId,
-            cohortId: null as any
+            subjectId
           }
         },
         data: {

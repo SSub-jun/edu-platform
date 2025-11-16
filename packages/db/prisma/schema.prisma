@@ -240,8 +240,9 @@ model SubjectProgress {
   subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
   cohort  Cohort? @relation(fields: [cohortId], references: [id], onDelete: SetNull)
 
-  @@unique([userId, subjectId, cohortId])
+  @@unique([userId, subjectId])
   @@index([userId, cohortId])
+  @@index([userId, subjectId, cohortId])
   @@map("subject_progress")
 }
 

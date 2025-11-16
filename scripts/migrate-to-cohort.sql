@@ -62,12 +62,11 @@ ALTER TABLE "user_cohorts" ADD CONSTRAINT "user_cohorts_cohortId_fkey"
 -- 4. SubjectProgress에 cohortId 컬럼 추가
 ALTER TABLE "subject_progress" ADD COLUMN IF NOT EXISTS "cohortId" TEXT;
 
--- 5. SubjectProgress의 기존 unique 제약조건 삭제 및 새로 생성
-ALTER TABLE "subject_progress" DROP CONSTRAINT IF EXISTS "subject_progress_userId_subjectId_key";
-CREATE UNIQUE INDEX IF NOT EXISTS "subject_progress_userId_subjectId_cohortId_key" 
-    ON "subject_progress"("userId", "subjectId", "cohortId");
+-- 5. SubjectProgress에 인덱스 추가 (unique 제약조건은 유지)
 CREATE INDEX IF NOT EXISTS "subject_progress_userId_cohortId_idx" 
     ON "subject_progress"("userId", "cohortId");
+CREATE INDEX IF NOT EXISTS "subject_progress_userId_subjectId_cohortId_idx" 
+    ON "subject_progress"("userId", "subjectId", "cohortId");
 
 -- 6. SubjectProgress에 cohortId 외래키 추가
 ALTER TABLE "subject_progress" ADD CONSTRAINT "subject_progress_cohortId_fkey" 

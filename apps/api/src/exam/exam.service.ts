@@ -20,10 +20,9 @@ export class ExamService {
     // 1. SubjectProgress 조회 또는 생성
     let subjectProgress = await this.prisma.subjectProgress.findUnique({
       where: {
-        userId_subjectId_cohortId: {
+        userId_subjectId: {
           userId,
-          subjectId,
-          cohortId: null as any
+          subjectId
         }
       }
     });
@@ -142,10 +141,9 @@ export class ExamService {
     // 2. SubjectProgress 조회 (checkEligibility에서 이미 생성됨)
     const subjectProgress = await this.prisma.subjectProgress.findUnique({
       where: {
-        userId_subjectId_cohortId: {
+        userId_subjectId: {
           userId,
-          subjectId,
-          cohortId: null as any
+          subjectId
         }
       }
     });
@@ -312,10 +310,9 @@ export class ExamService {
       // SubjectProgress 업데이트
       await this.prisma.subjectProgress.update({
         where: {
-          userId_subjectId_cohortId: {
+          userId_subjectId: {
             userId,
-            subjectId,
-            cohortId: null as any
+            subjectId
           }
         },
         data: {
@@ -884,10 +881,9 @@ export class ExamService {
     // 1. SubjectProgress 조회
     const subjectProgress = await this.prisma.subjectProgress.findUnique({
       where: {
-        userId_subjectId_cohortId: {
+        userId_subjectId: {
           userId,
-          subjectId,
-          cohortId: null as any
+          subjectId
         }
       }
     });
@@ -943,10 +939,9 @@ export class ExamService {
     // 6. SubjectProgress 업데이트: cycle +1, 진도/점수 초기화
     const updatedProgress = await this.prisma.subjectProgress.update({
       where: {
-        userId_subjectId_cohortId: {
+        userId_subjectId: {
           userId,
-          subjectId,
-          cohortId: null as any
+          subjectId
         }
       },
       data: {
