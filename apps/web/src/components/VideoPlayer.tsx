@@ -175,22 +175,32 @@ export default function VideoPlayer({
 
     const handleLoadedMetadata = () => {
       videoDurationRef.current = video.duration || 0;
-      applyInitialSeek('loadedmetadata');
+      // ✅ loadedmetadata에서는 seek 시도하지 않음 (데이터 부족)
     };
 
     const handleLoadedData = () => {
-      applyInitialSeek('loadeddata');
+      // ✅ loadeddata에서도 seek 시도하지 않음 (안정성)
     };
 
     const handleCanPlay = () => {
+      // ✅ canplay에서만 초기 seek 시도
       applyInitialSeek('canplay');
     };
 
     const handlePlay = () => {
-      const guardTarget = Math.max(resumeTimeRef.current, maxAllowedRef.current);
-      const current = video.currentTime || 0;
-      if (guardTarget > 0 && current + 0.3 < guardTarget) {
-        forceSeek(guardTarget, 'play-ensure');
+      // ✅ 초기 sync가 완료되지 않았고, canplay에서도 실패했다면 여기서 재시도
+      if (!hasSyncedInitialTimeRef.current) {
+        applyInitialSeek('play');
+        return;
+      }
+
+      // ✅ 일반 재생 시 위치 보정 (초기 sync 완료 후)
+      if (!isInitialSyncingRef.current) {
+        const guardTarget = Math.max(resumeTimeRef.current, maxAllowedRef.current);
+        const current = video.currentTime || 0;
+        if (guardTarget > 0 && current + 0.3 < guardTarget) {
+          forceSeek(guardTarget, 'play-ensure');
+        }
       }
     };
 
