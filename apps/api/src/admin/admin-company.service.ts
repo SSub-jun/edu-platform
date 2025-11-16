@@ -6,28 +6,58 @@ import { CreateCompanyDto, UpdateInviteCodeDto } from './dto/company.dto';
 export class AdminCompanyService {
   constructor(private readonly prisma: PrismaService) {}
 
+  private generateInviteCode(): string {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let code = '';
+    for (let i = 0; i < 6; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return code;
+  }
+
   async createCompany(createCompanyDto: CreateCompanyDto) {
     const { name, startDate, endDate, inviteCode, isActive } = createCompanyDto;
 
-    // 제공된 초대코드 중복 체크
-    const existingCompany = await this.prisma.company.findUnique({
-      where: { inviteCode },
-    });
-
-    if (existingCompany) {
-      throw new ConflictException({
-        code: 'INVITE_CODE_CONFLICT',
-        message: '이미 사용 중인 초대코드입니다.',
+    // 초대코드 생성 또는 검증
+    let finalInviteCode = inviteCode;
+    if (!finalInviteCode) {
+      // 초대코드가 없으면 자동 생성 (중복 체크)
+      let attempts = 0;
+      while (attempts < 10) {
+        finalInviteCode = this.generateInviteCode();
+        const existing = await this.prisma.company.findUnique({
+          where: { inviteCode: finalInviteCode },
+        });
+        if (!existing) break;
+        attempts++;
+      }
+      if (attempts >= 10) {
+        throw new ConflictException({
+          code: 'INVITE_CODE_GENERATION_FAILED',
+          message: '초대코드 생성에 실패했습니다. 다시 시도해주세요.',
+        });
+      }
+    } else {
+      // 제공된 초대코드 중복 체크
+      const existingCompany = await this.prisma.company.findUnique({
+        where: { inviteCode: finalInviteCode },
       });
+
+      if (existingCompany) {
+        throw new ConflictException({
+          code: 'INVITE_CODE_CONFLICT',
+          message: '이미 사용 중인 초대코드입니다.',
+        });
+      }
     }
 
     // 회사 생성
     const company = await this.prisma.company.create({
       data: {
         name,
-        startDate: new Date(startDate),
-        endDate: new Date(endDate),
-        inviteCode,
+        startDate: startDate ? new Date(startDate) : null,
+        endDate: endDate ? new Date(endDate) : null,
+        inviteCode: finalInviteCode,
         isActive: isActive ?? true,
       },
     });
@@ -35,8 +65,8 @@ export class AdminCompanyService {
     return {
       id: company.id,
       name: company.name,
-      startDate: company.startDate?.toISOString() || '',
-      endDate: company.endDate?.toISOString() || '',
+      startDate: company.startDate?.toISOString() || null,
+      endDate: company.endDate?.toISOString() || null,
       inviteCode: company.inviteCode!,
       isActive: company.isActive,
       createdAt: company.createdAt.toISOString(),
@@ -151,8 +181,8 @@ export class AdminCompanyService {
     return companies.map(company => ({
       id: company.id,
       name: company.name,
-      startDate: company.startDate?.toISOString() || '',
-      endDate: company.endDate?.toISOString() || '',
+      startDate: company.startDate?.toISOString() || null,
+      endDate: company.endDate?.toISOString() || null,
       inviteCode: company.inviteCode,
       isActive: company.isActive,
       createdAt: company.createdAt.toISOString(),

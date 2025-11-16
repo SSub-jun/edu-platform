@@ -31,13 +31,18 @@ export default function AdminCompaniesPage() {
   const loadCompanies = async () => {
     try {
       const response = await authClient.getApi().get('/admin/companies');
+      console.log('[ADMIN][COMPANIES] API Response:', response.data);
+      
+      // API 응답이 배열인지 확인
       if (Array.isArray(response.data)) {
+        console.log('[ADMIN][COMPANIES] Companies loaded:', response.data.length);
         setCompanies(response.data);
       } else {
+        console.warn('[ADMIN][COMPANIES] Response is not an array:', response.data);
         setCompanies([]);
       }
     } catch (error) {
-      console.error('기관 목록 로드 실패:', error);
+      console.error('[ADMIN][COMPANIES] 기관 목록 로드 실패:', error);
       setCompanies([]);
     } finally {
       setLoading(false);
