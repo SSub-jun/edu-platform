@@ -121,10 +121,15 @@ export default function VideoPlayer({
 
       // 🔒 SeekBar 클램프 설정 (seeking 이벤트 가로채기)
       const setupSeekBarClamp = () => {
-        let isSeeking = false;
+        let isCorrectingSeeking = false;
         
         // seeking 이벤트: 사용자가 시크를 시도할 때
         player.on('seeking', () => {
+          // 우리가 수정 중이면 무시 (무한 루프 방지)
+          if (isCorrectingSeeking) {
+            return;
+          }
+          
           const currentTime = player.currentTime() || 0;
           const duration = player.duration() || 0;
           const maxAllowedTime = maxReachedRef.current + 0.5;
@@ -135,19 +140,21 @@ export default function VideoPlayer({
           if (currentTime > maxAllowedTime) {
             console.log('🔒 [SeekBar] Blocked seek:', {
               requested: currentTime.toFixed(2),
-              allowed: maxAllowedTime.toFixed(2),
               maxReached: maxReachedRef.current.toFixed(2),
+              correcting: 'to maxReached'
             });
             
-            // 즉시 maxReached로 되돌림
-            isSeeking = true;
+            // 무한 루프 방지 플래그 설정
+            isCorrectingSeeking = true;
+            
+            // maxReached로 되돌림
             player.currentTime(maxReachedRef.current);
             
-            // 다음 프레임에서 플래그 해제
+            // 플래그 해제
             setTimeout(() => {
-              isSeeking = false;
+              isCorrectingSeeking = false;
             }, 100);
-          } else if (!isSeeking) {
+          } else {
             // 수강 구간으로 시크: 정상 처리
             console.log('✅ [SeekBar] Allowed seek:', {
               requested: currentTime.toFixed(2),
@@ -196,22 +203,28 @@ export default function VideoPlayer({
         }
       });
 
-      // 📊 Metadata 로드 완료: 이어보기
-      let hasInitialSeek = false; // 초기 시크 플래그
-      
+      // 📊 Metadata 로드 완료
       player.on('loadedmetadata', () => {
         const duration = player.duration() || 0;
         videoDurationRef.current = duration;
+        console.log('📊 [VideoPlayer] Metadata loaded, duration:', duration.toFixed(2));
 
+        // Watched Overlay 업데이트
+        updateWatchedOverlay();
+      });
+
+      // 📊 이어보기: canplay 이벤트에서 시크 (비디오가 재생 가능한 상태)
+      let hasInitialSeek = false; // 초기 시크 플래그
+      
+      player.on('canplay', () => {
+        const duration = player.duration() || 0;
+        
         // 이어보기: maxReached 위치로 이동 (한 번만)
         if (!hasInitialSeek && maxReachedRef.current > 0 && maxReachedRef.current < duration) {
           console.log('🎯 [VideoPlayer] Initial seek to maxReached:', maxReachedRef.current);
           player.currentTime(maxReachedRef.current);
           hasInitialSeek = true;
         }
-
-        // Watched Overlay 업데이트
-        updateWatchedOverlay();
       });
 
       // 📊 timeupdate: maxReached 갱신 (정상 재생 시에만)
