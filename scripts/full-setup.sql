@@ -290,7 +290,7 @@ VALUES
 -- 2. 회사 생성 (6개월 수강 기간)
 INSERT INTO "companies" ("id", "name", "startDate", "endDate", "isActive", "inviteCode", "createdAt", "updatedAt")
 VALUES 
-('company001', 'KIST 안전교육센터', NOW(), NOW() + INTERVAL '6 months', true, 'KIST25', NOW(), NOW());
+('company001', 'KIST 안전교육센터', NOW(), NOW() + INTERVAL '6 months', true, 'KIST24', NOW(), NOW());
 
 -- 3. 과목(Subject) 생성 - 산업안전 기초 3과목
 INSERT INTO "subjects" ("id", "name", "description", "order", "isActive", "createdAt", "updatedAt")
@@ -523,7 +523,7 @@ VALUES
 -- 학생2: student2 / Student123!
 -- 학생3: student3 / Student123!
 --
--- 회사 초대코드: KIST2024
+-- 회사 초대코드: KIST24
 -- 
 -- 3개 과목, 9개 강의, 30개 시험 문제가 생성되었습니다.
 
