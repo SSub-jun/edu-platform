@@ -192,5 +192,29 @@ export class AdminCompanyService {
     }));
   }
 
+  async deleteCompany(companyId: string) {
+    // 회사 존재 확인
+    const company = await this.prisma.company.findUnique({
+      where: { id: companyId },
+    });
+
+    if (!company) {
+      throw new NotFoundException({
+        code: 'COMPANY_NOT_FOUND',
+        message: '회사를 찾을 수 없습니다.',
+      });
+    }
+
+    // 회사 삭제 (Cascade로 연관 데이터 자동 삭제)
+    await this.prisma.company.delete({
+      where: { id: companyId },
+    });
+
+    return {
+      success: true,
+      message: '회사가 삭제되었습니다.',
+    };
+  }
+
 
 }

@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Patch, Param, Body, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
 import { AdminCompanyService } from './admin-company.service';
 import { CreateCompanyDto, UpdateInviteCodeDto, CompanyResponseDto, InviteCodeResponseDto } from './dto/company.dto';
@@ -132,6 +132,35 @@ export class AdminCompanyController {
     @Body() updateInviteCodeDto: UpdateInviteCodeDto,
   ): Promise<InviteCodeResponseDto> {
     return this.adminCompanyService.updateInviteCode(id, updateInviteCodeDto);
+  }
+
+  @Delete(':id')
+  @Roles('admin')
+  @ApiOperation({ 
+    summary: '회사 삭제',
+    description: '회사를 삭제합니다. 연관된 데이터(사용자, 레슨 배정 등)도 함께 삭제됩니다.'
+  })
+  @ApiParam({ name: 'id', description: '회사 ID' })
+  @ApiResponse({ 
+    status: 200, 
+    description: '회사 삭제 성공',
+    schema: {
+      example: { success: true, message: '회사가 삭제되었습니다.' }
+    }
+  })
+  @ApiResponse({ 
+    status: 404, 
+    description: '회사를 찾을 수 없음',
+    schema: {
+      example: { code: 'COMPANY_NOT_FOUND', message: '회사를 찾을 수 없습니다.' }
+    }
+  })
+  @ApiResponse({ 
+    status: 403, 
+    description: '권한 없음 - 관리자만 접근 가능'
+  })
+  async deleteCompany(@Param('id') id: string) {
+    return this.adminCompanyService.deleteCompany(id);
   }
 
   // =============== 기관별 과목 배정 ===============
