@@ -282,10 +282,10 @@ ALTER TABLE "qna_replies" ADD CONSTRAINT "qna_replies_userId_fkey" FOREIGN KEY (
 
 -- ========== PART 2: 샘플 데이터 생성 ==========
 
--- 1. 관리자 계정 생성 (비밀번호: Admin123!)
+-- 1. 관리자 계정 생성 (비밀번호: Kist2017!)
 INSERT INTO "users" ("id", "username", "passwordHash", "role", "name", "phone", "phoneVerifiedAt", "createdAt", "updatedAt")
 VALUES 
-('admin001', 'admin', '$2b$10$HCg4RF.hvy5l9k5pWWvpnOJzgKbMRn5aA.kY8kLghaPA.q8zAeOwe', 'admin', '관리자', '01012345678', NOW(), NOW(), NOW());
+('admin001', 'admin', '$2b$10$Gx97Cq0T0jAD0uswkokFiOeq6GIzRE5TkPcB0NbJZLGbztYpym7yu', 'admin', '관리자', '01012345678', NOW(), NOW(), NOW());
 
 -- 2. 회사 생성 (6개월 수강 기간)
 INSERT INTO "companies" ("id", "name", "startDate", "endDate", "isActive", "inviteCode", "createdAt", "updatedAt")
@@ -502,26 +502,26 @@ INSERT INTO "choices" ("id", "questionId", "text", "isAnswer", "order", "created
 ('c119', 'q030', '110', false, 2, NOW(), NOW()),
 ('c120', 'q030', '114', false, 3, NOW(), NOW());
 
--- 8. 테스트용 강사 계정 생성 (비밀번호: Instructor123!)
+-- 8. 테스트용 강사 계정 생성 (비밀번호: Kist2017!)
 INSERT INTO "users" ("id", "username", "passwordHash", "role", "name", "phone", "phoneVerifiedAt", "createdAt", "updatedAt")
 VALUES 
-('instructor001', 'instructor', '$2b$10$JoTDYnUMaebfI7HY8ttrGOMtX2DsZgLJPpB9Dt/WUrrPQQ5AShYSW', 'instructor', '강사님', '01099999999', NOW(), NOW(), NOW());
+('instructor001', 'instructor', '$2b$10$Gx97Cq0T0jAD0uswkokFiOeq6GIzRE5TkPcB0NbJZLGbztYpym7yu', 'instructor', '강사님', '01099999999', NOW(), NOW(), NOW());
 
--- 9. 테스트용 학생 계정 생성 (비밀번호: Student123!)
+-- 9. 테스트용 학생 계정 생성 (비밀번호: Kist2017!)
 INSERT INTO "users" ("id", "username", "passwordHash", "role", "name", "phone", "phoneVerifiedAt", "companyId", "createdAt", "updatedAt")
 VALUES 
-('student001', 'student1', '$2b$10$OPefolG0u8BcG/54airRSehVkc4yzDpL7cwDmyKdLH2ilbTm8BKre', 'student', '손흥민', '01011111111', NOW(), 'company001', NOW(), NOW()),
-('student002', 'student2', '$2b$10$OPefolG0u8BcG/54airRSehVkc4yzDpL7cwDmyKdLH2ilbTm8BKre', 'student', '이강인', '01022222222', NOW(), 'company001', NOW(), NOW()),
-('student003', 'student3', '$2b$10$OPefolG0u8BcG/54airRSehVkc4yzDpL7cwDmyKdLH2ilbTm8BKre', 'student', '김민재', '01033333333', NOW(), 'company001', NOW(), NOW());
+('student001', 'student1', '$2b$10$Gx97Cq0T0jAD0uswkokFiOeq6GIzRE5TkPcB0NbJZLGbztYpym7yu', 'student', '손흥민', '01011111111', NOW(), 'company001', NOW(), NOW()),
+('student002', 'student2', '$2b$10$Gx97Cq0T0jAD0uswkokFiOeq6GIzRE5TkPcB0NbJZLGbztYpym7yu', 'student', '이강인', '01022222222', NOW(), 'company001', NOW(), NOW()),
+('student003', 'student3', '$2b$10$Gx97Cq0T0jAD0uswkokFiOeq6GIzRE5TkPcB0NbJZLGbztYpym7yu', 'student', '김민재', '01033333333', NOW(), 'company001', NOW(), NOW());
 
 -- ========== 완료! ==========
 -- 
--- 생성된 계정:
--- 관리자: admin / Admin123!
--- 강사: instructor / Instructor123!
--- 학생1: student1 / Student123!
--- 학생2: student2 / Student123!
--- 학생3: student3 / Student123!
+-- 생성된 계정 (모든 계정 비밀번호: Kist2017!):
+-- 관리자: admin / Kist2017!
+-- 강사: instructor / Kist2017!
+-- 학생1: student1 / Kist2017!
+-- 학생2: student2 / Kist2017!
+-- 학생3: student3 / Kist2017!
 --
 -- 회사 초대코드: KIST25
 -- 
