@@ -8,7 +8,7 @@ const navItems = [
   { label: "강의실", href: "/curriculum" },
   { label: "Q&A", href: "/qna" },
   { label: "내정보", href: "/student" },
-  { label: "교육소개", href: "/guide" },
+  { label: "교육안내", href: "/guide" },
 ];
 
 export function MainNav() {
