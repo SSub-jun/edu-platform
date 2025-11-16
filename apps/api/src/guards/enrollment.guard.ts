@@ -28,7 +28,7 @@ export class EnrollmentGuard implements CanActivate {
 
 		// 회사 수강기간 확인
 		const now = new Date();
-		if (now < user.company.startDate || now > user.company.endDate) {
+		if (user.company.startDate && user.company.endDate && (now < user.company.startDate || now > user.company.endDate)) {
 			throw new UnprocessableEntityException('PERIOD_NOT_ACTIVE');
 		}
 

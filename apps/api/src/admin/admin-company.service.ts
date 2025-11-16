@@ -35,8 +35,8 @@ export class AdminCompanyService {
     return {
       id: company.id,
       name: company.name,
-      startDate: company.startDate.toISOString(),
-      endDate: company.endDate.toISOString(),
+      startDate: company.startDate?.toISOString() || '',
+      endDate: company.endDate?.toISOString() || '',
       inviteCode: company.inviteCode!,
       isActive: company.isActive,
       createdAt: company.createdAt.toISOString(),
@@ -124,8 +124,8 @@ export class AdminCompanyService {
     return {
       id: company.id,
       name: company.name,
-      startDate: company.startDate.toISOString(),
-      endDate: company.endDate.toISOString(),
+      startDate: company.startDate?.toISOString() || '',
+      endDate: company.endDate?.toISOString() || '',
       inviteCode: company.inviteCode,
       isActive: company.isActive,
       createdAt: company.createdAt.toISOString(),
@@ -151,8 +151,8 @@ export class AdminCompanyService {
     return companies.map(company => ({
       id: company.id,
       name: company.name,
-      startDate: company.startDate.toISOString(),
-      endDate: company.endDate.toISOString(),
+      startDate: company.startDate?.toISOString() || '',
+      endDate: company.endDate?.toISOString() || '',
       inviteCode: company.inviteCode,
       isActive: company.isActive,
       createdAt: company.createdAt.toISOString(),

@@ -35,7 +35,7 @@ export class ProgressService {
 
     // 회사 수강기간 확인
     const now = new Date();
-    if (now < user.company.startDate || now > user.company.endDate) {
+    if (user.company.startDate && user.company.endDate && (now < user.company.startDate || now > user.company.endDate)) {
       throw new ForbiddenException('수강기간이 아닙니다.');
     }
 
@@ -140,7 +140,7 @@ export class ProgressService {
 
     // 회사 수강기간 확인
     const now = new Date();
-    if (now < user.company.startDate || now > user.company.endDate) {
+    if (user.company.startDate && user.company.endDate && (now < user.company.startDate || now > user.company.endDate)) {
       throw new ForbiddenException('수강기간이 아닙니다.');
     }
 
@@ -270,7 +270,7 @@ export class ProgressService {
 
     // 회사 수강기간 확인
     const now = new Date();
-    if (now < user.company.startDate || now > user.company.endDate) {
+    if (user.company.startDate && user.company.endDate && (now < user.company.startDate || now > user.company.endDate)) {
       throw new ForbiddenException('수강기간이 아닙니다.');
     }
 
@@ -386,7 +386,7 @@ export class ProgressService {
 
     // 회사 수강기간 확인
     const now = new Date();
-    if (now < user.company.startDate || now > user.company.endDate) {
+    if (user.company.startDate && user.company.endDate && (now < user.company.startDate || now > user.company.endDate)) {
       throw new ForbiddenException('수강기간이 아닙니다.');
     }
 
@@ -559,7 +559,7 @@ export class ProgressService {
         userId_subjectId_cohortId: {
           userId,
           subjectId,
-          cohortId: null
+          cohortId: null as any
         }
       }
     });

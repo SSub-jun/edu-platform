@@ -282,8 +282,8 @@ export class CompanyService {
       return {
         id: company.id,
         name: company.name,
-        startDate: company.startDate,
-        endDate: company.endDate,
+        startDate: company.startDate || null,
+        endDate: company.endDate || null,
         isActive: company.isActive,
         studentCount: company.users.length,
         activeSubjects: company.activeSubjects.map(cs => ({
