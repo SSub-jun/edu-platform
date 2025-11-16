@@ -7,6 +7,7 @@ import {
   UploadedFile, 
   Body,
   Param,
+  Req,
   Res,
   StreamableFile,
   BadRequestException 
@@ -15,8 +16,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiConsumes, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
-import { createReadStream, existsSync, unlinkSync } from 'fs';
-import type { Response } from 'express';
+import { createReadStream, existsSync, unlinkSync, statSync } from 'fs';
+import type { Request, Response } from 'express';
 import { Roles } from '../auth/decorators/auth.decorator';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -151,9 +152,10 @@ export class MediaController {
   }
 
   @Get('videos/:filename')
-  @ApiOperation({ summary: '영상 파일 스트리밍' })
+  @ApiOperation({ summary: '영상 파일 스트리밍 (Range 요청 지원)' })
   async streamVideo(
     @Param('filename') filename: string,
+    @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): Promise<StreamableFile> {
     const filePath = join(process.cwd(), 'uploads', 'videos', filename);
@@ -162,6 +164,7 @@ export class MediaController {
       filename,
       filePath,
       exists: existsSync(filePath),
+      range: req.headers.range,
       cwd: process.cwd()
     });
 
@@ -169,8 +172,10 @@ export class MediaController {
       throw new BadRequestException('파일을 찾을 수 없습니다.');
     }
 
-    const file = createReadStream(filePath);
-    
+    const stat = statSync(filePath);
+    const fileSize = stat.size;
+    const range = req.headers.range;
+
     // MIME 타입 설정
     const ext = extname(filename).toLowerCase();
     const mimeTypes = {
@@ -179,13 +184,38 @@ export class MediaController {
       '.ogg': 'video/ogg',
       '.mov': 'video/quicktime',
     };
-    
-    res.set({
-      'Content-Type': mimeTypes[ext] || 'video/mp4',
-      'Accept-Ranges': 'bytes',
-    });
+    const mimeType = mimeTypes[ext] || 'video/mp4';
 
-    return new StreamableFile(file);
+    // Range 요청 처리 (seek 지원)
+    if (range) {
+      const parts = range.replace(/bytes=/, '').split('-');
+      const start = parseInt(parts[0], 10);
+      const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+      const chunksize = (end - start) + 1;
+      const file = createReadStream(filePath, { start, end });
+
+      res.status(206); // Partial Content
+      res.set({
+        'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+        'Accept-Ranges': 'bytes',
+        'Content-Length': chunksize,
+        'Content-Type': mimeType,
+      });
+
+      console.log('[MEDIA] Range request:', { start, end, chunksize, fileSize });
+      return new StreamableFile(file);
+    } else {
+      // 전체 파일 스트리밍
+      const file = createReadStream(filePath);
+      
+      res.set({
+        'Content-Type': mimeType,
+        'Content-Length': fileSize,
+        'Accept-Ranges': 'bytes',
+      });
+
+      return new StreamableFile(file);
+    }
   }
 
   @Delete('videos/:id')
