@@ -94,14 +94,6 @@ export class MeController {
                   }
                 }
               }
-            },
-            // 구버전 호환용
-            activeLessons: {
-              include: {
-                lesson: {
-                  include: { subject: true }
-                }
-              }
             }
           }
         }
@@ -191,66 +183,8 @@ export class MeController {
       return { success: true, data: result };
     }
 
-    // 구버전 호환: CompanyLesson 기반 커리큘럼
-    const activeLessons = user.company.activeLessons.map(cl => cl.lesson);
-    const grouped = new Map<string, { subject: any; lessons: any[]; remainingDays: number }>();
-    
-    for (const lesson of activeLessons) {
-      const subject = lesson.subject;
-      if (!grouped.has(subject.id)) {
-        grouped.set(subject.id, { 
-          subject: { 
-            id: subject.id, 
-            name: subject.name, 
-            description: subject.description, 
-            order: subject.order 
-          }, 
-          lessons: [], 
-          remainingDays 
-        });
-      }
-      
-      try {
-        const lessonStatus = await this.progressService.getLessonStatus(userId, lesson.id);
-        
-        let status: 'locked' | 'available' | 'passed';
-        if (lessonStatus.completed) {
-          status = 'passed';
-        } else if (!lessonStatus.unlocked) {
-          status = 'locked';
-        } else {
-          status = 'available';
-        }
-        
-        grouped.get(subject.id)!.lessons.push({
-          id: lesson.id,
-          title: lesson.title,
-          description: lesson.description,
-          order: lesson.order,
-          subjectId: lesson.subjectId,
-          progressPercent: lessonStatus.progressPercent,
-          status: status,
-          remainingTries: lessonStatus.remainingTries,
-          totalDurationMs: 0,
-        });
-      } catch (error) {
-        console.error(`Error getting lesson status for lesson ${lesson.id}:`, error);
-        grouped.get(subject.id)!.lessons.push({
-          id: lesson.id,
-          title: lesson.title,
-          description: lesson.description,
-          order: lesson.order,
-          subjectId: lesson.subjectId,
-          progressPercent: 0,
-          status: 'available',
-          remainingTries: 3,
-          totalDurationMs: 0,
-        });
-      }
-    }
-
-    const data = Array.from(grouped.values());
-    return { success: true, data };
+    // activeSubjects가 없으면 빈 배열 반환
+    return { success: true, data: [] };
   }
 }
 
