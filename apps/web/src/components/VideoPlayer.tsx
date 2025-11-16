@@ -1,8 +1,6 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import 'video.js/dist/video-js.css';
-import './videojs/CustomSeekBar.css';
 import styles from './VideoPlayer.module.css';
 
 interface VideoPlayerProps {
@@ -31,8 +29,6 @@ export default function VideoPlayer({
   autoPlay = false,
 }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const playerRef = useRef<any>(null);
-  const nativeVideoRef = useRef<HTMLVideoElement | null>(null);
 
   const resumeTimeRef = useRef(maxReachedSeconds || 0);
   const maxAllowedRef = useRef(maxReachedSeconds || 0);
@@ -98,340 +94,188 @@ export default function VideoPlayer({
   }
 
   useEffect(() => {
-    if (!videoRef.current || typeof window === 'undefined') return;
+    hasSyncedInitialTimeRef.current = false;
+  }, [videoUrl]);
 
-    let player: any;
-    let watchedOverlay: HTMLElement | null = null;
-    let disposed = false;
-    let detachKeyboard: (() => void) | null = null;
-    let detachNativeListeners: (() => void) | null = null;
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
 
-    const initPlayer = async () => {
-      const videojs = (await import('video.js')).default;
-      if (!videoRef.current || disposed) return;
+    const clampTimeToDuration = (time: number) => {
+      const duration = video.duration || videoDurationRef.current || 0;
+      if (!duration || duration <= 0) return Math.max(time, 0);
+      return Math.min(Math.max(time, 0), Math.max(duration - 0.2, 0));
+    };
 
-      player = videojs(videoRef.current, {
-        controls: true,
-        fluid: true,
-        responsive: true,
-        autoplay: autoPlay,
-        playbackRates: [1.0],
-        userActions: {
-          hotkeys: false,
-          doubleClick: false,
-        },
-        sources: [
-          {
-            src: videoUrl,
-            type: 'video/mp4',
-          },
-        ],
-      });
+    const forceSeek = (time: number, reason: string) => {
+      const target = clampTimeToDuration(time);
+      isProgrammaticSeekRef.current = true;
+      try {
+        video.currentTime = target;
+      } catch (err) {
+        console.warn('[VideoPlayer] forceSeek failed', { reason, err });
+      }
+      lastSafeTimeRef.current = target;
+      window.setTimeout(() => {
+        isProgrammaticSeekRef.current = false;
+      }, 60);
+    };
 
-      playerRef.current = player;
-      const resolveNativeVideo = () => {
-        const tech = player.tech?.(true);
-        const techEl = (tech?.el && tech.el()) as HTMLVideoElement | null;
-        const fallbackEl = player.el()?.querySelector('video') as HTMLVideoElement | null;
-        const native = techEl ?? fallbackEl ?? videoRef.current;
-        nativeVideoRef.current = native;
-        if (!native) {
-          console.warn('[VideoPlayer] Native video element not found');
-        }
-        return native;
-      };
+    const applyInitialSeek = (reason: string) => {
+      if (hasSyncedInitialTimeRef.current) return;
+      const duration = video.duration;
+      if (!duration || Number.isNaN(duration)) return;
 
-      const attachNativeListeners = (native: HTMLVideoElement | null) => {
-        if (!native) return () => {};
-        const ensureInitial = () => applyInitialSeek();
-        native.addEventListener('loadedmetadata', ensureInitial);
-        native.addEventListener('loadeddata', ensureInitial);
-        native.addEventListener('canplay', ensureInitial);
-        return () => {
-          native.removeEventListener('loadedmetadata', ensureInitial);
-          native.removeEventListener('loadeddata', ensureInitial);
-          native.removeEventListener('canplay', ensureInitial);
-        };
-      };
-
-      const native = resolveNativeVideo();
-      detachNativeListeners = attachNativeListeners(native);
-
-      const clampTimeToDuration = (time: number) => {
-        const duration = player.duration() || videoDurationRef.current || 0;
-        if (!duration || duration <= 0) return Math.max(time, 0);
-        return Math.min(Math.max(time, 0), Math.max(duration - 0.2, 0));
-      };
-
-      const updateWatchedOverlay = () => {
-        if (!watchedOverlay) return;
-        const duration = player.duration() || videoDurationRef.current || 0;
-        if (!duration) return;
-        const maxPct = (maxAllowedRef.current / duration) * 100;
-        watchedOverlay.style.width = `${Math.min(maxPct, 100)}%`;
-      };
-
-      const forceSeekBoth = (time: number, reason: string) => {
-        const playerInstance = playerRef.current;
-        const nativeVideo = nativeVideoRef.current;
-        if (!playerInstance || !nativeVideo) return;
-
-        const target = clampTimeToDuration(time);
-        isProgrammaticSeekRef.current = true;
-
-        console.log('🎬 [VideoPlayer] forceSeekBoth request', {
-          reason,
-          target: target.toFixed(2),
-        });
-
-        try {
-          nativeVideo.currentTime = target;
-        } catch (err) {
-          console.warn('[VideoPlayer] Native seek failed', { reason, err });
-        }
-
-        try {
-          playerInstance.currentTime(target);
-        } catch (err) {
-          console.warn('[VideoPlayer] Player seek failed', { reason, err });
-        }
-
-        const nativeCurrent = nativeVideo.currentTime;
-        const playerCurrent = playerInstance.currentTime();
-        console.log('🎬 [VideoPlayer] forceSeekBoth applied', {
-          reason,
-          nativeCurrent: nativeCurrent?.toFixed?.(2),
-          playerCurrent: playerCurrent?.toFixed?.(2),
-        });
-
-        lastSafeTimeRef.current = target;
-
-        window.setTimeout(() => {
-          isProgrammaticSeekRef.current = false;
-        }, 80);
-      };
-
-      const applyInitialSeek = () => {
-        if (hasSyncedInitialTimeRef.current) return;
-        const duration = player.duration() || 0;
-        if (!duration) return;
-
-        const resumeTarget = clampTimeToDuration(resumeTimeRef.current);
-        if (resumeTarget <= 0) {
-          hasSyncedInitialTimeRef.current = true;
-          return;
-        }
-
-        console.log('🎯 [VideoPlayer] Initial seek requested:', {
-          target: resumeTarget.toFixed(2),
-          duration: duration.toFixed(2),
-        });
-
-        forceSeekBoth(resumeTarget, 'initial');
-        maxAllowedRef.current = Math.max(maxAllowedRef.current, resumeTarget);
-        updateWatchedOverlay();
+      const resumeTarget = clampTimeToDuration(resumeTimeRef.current);
+      if (resumeTarget <= 0) {
         hasSyncedInitialTimeRef.current = true;
-      };
+        return;
+      }
 
-      const guardDrift = (current: number) => {
-        const guardTarget = Math.max(resumeTimeRef.current, maxAllowedRef.current);
-        if (guardTarget > 0 && current + 0.3 < guardTarget) {
-          console.warn('⚠️ [VideoPlayer] Drift detected, restoring position', {
-            current: current.toFixed(2),
-            guardTarget: guardTarget.toFixed(2),
-          });
-          const native = nativeVideoRef.current;
-          const playerInstance = playerRef.current;
-          if (!native || !playerInstance) return true;
-
-          const target = clampTimeToDuration(guardTarget);
-          isProgrammaticSeekRef.current = true;
-
-          try {
-            native.currentTime = target;
-          } catch (err) {
-            console.warn('[VideoPlayer] Native drift correction failed', err);
-          }
-
-          playerInstance.currentTime(target);
-
-          playerInstance.one('seeked', () => {
-            lastSafeTimeRef.current = target;
-            window.setTimeout(() => {
-              isProgrammaticSeekRef.current = false;
-            }, 60);
-          });
-
-          return true;
-        }
-        return false;
-      };
-
-      let previousTime = resumeTimeRef.current || 0;
-
-      const handleTimeUpdate = () => {
-        const currentTime = player.currentTime() || 0;
-        const duration = player.duration() || 0;
-        videoDurationRef.current = duration;
-
-        if (isProgrammaticSeekRef.current) {
-          previousTime = currentTime;
-          lastSafeTimeRef.current = currentTime;
-          return;
-        }
-
-        if (guardDrift(currentTime)) {
-          previousTime = currentTime;
-          return;
-        }
-
-        const delta = currentTime - previousTime;
-        previousTime = currentTime;
-        lastSafeTimeRef.current = currentTime;
-
-        if (!isUserSeekingRef.current && delta > 0 && delta < 5 && currentTime > maxAllowedRef.current) {
-          maxAllowedRef.current = currentTime;
-          updateWatchedOverlay();
-          onProgressRef.current?.({
-            currentTime,
-            maxReachedSeconds: currentTime,
-            videoDuration: duration,
-          });
-        }
-      };
-
-      const setupSeekingGuards = () => {
-        const handleSeeking = () => {
-          if (isProgrammaticSeekRef.current) return;
-          isUserSeekingRef.current = true;
-          seekStartRef.current = lastSafeTimeRef.current;
-        };
-
-        const handleSeeked = () => {
-          const currentTime = player.currentTime() || 0;
-
-          if (isProgrammaticSeekRef.current) {
-            isUserSeekingRef.current = false;
-            lastSafeTimeRef.current = currentTime;
-            return;
-          }
-
-          const allowed = maxAllowedRef.current + 0.2;
-          if (currentTime <= allowed) {
-            lastSafeTimeRef.current = currentTime;
-            isUserSeekingRef.current = false;
-            return;
-          }
-
-          const rollback = Math.max(seekStartRef.current, maxAllowedRef.current);
-          console.warn('🔒 [VideoPlayer] Seek blocked beyond allowed progress', {
-            requested: currentTime.toFixed(2),
-            allowed: maxAllowedRef.current.toFixed(2),
-            rollback: rollback.toFixed(2),
-          });
-          forceSeekBoth(rollback, 'seek-guard');
-          isUserSeekingRef.current = false;
-        };
-
-        player.on('seeking', handleSeeking);
-        player.on('seeked', handleSeeked);
-      };
-
-      const attachKeyboardGuard = () => {
-        const handleKeyDown = (e: Event) => {
-          const kbEvent = e as KeyboardEvent;
-          const blockedKeys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-          if (blockedKeys.includes(kbEvent.key)) {
-            kbEvent.preventDefault();
-            kbEvent.stopPropagation();
-          }
-        };
-
-        player.el()?.addEventListener('keydown', handleKeyDown as EventListener, true);
-
-        return () => {
-          player.el()?.removeEventListener('keydown', handleKeyDown as EventListener, true);
-        };
-      };
-
-      detachKeyboard = attachKeyboardGuard();
-      player.on('ratechange', () => {
-        if (player.playbackRate() !== 1.0) {
-          player.playbackRate(1.0);
-        }
+      console.log('🎯 [VideoPlayer] Initial seek requested:', {
+        reason,
+        target: resumeTarget.toFixed(2),
+        duration: duration.toFixed(2),
       });
 
-      player.on('loadedmetadata', () => {
-        const duration = player.duration() || 0;
-        videoDurationRef.current = duration;
-        updateWatchedOverlay();
-        applyInitialSeek();
-      });
+      forceSeek(resumeTarget, reason);
+      maxAllowedRef.current = Math.max(maxAllowedRef.current, resumeTarget);
+      hasSyncedInitialTimeRef.current = true;
+    };
 
-      player.on('canplay', applyInitialSeek);
-      player.one('play', applyInitialSeek);
-      player.on('play', () => {
-        const guardTarget = Math.max(resumeTimeRef.current, maxAllowedRef.current);
-        const current = player.currentTime() || 0;
-        if (guardTarget > 0 && current + 0.3 < guardTarget) {
-          forceSeekBoth(guardTarget, 'play-ensure');
-        }
-      });
+    const guardDrift = (current: number) => {
+      const guardTarget = Math.max(resumeTimeRef.current, maxAllowedRef.current);
+      if (guardTarget > 0 && current + 0.3 < guardTarget) {
+        console.warn('⚠️ [VideoPlayer] Drift detected, restoring position', {
+          current: current.toFixed(2),
+          guardTarget: guardTarget.toFixed(2),
+        });
+        forceSeek(guardTarget, 'drift-guard');
+        return true;
+      }
+      return false;
+    };
 
-      player.on('timeupdate', handleTimeUpdate);
-      setupSeekingGuards();
+    let previousTime = resumeTimeRef.current || 0;
 
-      player.ready(() => {
-        const progressControl = player.controlBar.progressControl;
-        const progressHolder = progressControl?.el()?.querySelector('.vjs-progress-holder');
+    const handleLoadedMetadata = () => {
+      videoDurationRef.current = video.duration || 0;
+      applyInitialSeek('loadedmetadata');
+    };
 
-        if (progressHolder) {
-          watchedOverlay = videojs.dom.createEl('div', {
-            className: 'vjs-watched-overlay',
-          }) as HTMLElement;
+    const handleLoadedData = () => {
+      applyInitialSeek('loadeddata');
+    };
 
-          progressHolder.appendChild(watchedOverlay);
-          updateWatchedOverlay();
-        }
-      });
+    const handleCanPlay = () => {
+      applyInitialSeek('canplay');
+    };
 
-      if (disposed) {
-        if (watchedOverlay) {
-          watchedOverlay.remove();
-          watchedOverlay = null;
-        }
-        if (detachKeyboard) {
-          detachKeyboard();
-        }
-        if (detachNativeListeners) {
-          detachNativeListeners();
-          detachNativeListeners = null;
-        }
-        if (player && !player.isDisposed?.()) {
-          player.dispose();
-        }
+    const handlePlay = () => {
+      const guardTarget = Math.max(resumeTimeRef.current, maxAllowedRef.current);
+      const current = video.currentTime || 0;
+      if (guardTarget > 0 && current + 0.3 < guardTarget) {
+        forceSeek(guardTarget, 'play-ensure');
       }
     };
 
-    initPlayer();
+    const handleTimeUpdate = () => {
+      const currentTime = video.currentTime || 0;
+      const duration = video.duration || 0;
+      videoDurationRef.current = duration;
+
+      if (isProgrammaticSeekRef.current) {
+        previousTime = currentTime;
+        lastSafeTimeRef.current = currentTime;
+        return;
+      }
+
+      if (guardDrift(currentTime)) {
+        previousTime = currentTime;
+        return;
+      }
+
+      const delta = currentTime - previousTime;
+      previousTime = currentTime;
+      lastSafeTimeRef.current = currentTime;
+
+      if (!isUserSeekingRef.current && delta > 0 && delta < 5 && currentTime > maxAllowedRef.current) {
+        maxAllowedRef.current = currentTime;
+        onProgressRef.current?.({
+          currentTime,
+          maxReachedSeconds: currentTime,
+          videoDuration: duration,
+        });
+      }
+    };
+
+    const handleSeeking = () => {
+      if (isProgrammaticSeekRef.current) return;
+      isUserSeekingRef.current = true;
+      seekStartRef.current = lastSafeTimeRef.current;
+    };
+
+    const handleSeeked = () => {
+      const currentTime = video.currentTime || 0;
+
+      if (isProgrammaticSeekRef.current) {
+        isUserSeekingRef.current = false;
+        lastSafeTimeRef.current = currentTime;
+        return;
+      }
+
+      const allowed = maxAllowedRef.current + 0.2;
+      if (currentTime <= allowed) {
+        lastSafeTimeRef.current = currentTime;
+        isUserSeekingRef.current = false;
+        return;
+      }
+
+      const rollback = Math.max(seekStartRef.current, maxAllowedRef.current);
+      console.warn('🔒 [VideoPlayer] Seek blocked beyond allowed progress', {
+        requested: currentTime.toFixed(2),
+        allowed: maxAllowedRef.current.toFixed(2),
+        rollback: rollback.toFixed(2),
+      });
+      forceSeek(rollback, 'seek-guard');
+      isUserSeekingRef.current = false;
+    };
+
+    const handlePause = () => {
+      const currentTime = video.currentTime || 0;
+      lastSafeTimeRef.current = currentTime;
+      onProgressRef.current?.({
+        currentTime,
+        maxReachedSeconds: Math.max(maxAllowedRef.current, currentTime),
+        videoDuration: video.duration || videoDurationRef.current || 0,
+      });
+    };
+
+    video.addEventListener('loadedmetadata', handleLoadedMetadata);
+    video.addEventListener('loadeddata', handleLoadedData);
+    video.addEventListener('canplay', handleCanPlay);
+    video.addEventListener('play', handlePlay);
+    video.addEventListener('timeupdate', handleTimeUpdate);
+    video.addEventListener('seeking', handleSeeking);
+    video.addEventListener('seeked', handleSeeked);
+    video.addEventListener('pause', handlePause);
+
+    // Auto play when requested
+    if (autoPlay) {
+      video.play().catch(() => {
+        /* ignore auto play block */
+      });
+    }
 
     return () => {
-      disposed = true;
-      if (watchedOverlay) {
-        watchedOverlay.remove();
-        watchedOverlay = null;
-      }
-      if (detachKeyboard) {
-        detachKeyboard();
-        detachKeyboard = null;
-      }
-      if (detachNativeListeners) {
-        detachNativeListeners();
-        detachNativeListeners = null;
-      }
-      if (player && !player.isDisposed?.()) {
-        player.dispose();
-      }
+      video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      video.removeEventListener('loadeddata', handleLoadedData);
+      video.removeEventListener('canplay', handleCanPlay);
+      video.removeEventListener('play', handlePlay);
+      video.removeEventListener('timeupdate', handleTimeUpdate);
+      video.removeEventListener('seeking', handleSeeking);
+      video.removeEventListener('seeked', handleSeeked);
+      video.removeEventListener('pause', handlePause);
     };
   }, [videoUrl, autoPlay]);
 
@@ -439,9 +283,11 @@ export default function VideoPlayer({
     <div data-vjs-player className={styles.playerWrapper}>
       <video
         ref={videoRef}
-        className="video-js vjs-big-play-centered"
+        className={styles.html5Video}
+        controls
         playsInline
         preload="metadata"
+        autoPlay={autoPlay}
       />
     </div>
   );

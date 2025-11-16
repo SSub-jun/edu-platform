@@ -5,6 +5,14 @@
   margin: 0 auto;
 }
 
+.html5Video {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  background: #000;
+  display: block;
+}
+
 .playerWrapper .video-js {
   width: 100%;
   height: auto;
