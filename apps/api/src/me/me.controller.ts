@@ -78,12 +78,16 @@ export class MeController {
   @Get('curriculum')
   async curriculum(@Request() req: any) {
     const userId = req.user.sub as string;
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
+    
+    // 사용자의 활성 Cohort 조회
+    const userCohorts = await this.prisma.userCohort.findMany({
+      where: { userId },
       include: {
-        company: {
+        cohort: {
+          where: { isActive: true },
           include: {
-            activeSubjects: {
+            company: true,
+            cohortSubjects: {
               include: {
                 subject: {
                   include: {
@@ -100,19 +104,25 @@ export class MeController {
       }
     });
 
-    if (!user || !user.company) {
+    if (!userCohorts || userCohorts.length === 0) {
+      return { success: true, data: [] };
+    }
+
+    // 첫 번째 활성 Cohort 사용 (나중에 여러 Cohort 지원 가능)
+    const activeCohort = userCohorts[0].cohort;
+    if (!activeCohort) {
       return { success: true, data: [] };
     }
 
     const now = new Date();
-    const end = user.company.endDate as Date;
+    const end = activeCohort.endDate as Date;
     const remainingDays = Math.max(0, Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
 
-    // 신규: CompanySubject 기반 커리큘럼
-    if (user.company.activeSubjects && user.company.activeSubjects.length > 0) {
+    // Cohort 기반 커리큘럼
+    if (activeCohort.cohortSubjects && activeCohort.cohortSubjects.length > 0) {
       const result: any[] = [];
 
-      for (const cs of user.company.activeSubjects) {
+      for (const cs of activeCohort.cohortSubjects) {
         const subject = cs.subject;
         
         // Subject 진도율 및 수료 상태 조회
@@ -174,9 +184,9 @@ export class MeController {
             remainingTries: subjectProgress.remainingTries,
             canTakeExam: subjectProgress.canTakeExam,
             canRestart: subjectProgress.canRestart,
-            // 회사 수강 기간 정보 추가
-            startDate: user.company.startDate,
-            endDate: user.company.endDate,
+            // Cohort 수강 기간 정보 추가
+            startDate: activeCohort.startDate,
+            endDate: activeCohort.endDate,
           },
           lessons,
           remainingDays
