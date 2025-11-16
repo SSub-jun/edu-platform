@@ -70,14 +70,26 @@ export default function SubjectManagePage() {
   // 모달 상태
   const [showLessonModal, setShowLessonModal] = useState(false);
   const [showQuestionModal, setShowQuestionModal] = useState(false);
+  const [showVideoPartModal, setShowVideoPartModal] = useState(false);
   const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
+  const [selectedLessonForVideos, setSelectedLessonForVideos] = useState<Lesson | null>(null);
+  const [editingVideoPart, setEditingVideoPart] = useState<LessonPart | null>(null);
 
   // 레슨 폼
   const [lessonForm, setLessonForm] = useState({
     title: '',
     description: '',
     order: 0,
+  });
+
+  // 영상 파트 폼
+  const [videoPartForm, setVideoPartForm] = useState({
+    title: '',
+    description: '',
+    order: 0,
+    videoUrl: '',
+    durationMs: 0,
   });
 
   // 문제 폼
@@ -315,6 +327,80 @@ export default function SubjectManagePage() {
       });
     }
     setShowQuestionModal(true);
+  };
+
+  const openVideoPartModal = (lesson: Lesson, videoPart?: LessonPart) => {
+    setSelectedLessonForVideos(lesson);
+    if (videoPart) {
+      setEditingVideoPart(videoPart);
+      setVideoPartForm({
+        title: videoPart.title,
+        description: videoPart.description || '',
+        order: videoPart.order,
+        videoUrl: videoPart.videoUrl,
+        durationMs: videoPart.durationMs,
+      });
+    } else {
+      setEditingVideoPart(null);
+      setVideoPartForm({
+        title: '',
+        description: '',
+        order: (lesson.parts?.length || 0) + 1,
+        videoUrl: '',
+        durationMs: 0,
+      });
+    }
+    setShowVideoPartModal(true);
+  };
+
+  const handleCreateVideoPart = async () => {
+    if (!selectedLessonForVideos) return;
+    if (!videoPartForm.title.trim() || !videoPartForm.videoUrl.trim()) {
+      alert('파트 제목과 영상 URL을 입력해주세요.');
+      return;
+    }
+
+    try {
+      await authClient.getApi().post(`/admin/lessons/${selectedLessonForVideos.id}/parts`, videoPartForm);
+      alert('영상 파트가 추가되었습니다.');
+      setShowVideoPartModal(false);
+      setSelectedLessonForVideos(null);
+      setVideoPartForm({ title: '', description: '', order: 0, videoUrl: '', durationMs: 0 });
+      loadLessons();
+    } catch (err: any) {
+      console.error('[ADMIN][VIDEO_PARTS] create failed', err);
+      alert('영상 파트 추가에 실패했습니다: ' + (err.response?.data?.message || err.message));
+    }
+  };
+
+  const handleUpdateVideoPart = async () => {
+    if (!editingVideoPart) return;
+
+    try {
+      await authClient.getApi().patch(`/admin/parts/${editingVideoPart.id}`, videoPartForm);
+      alert('영상 파트가 수정되었습니다.');
+      setShowVideoPartModal(false);
+      setEditingVideoPart(null);
+      setSelectedLessonForVideos(null);
+      setVideoPartForm({ title: '', description: '', order: 0, videoUrl: '', durationMs: 0 });
+      loadLessons();
+    } catch (err: any) {
+      console.error('[ADMIN][VIDEO_PARTS] update failed', err);
+      alert('영상 파트 수정에 실패했습니다: ' + (err.response?.data?.message || err.message));
+    }
+  };
+
+  const handleDeleteVideoPart = async (partId: string) => {
+    if (!confirm('이 영상 파트를 삭제하시겠습니까?')) return;
+
+    try {
+      await authClient.getApi().delete(`/admin/parts/${partId}`);
+      alert('영상 파트가 삭제되었습니다.');
+      loadLessons();
+    } catch (err: any) {
+      console.error('[ADMIN][VIDEO_PARTS] delete failed', err);
+      alert('영상 파트 삭제에 실패했습니다: ' + (err.response?.data?.message || err.message));
+    }
   };
 
   useEffect(() => {
@@ -604,6 +690,20 @@ export default function SubjectManagePage() {
                       </p>
                     </div>
                     <div style={{ display: 'flex', gap: '8px' }}>
+                      <button
+                        onClick={() => openVideoPartModal(lesson)}
+                        style={{
+                          padding: '6px 12px',
+                          backgroundColor: '#17a2b8',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontSize: '13px'
+                        }}
+                      >
+                        영상 관리
+                      </button>
                       <button
                         onClick={() => openLessonModal(lesson)}
                         style={{
@@ -1030,6 +1130,218 @@ export default function SubjectManagePage() {
                   }}
                 >
                   {editingQuestion ? '수정' : '생성'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 영상 파트 관리 모달 */}
+      {showVideoPartModal && selectedLessonForVideos && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '8px',
+            padding: '24px',
+            maxWidth: '800px',
+            width: '90%',
+            maxHeight: '90vh',
+            overflow: 'auto'
+          }}>
+            <h2 style={{ marginTop: 0 }}>영상 파트 관리 - {selectedLessonForVideos.title}</h2>
+            
+            {/* 기존 영상 파트 목록 */}
+            {selectedLessonForVideos.parts && selectedLessonForVideos.parts.length > 0 && (
+              <div style={{ marginBottom: '24px' }}>
+                <h3 style={{ fontSize: '16px', marginBottom: '12px' }}>등록된 영상 파트</h3>
+                <div style={{ display: 'grid', gap: '8px' }}>
+                  {selectedLessonForVideos.parts.map((part) => (
+                    <div key={part.id} style={{
+                      padding: '12px',
+                      border: '1px solid #e0e0e0',
+                      borderRadius: '6px',
+                      backgroundColor: '#f8f9fa',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
+                    }}>
+                      <div>
+                        <div style={{ fontWeight: 600, fontSize: '14px' }}>
+                          {part.order}. {part.title}
+                        </div>
+                        <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                          {part.videoUrl} • {Math.floor(part.durationMs / 60000)}분
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', gap: '6px' }}>
+                        <button
+                          onClick={() => openVideoPartModal(selectedLessonForVideos, part)}
+                          style={{
+                            padding: '4px 10px',
+                            backgroundColor: '#6c757d',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontSize: '12px'
+                          }}
+                        >
+                          수정
+                        </button>
+                        <button
+                          onClick={() => handleDeleteVideoPart(part.id)}
+                          style={{
+                            padding: '4px 10px',
+                            backgroundColor: '#dc3545',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontSize: '12px'
+                          }}
+                        >
+                          삭제
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 영상 파트 추가/수정 폼 */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <h3 style={{ fontSize: '16px', marginBottom: '0' }}>
+                {editingVideoPart ? '영상 파트 수정' : '새 영상 파트 추가'}
+              </h3>
+              <div>
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600 }}>파트 제목 *</label>
+                <input
+                  type="text"
+                  value={videoPartForm.title}
+                  onChange={(e) => setVideoPartForm({ ...videoPartForm, title: e.target.value })}
+                  placeholder="예: 1부 - 안전 기초"
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px',
+                    fontSize: '14px'
+                  }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600 }}>설명</label>
+                <textarea
+                  value={videoPartForm.description}
+                  onChange={(e) => setVideoPartForm({ ...videoPartForm, description: e.target.value })}
+                  rows={2}
+                  placeholder="파트에 대한 간단한 설명"
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px',
+                    fontSize: '14px',
+                    resize: 'vertical'
+                  }}
+                />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600 }}>순서</label>
+                  <input
+                    type="number"
+                    value={videoPartForm.order}
+                    onChange={(e) => setVideoPartForm({ ...videoPartForm, order: parseInt(e.target.value, 10) || 0 })}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '4px',
+                      fontSize: '14px'
+                    }}
+                  />
+                </div>
+                <div style={{ gridColumn: 'span 2' }}>
+                  <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600 }}>재생 시간 (분)</label>
+                  <input
+                    type="number"
+                    value={Math.floor(videoPartForm.durationMs / 60000)}
+                    onChange={(e) => setVideoPartForm({ ...videoPartForm, durationMs: (parseInt(e.target.value, 10) || 0) * 60000 })}
+                    placeholder="예: 15"
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '4px',
+                      fontSize: '14px'
+                    }}
+                  />
+                </div>
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600 }}>영상 URL *</label>
+                <input
+                  type="text"
+                  value={videoPartForm.videoUrl}
+                  onChange={(e) => setVideoPartForm({ ...videoPartForm, videoUrl: e.target.value })}
+                  placeholder="https://example.com/video.mp4 또는 /uploads/videos/..."
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px',
+                    fontSize: '14px'
+                  }}
+                />
+                <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                  💡 로컬 업로드 또는 외부 URL을 입력하세요
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '10px' }}>
+                <button
+                  onClick={() => {
+                    setShowVideoPartModal(false);
+                    setEditingVideoPart(null);
+                    setSelectedLessonForVideos(null);
+                    setVideoPartForm({ title: '', description: '', order: 0, videoUrl: '', durationMs: 0 });
+                  }}
+                  style={{
+                    padding: '10px 20px',
+                    backgroundColor: '#6c757d',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  닫기
+                </button>
+                <button
+                  onClick={editingVideoPart ? handleUpdateVideoPart : handleCreateVideoPart}
+                  style={{
+                    padding: '10px 20px',
+                    backgroundColor: '#17a2b8',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {editingVideoPart ? '수정' : '추가'}
                 </button>
               </div>
             </div>
