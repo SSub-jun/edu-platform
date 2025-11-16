@@ -132,14 +132,33 @@ export default function CurriculumPage() {
   };
 
   const handleViewLessons = (subjectId: string) => {
-    // 첫 번째 레슨으로 이동
     const item = curriculumData.find(d => d.subject.id === subjectId);
-    if (item && item.lessons.length > 0) {
-      const firstLesson = item.lessons.sort((a, b) => a.order - b.order)[0];
-      if (firstLesson) {
-        router.push(`/lesson/${firstLesson.id}`);
-      }
+    if (!item || item.lessons.length === 0) return;
+
+    const sortedLessons = item.lessons.sort((a, b) => a.order - b.order);
+    
+    // 1. 진행 중인 레슨 찾기 (0% < progress < 100%)
+    const inProgressLesson = sortedLessons.find(
+      lesson => lesson.progressPercent > 0 && lesson.progressPercent < 100
+    );
+    
+    if (inProgressLesson) {
+      router.push(`/lesson/${inProgressLesson.id}`);
+      return;
     }
+    
+    // 2. 아직 시작 안 한 첫 번째 레슨 찾기 (progress === 0%)
+    const notStartedLesson = sortedLessons.find(
+      lesson => lesson.progressPercent === 0
+    );
+    
+    if (notStartedLesson) {
+      router.push(`/lesson/${notStartedLesson.id}`);
+      return;
+    }
+    
+    // 3. 모든 레슨이 완료된 경우 첫 번째 레슨으로 (복습용)
+    router.push(`/lesson/${sortedLessons[0].id}`);
   };
 
   // 인증 로딩 중
