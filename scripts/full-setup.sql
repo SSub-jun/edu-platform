@@ -290,7 +290,7 @@ VALUES
 -- 2. 회사 생성 (6개월 수강 기간)
 INSERT INTO "companies" ("id", "name", "startDate", "endDate", "isActive", "inviteCode", "createdAt", "updatedAt")
 VALUES 
-('company001', 'KIST 안전교육센터', NOW(), NOW() + INTERVAL '6 months', true, 'KIST2024', NOW(), NOW());
+('company001', 'KIST 안전교육센터', NOW(), NOW() + INTERVAL '6 months', true, 'KIST25', NOW(), NOW());
 
 -- 3. 과목(Subject) 생성 - 산업안전 기초 3과목
 INSERT INTO "subjects" ("id", "name", "description", "order", "isActive", "createdAt", "updatedAt")
@@ -502,7 +502,12 @@ INSERT INTO "choices" ("id", "questionId", "text", "isAnswer", "order", "created
 ('c119', 'q030', '110', false, 2, NOW(), NOW()),
 ('c120', 'q030', '114', false, 3, NOW(), NOW());
 
--- 8. 테스트용 학생 계정 생성 (비밀번호: Student123!)
+-- 8. 테스트용 강사 계정 생성 (비밀번호: Instructor123!)
+INSERT INTO "users" ("id", "username", "passwordHash", "role", "name", "phone", "phoneVerifiedAt", "createdAt", "updatedAt")
+VALUES 
+('instructor001', 'instructor', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'instructor', '강사님', '01099999999', NOW(), NOW(), NOW());
+
+-- 9. 테스트용 학생 계정 생성 (비밀번호: Student123!)
 INSERT INTO "users" ("id", "username", "passwordHash", "role", "name", "phone", "phoneVerifiedAt", "companyId", "createdAt", "updatedAt")
 VALUES 
 ('student001', 'student1', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', '김철수', '01011111111', NOW(), 'company001', NOW(), NOW()),
@@ -513,6 +518,7 @@ VALUES
 -- 
 -- 생성된 계정:
 -- 관리자: admin / Admin123!
+-- 강사: instructor / Instructor123!
 -- 학생1: student1 / Student123!
 -- 학생2: student2 / Student123!
 -- 학생3: student3 / Student123!
