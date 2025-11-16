@@ -27,7 +27,7 @@ export class AdminLessonService {
         isActive: true,
       },
       include: {
-        parts: {
+        videoParts: {
           where: { isActive: true },
           orderBy: { order: 'asc' },
         },
@@ -41,7 +41,7 @@ export class AdminLessonService {
     const lessons = await this.prisma.lesson.findMany({
       where: { subjectId },
       include: {
-        parts: {
+        videoParts: {
           where: { isActive: true },
           orderBy: { order: 'asc' },
         },
@@ -57,7 +57,7 @@ export class AdminLessonService {
       where: { id: lessonId },
       include: {
         subject: true,
-        parts: {
+        videoParts: {
           orderBy: { order: 'asc' },
         },
       },
@@ -88,7 +88,7 @@ export class AdminLessonService {
         isActive: dto.isActive,
       },
       include: {
-        parts: {
+        videoParts: {
           where: { isActive: true },
           orderBy: { order: 'asc' },
         },
@@ -126,7 +126,7 @@ export class AdminLessonService {
       throw new NotFoundException(`Lesson with ID ${lessonId} not found`);
     }
 
-    const part = await this.prisma.lessonPart.create({
+    const part = await this.prisma.videoPart.create({
       data: {
         lessonId,
         title: dto.title,
@@ -142,7 +142,7 @@ export class AdminLessonService {
   }
 
   async getLessonParts(lessonId: string) {
-    const parts = await this.prisma.lessonPart.findMany({
+    const parts = await this.prisma.videoPart.findMany({
       where: { lessonId },
       orderBy: { order: 'asc' },
     });
@@ -151,7 +151,7 @@ export class AdminLessonService {
   }
 
   async updateLessonPart(partId: string, dto: UpdateLessonPartDto) {
-    const part = await this.prisma.lessonPart.findUnique({
+    const part = await this.prisma.videoPart.findUnique({
       where: { id: partId },
     });
 
@@ -159,7 +159,7 @@ export class AdminLessonService {
       throw new NotFoundException(`Lesson part with ID ${partId} not found`);
     }
 
-    const updated = await this.prisma.lessonPart.update({
+    const updated = await this.prisma.videoPart.update({
       where: { id: partId },
       data: {
         title: dto.title,
@@ -175,7 +175,7 @@ export class AdminLessonService {
   }
 
   async deleteLessonPart(partId: string) {
-    const part = await this.prisma.lessonPart.findUnique({
+    const part = await this.prisma.videoPart.findUnique({
       where: { id: partId },
     });
 
@@ -183,7 +183,7 @@ export class AdminLessonService {
       throw new NotFoundException(`Lesson part with ID ${partId} not found`);
     }
 
-    await this.prisma.lessonPart.update({
+    await this.prisma.videoPart.update({
       where: { id: partId },
       data: { isActive: false },
     });
@@ -207,16 +207,22 @@ export class AdminLessonService {
       throw new BadRequestException('correctAnswer must be a valid index of choices array');
     }
 
+    // Choice 생성을 위한 데이터 준비
+    const choicesData = dto.choices.map((text) => ({ text }));
+
     const question = await this.prisma.question.create({
       data: {
         subjectId,
-        content: dto.content,
-        choices: dto.choices,
-        correctAnswer: dto.correctAnswer,
+        stem: dto.content,
+        answerIndex: dto.correctAnswer,
         explanation: dto.explanation,
-        difficulty: dto.difficulty,
-        tags: dto.tags,
         isActive: true,
+        choices: {
+          create: choicesData,
+        },
+      },
+      include: {
+        choices: true,
       },
     });
 
@@ -226,10 +232,24 @@ export class AdminLessonService {
   async getQuestionsBySubject(subjectId: string) {
     const questions = await this.prisma.question.findMany({
       where: { subjectId },
+      include: {
+        choices: true,
+      },
       orderBy: { createdAt: 'desc' },
     });
 
-    return questions;
+    // 프론트엔드 형식으로 변환
+    return questions.map((q) => ({
+      id: q.id,
+      content: q.stem,
+      choices: q.choices.map((c) => c.text),
+      correctAnswer: q.answerIndex,
+      explanation: q.explanation,
+      difficulty: 3, // 기본값
+      tags: '', // 기본값
+      isActive: q.isActive,
+      createdAt: q.createdAt,
+    }));
   }
 
   async getQuestionById(questionId: string) {
@@ -237,6 +257,7 @@ export class AdminLessonService {
       where: { id: questionId },
       include: {
         subject: true,
+        choices: true,
       },
     });
 
@@ -244,12 +265,26 @@ export class AdminLessonService {
       throw new NotFoundException(`Question with ID ${questionId} not found`);
     }
 
-    return question;
+    // 프론트엔드 형식으로 변환
+    return {
+      id: question.id,
+      content: question.stem,
+      choices: question.choices.map((c) => c.text),
+      correctAnswer: question.answerIndex,
+      explanation: question.explanation,
+      difficulty: 3,
+      tags: '',
+      isActive: question.isActive,
+      createdAt: question.createdAt,
+    };
   }
 
   async updateQuestion(questionId: string, dto: UpdateQuestionDto) {
     const question = await this.prisma.question.findUnique({
       where: { id: questionId },
+      include: {
+        choices: true,
+      },
     });
 
     if (!question) {
@@ -257,27 +292,50 @@ export class AdminLessonService {
     }
 
     // 정답 인덱스 유효성 검증
-    const finalChoices = dto.choices || question.choices;
-    const finalCorrectAnswer = dto.correctAnswer !== undefined ? dto.correctAnswer : question.correctAnswer;
+    const finalChoices = dto.choices || question.choices.map((c) => c.text);
+    const finalCorrectAnswer = dto.correctAnswer !== undefined ? dto.correctAnswer : question.answerIndex;
 
     if (finalCorrectAnswer < 0 || finalCorrectAnswer >= finalChoices.length) {
       throw new BadRequestException('correctAnswer must be a valid index of choices array');
     }
 
+    // 기존 choices 삭제 후 새로 생성 (choices가 제공된 경우)
+    if (dto.choices) {
+      await this.prisma.choice.deleteMany({
+        where: { questionId },
+      });
+    }
+
     const updated = await this.prisma.question.update({
       where: { id: questionId },
       data: {
-        content: dto.content,
-        choices: dto.choices,
-        correctAnswer: dto.correctAnswer,
+        stem: dto.content,
+        answerIndex: dto.correctAnswer,
         explanation: dto.explanation,
-        difficulty: dto.difficulty,
-        tags: dto.tags,
         isActive: dto.isActive,
+        ...(dto.choices && {
+          choices: {
+            create: dto.choices.map((text) => ({ text })),
+          },
+        }),
+      },
+      include: {
+        choices: true,
       },
     });
 
-    return updated;
+    // 프론트엔드 형식으로 변환
+    return {
+      id: updated.id,
+      content: updated.stem,
+      choices: updated.choices.map((c) => c.text),
+      correctAnswer: updated.answerIndex,
+      explanation: updated.explanation,
+      difficulty: 3,
+      tags: '',
+      isActive: updated.isActive,
+      createdAt: updated.createdAt,
+    };
   }
 
   async deleteQuestion(questionId: string) {
@@ -300,6 +358,9 @@ export class AdminLessonService {
   async duplicateQuestion(questionId: string) {
     const question = await this.prisma.question.findUnique({
       where: { id: questionId },
+      include: {
+        choices: true,
+      },
     });
 
     if (!question) {
@@ -309,17 +370,31 @@ export class AdminLessonService {
     const duplicated = await this.prisma.question.create({
       data: {
         subjectId: question.subjectId,
-        content: question.content + ' (복사본)',
-        choices: question.choices,
-        correctAnswer: question.correctAnswer,
+        stem: question.stem + ' (복사본)',
+        answerIndex: question.answerIndex,
         explanation: question.explanation,
-        difficulty: question.difficulty,
-        tags: question.tags,
         isActive: true,
+        choices: {
+          create: question.choices.map((c) => ({ text: c.text })),
+        },
+      },
+      include: {
+        choices: true,
       },
     });
 
-    return duplicated;
+    // 프론트엔드 형식으로 변환
+    return {
+      id: duplicated.id,
+      content: duplicated.stem,
+      choices: duplicated.choices.map((c) => c.text),
+      correctAnswer: duplicated.answerIndex,
+      explanation: duplicated.explanation,
+      difficulty: 3,
+      tags: '',
+      isActive: duplicated.isActive,
+      createdAt: duplicated.createdAt,
+    };
   }
 }
 
