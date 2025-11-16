@@ -174,6 +174,9 @@ export class MeController {
             remainingTries: subjectProgress.remainingTries,
             canTakeExam: subjectProgress.canTakeExam,
             canRestart: subjectProgress.canRestart,
+            // 회사 수강 기간 정보 추가
+            startDate: user.company.startDate,
+            endDate: user.company.endDate,
           },
           lessons,
           remainingDays
