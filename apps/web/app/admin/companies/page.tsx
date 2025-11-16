@@ -7,12 +7,12 @@ import { authClient } from '../../../lib/auth';
 interface Company {
   id: string;
   name: string;
-  startDate: string;
-  endDate: string;
   inviteCode: string;
   isActive: boolean;
-  userCount: number;
-  activeLessonCount: number;
+  startDate?: string | null;
+  endDate?: string | null;
+  userCount?: number;
+  activeLessonCount?: number;
   createdAt: string;
 }
 
@@ -53,8 +53,8 @@ export default function AdminCompaniesPage() {
     try {
       await authClient.getApi().post('/admin/companies', {
         name: newCompany.name.trim(),
-        startDate: newCompany.startDate,
-        endDate: newCompany.endDate,
+        startDate: newCompany.startDate || undefined,
+        endDate: newCompany.endDate || undefined,
         description: newCompany.description || undefined
       });
 
@@ -83,8 +83,8 @@ export default function AdminCompaniesPage() {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    if (!dateString) return '';
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return '미정';
     return new Date(dateString).toLocaleDateString('ko-KR');
   };
 
@@ -134,17 +134,22 @@ export default function AdminCompaniesPage() {
               ← 관리자 대시보드
             </button>
             
-            <h1 style={{ 
-              fontSize: '28px', 
-              fontWeight: 'bold', 
-              color: '#333',
-              margin: 0,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px'
-            }}>
-              🏢 기관 목록 관리
-            </h1>
+            <div>
+              <h1 style={{ 
+                fontSize: '28px', 
+                fontWeight: 'bold', 
+                color: '#333',
+                margin: 0,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px'
+              }}>
+                🏢 회사 목록 / Cohort 준비
+              </h1>
+              <p style={{ marginTop: '6px', color: '#666', fontSize: '14px' }}>
+                회사를 선택하면 새로운 Cohort 관리 화면으로 이동할 수 있습니다.
+              </p>
+            </div>
           </div>
 
           <button
@@ -330,16 +335,19 @@ export default function AdminCompaniesPage() {
                 key={company.id}
                 style={{
                   border: '1px solid #e0e0e0',
-                  borderRadius: '8px',
-                  padding: '20px',
+                  borderRadius: '10px',
+                  padding: '24px',
                   backgroundColor: '#fafafa',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '18px'
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+                  <div>
                     <h3 style={{ 
-                      margin: '0 0 10px 0',
+                      margin: '0 0 6px 0',
                       fontSize: '20px',
                       fontWeight: 'bold',
                       color: '#333',
@@ -361,62 +369,79 @@ export default function AdminCompaniesPage() {
                         </span>
                       )}
                     </h3>
-
-                    <div style={{ 
-                      display: 'grid', 
-                      gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                      gap: '15px',
-                      color: '#666',
-                      fontSize: '14px'
-                    }}>
-                      <div>
-                        <strong>초대 코드:</strong> {company.inviteCode}
-                      </div>
-                      <div>
-                        <strong>사용자 수:</strong> {company.userCount}명
-                      </div>
-                      <div>
-                        <strong>활성 강의:</strong> {company.activeLessonCount}개
-                      </div>
-                      <div>
-                        <strong>운영 기간:</strong> {formatDate(company.startDate)} ~ {formatDate(company.endDate)}
-                      </div>
+                    <div style={{ color: '#666', fontSize: '13px' }}>
+                      생성일 {new Date(company.createdAt).toLocaleDateString('ko-KR')} · 초대코드 {company.inviteCode}
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', gap: '8px', marginLeft: '20px' }}>
+                  <div style={{ display: 'flex', gap: '10px' }}>
                     <button
-                      onClick={() => router.push(`/admin/companies/${company.id}/subjects`)}
+                      onClick={() => router.push(`/admin/cohorts/${company.id}`)}
                       style={{
-                        padding: '8px 12px',
+                        padding: '10px 16px',
                         backgroundColor: '#0070f3',
                         color: 'white',
                         border: 'none',
-                        borderRadius: '4px',
+                        borderRadius: '6px',
                         cursor: 'pointer',
-                        fontSize: '12px',
-                        fontWeight: '500'
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px'
                       }}
                     >
-                      📚 과목 배정
+                      📅 Cohort 관리
                     </button>
-
                     <button
                       onClick={() => handleDeleteCompany(company.id, company.name)}
                       style={{
-                        padding: '8px 12px',
+                        padding: '10px 16px',
                         backgroundColor: '#dc3545',
                         color: 'white',
                         border: 'none',
-                        borderRadius: '4px',
+                        borderRadius: '6px',
                         cursor: 'pointer',
-                        fontSize: '12px',
+                        fontSize: '14px',
                         fontWeight: '500'
                       }}
                     >
                       🗑️ 삭제
                     </button>
                   </div>
+                </div>
+
+                <div style={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                  gap: '12px',
+                  color: '#555',
+                  fontSize: '14px'
+                }}>
+                  <div style={{ background: '#fff', padding: '12px', borderRadius: '8px', border: '1px solid #eee' }}>
+                    <div style={{ fontSize: '12px', color: '#888', marginBottom: '4px' }}>예정 기수 기간</div>
+                    <strong>{formatDate(company.startDate ?? undefined)} ~ {formatDate(company.endDate ?? undefined)}</strong>
+                  </div>
+                  <div style={{ background: '#fff', padding: '12px', borderRadius: '8px', border: '1px solid #eee' }}>
+                    <div style={{ fontSize: '12px', color: '#888', marginBottom: '4px' }}>등록 학생 수</div>
+                    <strong>{company.userCount ?? 0}명</strong>
+                  </div>
+                  <div style={{ background: '#fff', padding: '12px', borderRadius: '8px', border: '1px solid #eee' }}>
+                    <div style={{ fontSize: '12px', color: '#888', marginBottom: '4px' }}>활성 레슨</div>
+                    <strong>{company.activeLessonCount ?? 0}개</strong>
+                  </div>
+                </div>
+
+                <div style={{
+                  padding: '12px 16px',
+                  backgroundColor: '#fff',
+                  borderRadius: '8px',
+                  border: '1px dashed #d0d5dd',
+                  color: '#495057',
+                  fontSize: '13px',
+                  lineHeight: '1.6'
+                }}>
+                  앞으로 이 회사에 속한 기수, 배정된 과목/학생 현황을 Cohort 관리 페이지에서 확인할 수 있습니다.
                 </div>
               </div>
             ))}
