@@ -290,7 +290,7 @@ VALUES
 -- 2. 회사 생성 (6개월 수강 기간)
 INSERT INTO "companies" ("id", "name", "startDate", "endDate", "isActive", "inviteCode", "createdAt", "updatedAt")
 VALUES 
-('company001', 'KIST 안전교육센터', NOW(), NOW() + INTERVAL '6 months', true, 'KIST24', NOW(), NOW());
+('company001', 'KIST 안전교육센터', NOW(), NOW() + INTERVAL '6 months', true, 'KIST25', NOW(), NOW());
 
 -- 3. 과목(Subject) 생성 - 산업안전 기초 3과목
 INSERT INTO "subjects" ("id", "name", "description", "order", "isActive", "createdAt", "updatedAt")
@@ -510,9 +510,9 @@ VALUES
 -- 9. 테스트용 학생 계정 생성 (비밀번호: Student123!)
 INSERT INTO "users" ("id", "username", "passwordHash", "role", "name", "phone", "phoneVerifiedAt", "companyId", "createdAt", "updatedAt")
 VALUES 
-('student001', 'student1', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', '김철수', '01011111111', NOW(), 'company001', NOW(), NOW()),
-('student002', 'student2', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', '이영희', '01022222222', NOW(), 'company001', NOW(), NOW()),
-('student003', 'student3', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', '박민수', '01033333333', NOW(), 'company001', NOW(), NOW());
+('student001', 'student1', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', '손흥민', '01011111111', NOW(), 'company001', NOW(), NOW()),
+('student002', 'student2', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', '이강인', '01022222222', NOW(), 'company001', NOW(), NOW()),
+('student003', 'student3', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', '김민재', '01033333333', NOW(), 'company001', NOW(), NOW());
 
 -- ========== 완료! ==========
 -- 
@@ -523,7 +523,6 @@ VALUES
 -- 학생2: student2 / Student123!
 -- 학생3: student3 / Student123!
 --
--- 회사 초대코드: KIST24
+-- 회사 초대코드: KIST25
 -- 
 -- 3개 과목, 9개 강의, 30개 시험 문제가 생성되었습니다.
-
