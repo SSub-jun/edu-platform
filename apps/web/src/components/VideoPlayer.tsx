@@ -36,22 +36,10 @@ export default function VideoPlayer({
   const videoDurationRef = useRef(videoDuration);
   const onProgressRef = useRef(onProgress); // ✅ onProgress를 ref로 관리
 
-  // ✅ maxReachedSeconds props 변경 시 ref 업데이트 + 플레이어 시작 위치 설정
+  // ✅ maxReachedSeconds props 변경 시 ref 업데이트
   useEffect(() => {
     maxReachedRef.current = maxReachedSeconds;
     console.log('🎯 [VideoPlayer] maxReachedSeconds updated:', maxReachedSeconds);
-    
-    // 플레이어가 이미 로드되어 있고, 현재 시점이 0초(처음)이면 maxReached로 이동
-    if (playerRef.current && maxReachedSeconds > 0) {
-      const currentTime = playerRef.current.currentTime();
-      const duration = playerRef.current.duration();
-      
-      // 현재 시점이 0초이고, maxReached가 유효한 범위 내이면 이동
-      if (currentTime === 0 && duration > 0 && maxReachedSeconds < duration) {
-        console.log('🎯 [VideoPlayer] Seeking to maxReached:', maxReachedSeconds);
-        playerRef.current.currentTime(maxReachedSeconds);
-      }
-    }
   }, [maxReachedSeconds]);
 
   // ✅ onProgress를 항상 최신 값으로 유지
@@ -134,31 +122,43 @@ export default function VideoPlayer({
         
         if (!seekBar) return;
 
-        // calculateDistance 메서드 오버라이드
-        const originalCalculateDistance = seekBar.calculateDistance.bind(seekBar);
+        // handleMouseDown 메서드 오버라이드 (클릭/드래그 시작)
+        const originalHandleMouseDown = seekBar.handleMouseDown.bind(seekBar);
         
-        seekBar.calculateDistance = function(event: MouseEvent | TouchEvent) {
-          const distance = originalCalculateDistance(event);
+        seekBar.handleMouseDown = function(event: MouseEvent | TouchEvent) {
           const duration = player.duration() || 0;
-          
-          if (duration <= 0) return distance;
-
-          // maxReached를 비율로 변환 (+ 0.5초 버퍼)
-          const maxPct = (maxReachedRef.current + 0.5) / duration;
-          
-          // 🔒 클램프: 사용자가 미수강 구간 클릭 시 maxReached로 제한
-          const clampedDistance = Math.min(distance, maxPct);
-          
-          // 디버그 로그 (클램프 발생 시에만)
-          if (distance > maxPct) {
-            console.log('🔒 [SeekBar] Clamped:', {
-              requested: `${(distance * 100).toFixed(1)}%`,
-              allowed: `${(maxPct * 100).toFixed(1)}%`,
-              maxReached: maxReachedRef.current.toFixed(2),
-            });
+          if (duration <= 0) {
+            return originalHandleMouseDown(event);
           }
+
+          // 클릭 위치 계산
+          const rect = seekBar.el().getBoundingClientRect();
+          const clientX = 'touches' in event ? event.touches[0].clientX : event.clientX;
+          const clickX = clientX - rect.left;
+          const clickRatio = Math.max(0, Math.min(1, clickX / rect.width));
+          const requestedTime = clickRatio * duration;
+
+          // maxReached 체크 (+ 0.5초 버퍼)
+          const maxAllowedTime = maxReachedRef.current + 0.5;
           
-          return clampedDistance;
+          if (requestedTime > maxAllowedTime) {
+            // 🔒 미수강 구간 클릭: maxReached로 이동
+            console.log('🔒 [SeekBar] Blocked seek:', {
+              requested: requestedTime.toFixed(2),
+              allowed: maxAllowedTime.toFixed(2),
+            });
+            player.currentTime(maxReachedRef.current);
+            event.preventDefault();
+            event.stopPropagation();
+            return;
+          }
+
+          // ✅ 수강한 구간 클릭: 정상 처리
+          console.log('✅ [SeekBar] Allowed seek:', {
+            requested: requestedTime.toFixed(2),
+            maxReached: maxReachedRef.current.toFixed(2),
+          });
+          originalHandleMouseDown(event);
         };
       };
 
@@ -202,13 +202,17 @@ export default function VideoPlayer({
       });
 
       // 📊 Metadata 로드 완료: 이어보기
+      let hasInitialSeek = false; // 초기 시크 플래그
+      
       player.on('loadedmetadata', () => {
         const duration = player.duration() || 0;
         videoDurationRef.current = duration;
 
-        // 이어보기: maxReached 위치로 이동
-        if (maxReachedRef.current > 0 && maxReachedRef.current < duration) {
+        // 이어보기: maxReached 위치로 이동 (한 번만)
+        if (!hasInitialSeek && maxReachedRef.current > 0 && maxReachedRef.current < duration) {
+          console.log('🎯 [VideoPlayer] Initial seek to maxReached:', maxReachedRef.current);
           player.currentTime(maxReachedRef.current);
+          hasInitialSeek = true;
         }
 
         // Watched Overlay 업데이트
