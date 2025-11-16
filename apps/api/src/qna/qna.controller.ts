@@ -1,7 +1,7 @@
-import { Controller, Get, Post, Body, Request } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { Controller, Get, Post, Delete, Body, Param, Request } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam } from '@nestjs/swagger';
 import { IsString, IsNotEmpty } from 'class-validator';
-import { Auth } from '../auth/decorators/auth.decorator';
+import { Auth, Roles } from '../auth/decorators/auth.decorator';
 import { PrismaService } from '../prisma/prisma.service';
 
 class QnaPostDto {
@@ -106,5 +106,40 @@ export class QnaController {
         createdAt: 'desc'
       }
     });
+  }
+
+  @Delete('posts/:id')
+  @Auth()
+  @Roles('admin', 'instructor')
+  @ApiOperation({ summary: '질문 삭제 (관리자/강사)' })
+  @ApiParam({ name: 'id', description: '질문 ID' })
+  @ApiResponse({ status: 200, description: '질문 삭제 성공' })
+  async deletePost(@Param('id') postId: string) {
+    // Cascade로 답변도 함께 삭제됨
+    await this.prisma.qnaPost.delete({
+      where: { id: postId }
+    });
+
+    return {
+      success: true,
+      message: '질문이 삭제되었습니다.'
+    };
+  }
+
+  @Delete('replies/:id')
+  @Auth()
+  @Roles('admin', 'instructor')
+  @ApiOperation({ summary: '답변 삭제 (관리자/강사)' })
+  @ApiParam({ name: 'id', description: '답변 ID' })
+  @ApiResponse({ status: 200, description: '답변 삭제 성공' })
+  async deleteReply(@Param('id') replyId: string) {
+    await this.prisma.qnaReply.delete({
+      where: { id: replyId }
+    });
+
+    return {
+      success: true,
+      message: '답변이 삭제되었습니다.'
+    };
   }
 }
