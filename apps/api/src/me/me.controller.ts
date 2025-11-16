@@ -47,8 +47,6 @@ export class MeController {
           select: {
             id: true,
             name: true,
-            startDate: true,
-            endDate: true,
             isActive: true,
           }
         }
@@ -81,10 +79,14 @@ export class MeController {
     
     // 사용자의 활성 Cohort 조회
     const userCohorts = await this.prisma.userCohort.findMany({
-      where: { userId },
+      where: { 
+        userId,
+        cohort: {
+          isActive: true
+        }
+      },
       include: {
         cohort: {
-          where: { isActive: true },
           include: {
             company: true,
             cohortSubjects: {
