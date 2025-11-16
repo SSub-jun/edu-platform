@@ -247,17 +247,15 @@ export default function VideoPlayer({
 
       // ✅ 사용자가 아직 안 본 부분으로 이동하려고 하면 즉시 차단
       if (currentTime > allowed) {
-        const rollback = maxAllowedRef.current;
-        console.warn('🔒 [VideoPlayer] Seek blocked during seeking', {
+        console.warn('🔒 [VideoPlayer] Seek blocked - staying at current position', {
           requested: currentTime.toFixed(2),
           maxAllowed: maxAllowedRef.current.toFixed(2),
-          rollback: rollback.toFixed(2),
+          stayingAt: lastSafeTimeRef.current.toFixed(2),
         });
         
-        // 즉시 되돌림
+        // ✅ 현재 위치(lastSafeTime)로 되돌림 (maxAllowed가 아닌 현재 재생 위치)
         isProgrammaticSeekRef.current = true;
-        video.currentTime = rollback;
-        lastSafeTimeRef.current = rollback;
+        video.currentTime = lastSafeTimeRef.current;
         
         // seeked 이벤트에서 플래그 해제
         return;
@@ -296,11 +294,12 @@ export default function VideoPlayer({
         });
       } else {
         // ✅ 만약 seeking에서 놓친 경우를 위한 fallback (이중 안전장치)
-        const rollback = maxAllowedRef.current;
+        // 현재 재생 위치로 되돌림 (maxAllowed가 아닌 lastSafeTime)
+        const rollback = lastSafeTimeRef.current;
         console.warn('🔒 [VideoPlayer] Fallback: Seek blocked in seeked event', {
           requested: currentTime.toFixed(2),
           maxAllowed: maxAllowedRef.current.toFixed(2),
-          rollback: rollback.toFixed(2),
+          stayingAt: rollback.toFixed(2),
         });
         forceSeek(rollback, 'seek-guard-fallback');
         isUserSeekingRef.current = false;
