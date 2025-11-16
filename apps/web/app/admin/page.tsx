@@ -209,7 +209,7 @@ export default function AdminPage() {
             transition: 'transform 0.2s, box-shadow 0.2s',
             cursor: 'pointer'
           }}
-          onClick={() => router.push('/admin/users')}
+          onClick={() => router.push('/admin/students')}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = 'translateY(-4px)';
             e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
