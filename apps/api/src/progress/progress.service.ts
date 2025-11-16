@@ -608,7 +608,7 @@ export class ProgressService {
           userId_subjectId_cohortId: {
             userId,
             subjectId,
-            cohortId: null
+            cohortId: null as any
           }
         },
         data: {
