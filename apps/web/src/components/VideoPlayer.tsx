@@ -15,12 +15,12 @@ interface VideoPlayerProps {
 }
 
 /**
- * VideoPlayer - Video.js + CustomSeekBar (클램프 방식)
+ * VideoPlayer - Video.js 기반 비디오 플레이어
  * 
- * Phase 1: SeekBar 클램프 구현
- * - CustomSeekBar에서 사전 차단
- * - "되돌리기" 로직 없음
- * - 영상 멈춤 방지
+ * 기능:
+ * - 이어보기: maxReachedSeconds 위치부터 재생
+ * - SeekBar 제한: 수강한 구간만 이동 가능
+ * - 진도 추적: maxReachedSeconds 실시간 업데이트
  */
 export default function VideoPlayer({
   src,
