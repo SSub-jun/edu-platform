@@ -68,11 +68,11 @@ export class CompanyResponseDto {
   @ApiProperty({ description: '회사명' })
   name: string;
 
-  @ApiProperty({ description: '수강 시작일' })
-  startDate: string;
+  @ApiProperty({ description: '수강 시작일', nullable: true })
+  startDate: string | null;
 
-  @ApiProperty({ description: '수강 종료일' })
-  endDate: string;
+  @ApiProperty({ description: '수강 종료일', nullable: true })
+  endDate: string | null;
 
   @ApiProperty({ description: '초대코드' })
   inviteCode: string;
