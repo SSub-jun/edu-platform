@@ -128,15 +128,38 @@ export default function VideoPlayer({
         const target = Math.min(maxReachedRef.current, Math.max(duration - 0.5, 0));
         let attempts = 0;
 
+        const applyCurrentTime = (time: number) => {
+          try {
+            player.currentTime(time);
+          } catch (err) {
+            console.warn('[VideoPlayer] Failed to set player.currentTime', err);
+          }
+
+          const nativeVideo = player.el()?.querySelector('video') as HTMLVideoElement | null;
+          if (nativeVideo) {
+            try {
+              if (nativeVideo.fastSeek) {
+                nativeVideo.fastSeek(time).catch(() => {
+                  nativeVideo.currentTime = time;
+                });
+              } else {
+                nativeVideo.currentTime = time;
+              }
+            } catch (err) {
+              console.warn('[VideoPlayer] Failed to set native video time', err);
+            }
+          }
+        };
+
         const trySeek = () => {
           attempts += 1;
-          player.currentTime(target);
+          applyCurrentTime(target);
 
           setTimeout(() => {
             const actual = player.currentTime() || 0;
             const diff = Math.abs(actual - target);
 
-            if (diff > 0.35 && attempts < 5) {
+            if (diff > 0.5 && attempts < 6) {
               console.log('⏳ [VideoPlayer] Seek mismatch, retrying...', {
                 reason,
                 attempt: attempts,
@@ -146,7 +169,7 @@ export default function VideoPlayer({
               });
               trySeek();
             } else {
-              console.log('✅ [VideoPlayer] Seek confirmed:', {
+              console.log(diff <= 0.5 ? '✅ [VideoPlayer] Seek confirmed:' : '⚠️ [VideoPlayer] Seek giving up:', {
                 reason,
                 attempt: attempts,
                 target: target.toFixed(2),
@@ -154,7 +177,7 @@ export default function VideoPlayer({
                 diff: diff.toFixed(2),
               });
             }
-          }, 120);
+          }, 160);
         };
 
         trySeek();
