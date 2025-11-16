@@ -60,6 +60,10 @@ export default function CurriculumPage() {
       const response = await rawResponse.json();
       const data = response.data || [];
 
+      console.log('[CURRICULUM] API Response:', response);
+      console.log('[CURRICULUM] Data length:', data.length);
+      console.log('[CURRICULUM] Data:', data);
+
       // API 응답 형태: [{ subject: {...}, lessons: [...], remainingDays: number }]
       if (data.length > 0) {
         // 수강 기간 정보 설정 (첫 번째 항목에서 가져옴)
