@@ -145,6 +145,12 @@ class AuthClient {
           isRefreshing: this.isRefreshing
         });
 
+        // 로그인 요청은 인터셉터에서 제외 (로그인 실패를 토큰 갱신 실패로 처리하지 않음)
+        if (originalRequest?.url?.includes('/auth/login') || originalRequest?.url?.includes('/auth/register')) {
+          console.log('[AUTH_CLIENT] Skipping interceptor for auth endpoints');
+          return Promise.reject(error);
+        }
+
         if (error.response?.status === 401 && !originalRequest._retry) {
           if (this.isRefreshing) {
             // 이미 갱신 중이면 큐에 추가
