@@ -158,7 +158,9 @@ export default function CurriculumPage() {
     }
     
     // 3. 모든 레슨이 완료된 경우 첫 번째 레슨으로 (복습용)
-    router.push(`/lesson/${sortedLessons[0].id}`);
+    if (sortedLessons[0]) {
+      router.push(`/lesson/${sortedLessons[0].id}`);
+    }
   };
 
   // 인증 로딩 중
