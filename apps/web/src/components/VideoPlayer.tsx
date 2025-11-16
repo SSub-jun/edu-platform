@@ -257,17 +257,25 @@ export default function VideoPlayer({
         return;
       }
 
-      const allowed = maxAllowedRef.current + 0.2;
+      // ✅ 이미 본 부분(maxAllowed 이하)은 자유롭게 이동 가능
+      // ✅ 아직 안 본 부분(maxAllowed 초과)은 막음
+      const allowed = maxAllowedRef.current + 0.5; // 약간의 여유 (0.5초)
       if (currentTime <= allowed) {
+        // 허용된 범위 내 - 정상 seek
         lastSafeTimeRef.current = currentTime;
         isUserSeekingRef.current = false;
+        console.log('✅ [VideoPlayer] Seek allowed within watched area', {
+          requested: currentTime.toFixed(2),
+          maxAllowed: maxAllowedRef.current.toFixed(2),
+        });
         return;
       }
 
+      // 허용된 범위 초과 - seek 차단하고 되돌림
       const rollback = Math.max(seekStartRef.current, maxAllowedRef.current);
-      console.warn('🔒 [VideoPlayer] Seek blocked beyond allowed progress', {
+      console.warn('🔒 [VideoPlayer] Seek blocked beyond watched area', {
         requested: currentTime.toFixed(2),
-        allowed: maxAllowedRef.current.toFixed(2),
+        maxAllowed: maxAllowedRef.current.toFixed(2),
         rollback: rollback.toFixed(2),
       });
       forceSeek(rollback, 'seek-guard');
