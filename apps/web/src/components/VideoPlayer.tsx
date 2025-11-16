@@ -139,14 +139,17 @@ export default function VideoPlayer({
           if (nativeVideo) {
             try {
               if (nativeVideo.fastSeek) {
-                nativeVideo.fastSeek(time).catch(() => {
-                  nativeVideo.currentTime = time;
-                });
+                nativeVideo.fastSeek(time);
               } else {
                 nativeVideo.currentTime = time;
               }
             } catch (err) {
-              console.warn('[VideoPlayer] Failed to set native video time', err);
+              console.warn('[VideoPlayer] Failed to set native video time, fallback currentTime', err);
+              try {
+                nativeVideo.currentTime = time;
+              } catch (innerErr) {
+                console.warn('[VideoPlayer] Native fallback also failed', innerErr);
+              }
             }
           }
         };
