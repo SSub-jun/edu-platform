@@ -36,15 +36,27 @@ export default function AdminPage() {
           display: 'flex', 
           justifyContent: 'space-between', 
           alignItems: 'center',
-          marginBottom: '30px'
+          marginBottom: '30px',
+          paddingBottom: '20px',
+          borderBottom: '2px solid #e0e0e0'
         }}>
-          <h1 style={{ 
-            fontSize: '28px', 
-            fontWeight: 'bold',
-            color: '#333'
-          }}>
-            관리자 대시보드
-          </h1>
+          <div>
+            <h1 style={{ 
+              fontSize: '28px', 
+              fontWeight: 'bold',
+              color: '#333',
+              margin: '0 0 8px 0'
+            }}>
+              관리자 대시보드
+            </h1>
+            <p style={{ 
+              fontSize: '14px', 
+              color: '#666',
+              margin: 0
+            }}>
+              교육 플랫폼의 모든 콘텐츠와 운영을 관리하세요
+            </p>
+          </div>
           <button
             onClick={handleLogout}
             style={{
@@ -52,9 +64,10 @@ export default function AdminPage() {
               backgroundColor: '#dc3545',
               color: 'white',
               border: 'none',
-              borderRadius: '4px',
+              borderRadius: '6px',
               cursor: 'pointer',
-              fontSize: '14px'
+              fontSize: '14px',
+              fontWeight: '500'
             }}
           >
             로그아웃
@@ -63,152 +76,333 @@ export default function AdminPage() {
 
         <div style={{ 
           display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
-          gap: '25px'
+          gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
+          gap: '20px'
         }}>
-          {/* 회사 & 기수 관리 */}
+          {/* 회사 관리 */}
           <div style={{
-            padding: '25px',
+            padding: '24px',
             border: '1px solid #e0e0e0',
             borderRadius: '12px',
-            backgroundColor: '#f8f9fa',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+            backgroundColor: '#ffffff',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+            transition: 'transform 0.2s, box-shadow 0.2s',
+            cursor: 'pointer'
+          }}
+          onClick={() => router.push('/admin/companies')}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-4px)';
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)';
           }}>
-            <h3 style={{ 
-              marginBottom: '10px', 
-              color: '#333',
-              fontSize: '20px',
-              fontWeight: 'bold',
+            <div style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '12px',
+              backgroundColor: '#e3f2fd',
               display: 'flex',
               alignItems: 'center',
-              gap: '8px'
+              justifyContent: 'center',
+              fontSize: '24px',
+              marginBottom: '16px'
             }}>
-              🏢 회사 & 기수 관리
+              🏢
+            </div>
+            <h3 style={{ 
+              marginBottom: '8px', 
+              color: '#333',
+              fontSize: '18px',
+              fontWeight: 'bold'
+            }}>
+              회사 관리
             </h3>
             <p style={{ 
               color: '#666', 
-              marginBottom: '20px',
+              marginBottom: '16px',
               fontSize: '14px',
               lineHeight: '1.5'
             }}>
-              Cohort 기반 운영 화면을 준비 중입니다. 그 전까지는 기존 회사 관리 화면을 통해 기관 정보를 확인해주세요.
+              교육 기관 등록, 초대코드 발급, 기수(Cohort) 생성 및 과목/학생 배정
             </p>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <button 
-                onClick={() => router.push('/admin/companies')}
-                style={{
-                  padding: '12px 16px',
-                  backgroundColor: '#0070f3',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}
-              >
-                🏢 회사 목록 열기
-              </button>
-              
-              <div style={{
-                padding: '12px 16px',
-                backgroundColor: '#e9ecef',
-                color: '#5c636a',
-                borderRadius: '6px',
-                fontSize: '13px',
-                lineHeight: '1.5'
-              }}>
-                새 Cohort 관리 UI가 곧 제공될 예정입니다. 기존 회사/과목 배정 화면은 더 이상 노출하지 않습니다.
-              </div>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              color: '#0070f3',
+              fontSize: '14px',
+              fontWeight: '500'
+            }}>
+              관리하기 →
             </div>
           </div>
 
-          {/* 콘텐츠 & 시험 관리 */}
+          {/* 과목 관리 */}
           <div style={{
-            padding: '25px',
+            padding: '24px',
             border: '1px solid #e0e0e0',
             borderRadius: '12px',
-            backgroundColor: '#f8f9fa',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+            backgroundColor: '#ffffff',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+            transition: 'transform 0.2s, box-shadow 0.2s',
+            cursor: 'pointer'
+          }}
+          onClick={() => router.push('/admin/subjects')}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-4px)';
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)';
           }}>
-            <h3 style={{ 
-              marginBottom: '10px', 
-              color: '#333',
-              fontSize: '20px',
-              fontWeight: 'bold',
+            <div style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '12px',
+              backgroundColor: '#f3e5f5',
               display: 'flex',
               alignItems: 'center',
-              gap: '8px'
+              justifyContent: 'center',
+              fontSize: '24px',
+              marginBottom: '16px'
             }}>
-              📚 콘텐츠 & 시험 관리
+              📚
+            </div>
+            <h3 style={{ 
+              marginBottom: '8px', 
+              color: '#333',
+              fontSize: '18px',
+              fontWeight: 'bold'
+            }}>
+              과목 관리
             </h3>
             <p style={{ 
               color: '#666', 
-              marginBottom: '20px',
+              marginBottom: '16px',
               fontSize: '14px',
               lineHeight: '1.5'
             }}>
-              과목/레슨/시험 문제 관리 화면을 새로 만들고 있습니다. 개편이 완료되면 여기에서 바로 접근할 수 있어요.
+              과목 생성/수정, 레슨 구성, 영상 업로드, 시험 문제 출제
             </p>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <div style={{
-                padding: '12px 16px',
-                border: '1px dashed #adb5bd',
-                borderRadius: '6px',
-                color: '#495057',
-                backgroundColor: '#fff'
-              }}>
-                ✅ 목표<br />
-                - 과목 상세에서 레슨·영상·시험을 한 번에 관리<br />
-                - 문제 은행 / 보기 / 해설 / 미리보기 지원<br />
-                - 업로드 파이프라인 정리
-              </div>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              color: '#9c27b0',
+              fontSize: '14px',
+              fontWeight: '500'
+            }}>
+              관리하기 →
             </div>
           </div>
 
-          {/* 운영 지원 안내 */}
+          {/* 학생 관리 */}
           <div style={{
-            padding: '25px',
+            padding: '24px',
             border: '1px solid #e0e0e0',
             borderRadius: '12px',
-            backgroundColor: '#fff8e1',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+            backgroundColor: '#ffffff',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+            transition: 'transform 0.2s, box-shadow 0.2s',
+            cursor: 'pointer'
+          }}
+          onClick={() => router.push('/admin/users')}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-4px)';
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)';
           }}>
-            <h3 style={{ 
-              marginBottom: '10px', 
-              color: '#8a6d3b',
-              fontSize: '20px',
-              fontWeight: 'bold',
+            <div style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '12px',
+              backgroundColor: '#e8f5e9',
               display: 'flex',
               alignItems: 'center',
-              gap: '8px'
+              justifyContent: 'center',
+              fontSize: '24px',
+              marginBottom: '16px'
             }}>
-              🛠️ 운영 도구 개편 안내
+              👥
+            </div>
+            <h3 style={{ 
+              marginBottom: '8px', 
+              color: '#333',
+              fontSize: '18px',
+              fontWeight: 'bold'
+            }}>
+              학생 관리
             </h3>
             <p style={{ 
-              color: '#7a5d2f', 
-              marginBottom: '20px',
+              color: '#666', 
+              marginBottom: '16px',
               fontSize: '14px',
-              lineHeight: '1.6'
+              lineHeight: '1.5'
             }}>
-              계정 관리, 포털 시험, Q&A 통계 등 구버전 메뉴는 일시적으로 숨겼습니다. 필요 시 운영팀을 통해 직접 지원받아 주세요.
+              학생 계정 생성, 회사 배정, 기수 등록, 진도 및 시험 결과 조회
             </p>
-            <ul style={{ 
-              margin: 0, 
-              paddingLeft: '20px', 
-              color: '#7a5d2f', 
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              color: '#4caf50',
               fontSize: '14px',
-              lineHeight: '1.6'
+              fontWeight: '500'
             }}>
-              <li>강사/학생 계정은 초대코드 기반 가입으로 전환</li>
-              <li>포털 시험 기능은 별도 프로젝트로 분리</li>
-              <li>Q&A 분석은 backend API 정리 후 재도입 예정</li>
-            </ul>
+              관리하기 →
+            </div>
+          </div>
+
+          {/* Q&A 관리 */}
+          <div style={{
+            padding: '24px',
+            border: '1px solid #e0e0e0',
+            borderRadius: '12px',
+            backgroundColor: '#ffffff',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+            transition: 'transform 0.2s, box-shadow 0.2s',
+            cursor: 'pointer'
+          }}
+          onClick={() => router.push('/admin/qna')}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-4px)';
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)';
+          }}>
+            <div style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '12px',
+              backgroundColor: '#fff3e0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '24px',
+              marginBottom: '16px'
+            }}>
+              💬
+            </div>
+            <h3 style={{ 
+              marginBottom: '8px', 
+              color: '#333',
+              fontSize: '18px',
+              fontWeight: 'bold'
+            }}>
+              Q&A 관리
+            </h3>
+            <p style={{ 
+              color: '#666', 
+              marginBottom: '16px',
+              fontSize: '14px',
+              lineHeight: '1.5'
+            }}>
+              학생 질문 확인 및 답변, 자주 묻는 질문(FAQ) 관리
+            </p>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              color: '#ff9800',
+              fontSize: '14px',
+              fontWeight: '500'
+            }}>
+              관리하기 →
+            </div>
+          </div>
+        </div>
+
+        {/* 빠른 통계 */}
+        <div style={{
+          marginTop: '30px',
+          padding: '24px',
+          border: '1px solid #e0e0e0',
+          borderRadius: '12px',
+          backgroundColor: '#f8f9fa'
+        }}>
+          <h3 style={{
+            fontSize: '18px',
+            fontWeight: 'bold',
+            color: '#333',
+            marginBottom: '16px'
+          }}>
+            📊 빠른 통계 (준비 중)
+          </h3>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+            gap: '16px'
+          }}>
+            <div style={{
+              padding: '16px',
+              backgroundColor: 'white',
+              borderRadius: '8px',
+              border: '1px solid #e0e0e0'
+            }}>
+              <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>전체 회사</div>
+              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#333' }}>-</div>
+            </div>
+            <div style={{
+              padding: '16px',
+              backgroundColor: 'white',
+              borderRadius: '8px',
+              border: '1px solid #e0e0e0'
+            }}>
+              <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>활성 기수</div>
+              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#333' }}>-</div>
+            </div>
+            <div style={{
+              padding: '16px',
+              backgroundColor: 'white',
+              borderRadius: '8px',
+              border: '1px solid #e0e0e0'
+            }}>
+              <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>전체 학생</div>
+              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#333' }}>-</div>
+            </div>
+            <div style={{
+              padding: '16px',
+              backgroundColor: 'white',
+              borderRadius: '8px',
+              border: '1px solid #e0e0e0'
+            }}>
+              <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>등록 과목</div>
+              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#333' }}>-</div>
+            </div>
+          </div>
+        </div>
+
+        {/* 안내 메시지 */}
+        <div style={{
+          marginTop: '20px',
+          padding: '16px 20px',
+          backgroundColor: '#e3f2fd',
+          borderRadius: '8px',
+          border: '1px solid #90caf9'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '12px'
+          }}>
+            <div style={{ fontSize: '20px' }}>ℹ️</div>
+            <div>
+              <div style={{ fontSize: '14px', fontWeight: '600', color: '#1565c0', marginBottom: '4px' }}>
+                Cohort 기반 운영 시스템
+              </div>
+              <div style={{ fontSize: '13px', color: '#1976d2', lineHeight: '1.5' }}>
+                회사별 기수(Cohort)를 생성하고, 각 기수에 과목과 학생을 배정하여 6개월 단위 교육을 효율적으로 관리할 수 있습니다.
+                회사 관리 페이지에서 "Cohort 관리" 버튼을 눌러 시작하세요.
+              </div>
+            </div>
           </div>
         </div>
       </div>
