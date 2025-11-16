@@ -119,6 +119,47 @@ export default function VideoPlayer({
         watchedOverlay.style.width = `${Math.min(maxPct, 100)}%`;
       };
 
+      // 🎯 이어보기 위치 보장 함수
+      const ensureSeekToMaxReached = (reason: string) => {
+        if (!player || maxReachedRef.current <= 0) return;
+        const duration = player.duration() || 0;
+        if (duration <= 0) return;
+
+        const target = Math.min(maxReachedRef.current, Math.max(duration - 0.5, 0));
+        let attempts = 0;
+
+        const trySeek = () => {
+          attempts += 1;
+          player.currentTime(target);
+
+          setTimeout(() => {
+            const actual = player.currentTime() || 0;
+            const diff = Math.abs(actual - target);
+
+            if (diff > 0.35 && attempts < 5) {
+              console.log('⏳ [VideoPlayer] Seek mismatch, retrying...', {
+                reason,
+                attempt: attempts,
+                target: target.toFixed(2),
+                actual: actual.toFixed(2),
+                diff: diff.toFixed(2),
+              });
+              trySeek();
+            } else {
+              console.log('✅ [VideoPlayer] Seek confirmed:', {
+                reason,
+                attempt: attempts,
+                target: target.toFixed(2),
+                actual: actual.toFixed(2),
+                diff: diff.toFixed(2),
+              });
+            }
+          }, 120);
+        };
+
+        trySeek();
+      };
+
       // 🔒 SeekBar 클램프 설정 (seeking 이벤트 가로채기)
       const setupSeekBarClamp = () => {
         let isCorrectingSeeking = false;
@@ -148,12 +189,12 @@ export default function VideoPlayer({
             isCorrectingSeeking = true;
             
             // maxReached로 되돌림
-            player.currentTime(maxReachedRef.current);
+            ensureSeekToMaxReached('blocked-seek');
             
             // 플래그 해제
             setTimeout(() => {
               isCorrectingSeeking = false;
-            }, 100);
+            }, 150);
           } else {
             // 수강 구간으로 시크: 정상 처리
             console.log('✅ [SeekBar] Allowed seek:', {
@@ -221,9 +262,23 @@ export default function VideoPlayer({
         
         // 이어보기: maxReached 위치로 이동 (한 번만)
         if (!hasInitialSeek && maxReachedRef.current > 0 && maxReachedRef.current < duration) {
-          console.log('🎯 [VideoPlayer] Initial seek to maxReached:', maxReachedRef.current);
-          player.currentTime(maxReachedRef.current);
+          console.log('🎯 [VideoPlayer] Initial seek requested:', {
+            target: maxReachedRef.current.toFixed(2),
+            duration: duration.toFixed(2),
+          });
+          ensureSeekToMaxReached('initial-canplay');
           hasInitialSeek = true;
+        }
+      });
+
+      player.on('play', () => {
+        const currentTime = player.currentTime() || 0;
+        if (maxReachedRef.current > 0 && currentTime < maxReachedRef.current - 0.5) {
+          console.log('🎯 [VideoPlayer] Play ensure seek:', {
+            currentTime: currentTime.toFixed(2),
+            target: maxReachedRef.current.toFixed(2),
+          });
+          ensureSeekToMaxReached('play');
         }
       });
 
