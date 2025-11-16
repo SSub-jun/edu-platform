@@ -80,11 +80,24 @@ export default function LoginPage() {
         }, 100);
       } else {
         console.error(`[LOGIN_PAGE] Login failed:`, result.error);
-        setError(result.error || '로그인에 실패했습니다.');
+        // 더 명확한 에러 메시지 표시
+        const errorMessage = result.error || '로그인에 실패했습니다.';
+        if (errorMessage.includes('Invalid') || errorMessage.includes('credentials') || errorMessage.includes('Unauthorized')) {
+          setError('아이디 또는 비밀번호가 올바르지 않습니다.');
+        } else {
+          setError(errorMessage);
+        }
       }
-    } catch (error) {
-      setError('로그인 중 오류가 발생했습니다.');
-      console.error(error);
+    } catch (error: any) {
+      console.error('[LOGIN_PAGE] Login error:', error);
+      // 네트워크 오류와 인증 오류 구분
+      if (error.response?.status === 401) {
+        setError('아이디 또는 비밀번호가 올바르지 않습니다.');
+      } else if (error.message?.includes('Network')) {
+        setError('서버에 연결할 수 없습니다. 네트워크 연결을 확인해주세요.');
+      } else {
+        setError('로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+      }
     } finally {
       setLoading(false);
     }
