@@ -137,7 +137,7 @@ export default function VideoPlayer({
 
           // 클릭 위치 계산
           const rect = seekBar.el().getBoundingClientRect();
-          const clientX = 'touches' in event ? event.touches[0].clientX : event.clientX;
+          const clientX = 'touches' in event ? (event.touches[0]?.clientX ?? 0) : (event as MouseEvent).clientX;
           const clickX = clientX - rect.left;
           const clickRatio = Math.max(0, Math.min(1, clickX / rect.width));
           const requestedTime = clickRatio * duration;
