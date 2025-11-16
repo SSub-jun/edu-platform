@@ -104,6 +104,7 @@ export default function VideoPlayer({
     let watchedOverlay: HTMLElement | null = null;
     let disposed = false;
     let detachKeyboard: (() => void) | null = null;
+    let detachNativeListeners: (() => void) | null = null;
 
     const initPlayer = async () => {
       const videojs = (await import('video.js')).default;
@@ -128,10 +129,33 @@ export default function VideoPlayer({
       });
 
       playerRef.current = player;
-      const tech = player.tech?.(true);
-      nativeVideoRef.current =
-        (tech?.el() as HTMLVideoElement | null) ??
-        (player.el()?.querySelector('video') as HTMLVideoElement | null);
+      const resolveNativeVideo = () => {
+        const tech = player.tech?.(true);
+        const techEl = (tech?.el && tech.el()) as HTMLVideoElement | null;
+        const fallbackEl = player.el()?.querySelector('video') as HTMLVideoElement | null;
+        const native = techEl ?? fallbackEl ?? videoRef.current;
+        nativeVideoRef.current = native;
+        if (!native) {
+          console.warn('[VideoPlayer] Native video element not found');
+        }
+        return native;
+      };
+
+      const attachNativeListeners = (native: HTMLVideoElement | null) => {
+        if (!native) return () => {};
+        const ensureInitial = () => applyInitialSeek();
+        native.addEventListener('loadedmetadata', ensureInitial);
+        native.addEventListener('loadeddata', ensureInitial);
+        native.addEventListener('canplay', ensureInitial);
+        return () => {
+          native.removeEventListener('loadedmetadata', ensureInitial);
+          native.removeEventListener('loadeddata', ensureInitial);
+          native.removeEventListener('canplay', ensureInitial);
+        };
+      };
+
+      const native = resolveNativeVideo();
+      detachNativeListeners = attachNativeListeners(native);
 
       const clampTimeToDuration = (time: number) => {
         const duration = player.duration() || videoDurationRef.current || 0;
@@ -155,6 +179,11 @@ export default function VideoPlayer({
         const target = clampTimeToDuration(time);
         isProgrammaticSeekRef.current = true;
 
+        console.log('🎬 [VideoPlayer] forceSeekBoth request', {
+          reason,
+          target: target.toFixed(2),
+        });
+
         try {
           nativeVideo.currentTime = target;
         } catch (err) {
@@ -166,6 +195,14 @@ export default function VideoPlayer({
         } catch (err) {
           console.warn('[VideoPlayer] Player seek failed', { reason, err });
         }
+
+        const nativeCurrent = nativeVideo.currentTime;
+        const playerCurrent = playerInstance.currentTime();
+        console.log('🎬 [VideoPlayer] forceSeekBoth applied', {
+          reason,
+          nativeCurrent: nativeCurrent?.toFixed?.(2),
+          playerCurrent: playerCurrent?.toFixed?.(2),
+        });
 
         lastSafeTimeRef.current = target;
 
@@ -203,7 +240,28 @@ export default function VideoPlayer({
             current: current.toFixed(2),
             guardTarget: guardTarget.toFixed(2),
           });
-          forceSeekBoth(guardTarget, 'drift-guard');
+          const native = nativeVideoRef.current;
+          const playerInstance = playerRef.current;
+          if (!native || !playerInstance) return true;
+
+          const target = clampTimeToDuration(guardTarget);
+          isProgrammaticSeekRef.current = true;
+
+          try {
+            native.currentTime = target;
+          } catch (err) {
+            console.warn('[VideoPlayer] Native drift correction failed', err);
+          }
+
+          playerInstance.currentTime(target);
+
+          playerInstance.one('seeked', () => {
+            lastSafeTimeRef.current = target;
+            window.setTimeout(() => {
+              isProgrammaticSeekRef.current = false;
+            }, 60);
+          });
+
           return true;
         }
         return false;
@@ -345,6 +403,10 @@ export default function VideoPlayer({
         if (detachKeyboard) {
           detachKeyboard();
         }
+        if (detachNativeListeners) {
+          detachNativeListeners();
+          detachNativeListeners = null;
+        }
         if (player && !player.isDisposed?.()) {
           player.dispose();
         }
@@ -362,6 +424,10 @@ export default function VideoPlayer({
       if (detachKeyboard) {
         detachKeyboard();
         detachKeyboard = null;
+      }
+      if (detachNativeListeners) {
+        detachNativeListeners();
+        detachNativeListeners = null;
       }
       if (player && !player.isDisposed?.()) {
         player.dispose();
