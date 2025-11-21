@@ -4,6 +4,7 @@ import "./globals.css";
 import QueryProvider from "../src/components/QueryProvider";
 import { MainNav } from "../src/components/MainNav";
 import { Toaster } from 'react-hot-toast';
+import { AuthProvider } from "../src/components/AuthProvider";
 
 const geistSans = localFont({
   src: [{ path: "./fonts/GeistVF.woff", weight: "100 900" }],
@@ -30,32 +31,34 @@ export default function RootLayout({
     <html lang="ko">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <QueryProvider>
-          <MainNav />
-          {children}
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              duration: 4000,
-              style: {
-                background: '#363636',
-                color: '#fff',
-              },
-              success: {
-                duration: 3000,
-                iconTheme: {
-                  primary: '#10b981',
-                  secondary: '#fff',
+          <AuthProvider>
+            <MainNav />
+            {children}
+            <Toaster
+              position="top-right"
+              toastOptions={{
+                duration: 4000,
+                style: {
+                  background: '#363636',
+                  color: '#fff',
                 },
-              },
-              error: {
-                duration: 5000,
-                iconTheme: {
-                  primary: '#ef4444',
-                  secondary: '#fff',
+                success: {
+                  duration: 3000,
+                  iconTheme: {
+                    primary: '#10b981',
+                    secondary: '#fff',
+                  },
                 },
-              },
-            }}
-          />
+                error: {
+                  duration: 5000,
+                  iconTheme: {
+                    primary: '#ef4444',
+                    secondary: '#fff',
+                  },
+                },
+              }}
+            />
+          </AuthProvider>
         </QueryProvider>
       </body>
     </html>

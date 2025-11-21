@@ -3,11 +3,12 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { authClient } from '../../lib/auth';
+import { useAuthContext } from '../../src/components/AuthProvider';
 
 export const useAuthGuard = () => {
   const router = useRouter();
+  const { user, isAuthenticated, isAuthLoading, refreshProfile } = useAuthContext();
   const [isLoading, setIsLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -23,12 +24,15 @@ export const useAuthGuard = () => {
         console.log(`  CURRENT_PATH: ${currentPath}`);
         console.log(`  SEARCH_PARAMS_REDIRECT: ${redirectParam}`);
 
-        // Auth 클라이언트에서 인증 상태 확인
-        const authenticated = authClient.isAuthenticated();
+        // AuthProvider에서 관리하는 인증 상태 활용
+        const baseAuthenticated = authClient.isAuthenticated();
+        const effectiveAuthenticated = baseAuthenticated && isAuthenticated;
+
+        console.log(`  AUTH_CLIENT_IS_AUTHENTICATED: ${baseAuthenticated}`);
+        console.log(`  CONTEXT_IS_AUTHENTICATED: ${isAuthenticated}`);
+        console.log(`  EFFECTIVE_AUTHENTICATED: ${effectiveAuthenticated}`);
         
-        console.log(`  IS_AUTHENTICATED: ${authenticated}`);
-        
-        if (!authenticated) {
+        if (!effectiveAuthenticated) {
           const redirect = redirectParam || currentPath || '/curriculum';
           const loginPath = `/login?redirect=${encodeURIComponent(redirect)}`;
           
@@ -47,64 +51,33 @@ export const useAuthGuard = () => {
 
         // 회사 배정 확인이 필요한 경우 (company-assign 페이지는 제외)
         if (needsCompanyAssignment && currentPath !== '/company-assign') {
-          try {
-            console.log(`[AUTH_GUARD] Checking company assignment status...`);
-            const response = await authClient.getApi().get('/me/profile');
-            
-            if (response.data.success) {
-              const user = response.data.data;
-              console.log(`  USER_ROLE: ${user.role}`);
-              console.log(`  USER_COMPANY_ASSIGNED: ${user.isCompanyAssigned}`);
-              
-              // 강사나 관리자는 회사 배정 체크를 건너뜀
-              if (user.role === 'instructor' || user.role === 'admin') {
-                console.log(`[AUTH_GUARD] Skipping company check for ${user.role}`);
-              } else if (!user.isCompanyAssigned) {
-                console.log(`[AUTH_GUARD REDIRECT] ${currentPath} -> /company-assign`);
-                console.log(`  REASON: Student without company assignment`);
-                router.push('/company-assign');
-                return;
-              }
-            }
-          } catch (error) {
-            console.error('[AUTH_GUARD ERROR] Company check failed:', error);
-            // 프로필 확인 실패 시에도 회사 배정 페이지로 이동
-            const isAxiosError = (err: unknown): err is { response?: { status?: number } } => {
-              return typeof err === 'object' && err !== null && 'response' in err;
-            };
-            
-            if (isAxiosError(error) && error.response?.status === 401) {
-              router.push('/login');
-            } else {
-              // 강사/관리자는 회사 배정 실패 시에도 진행
-              const token = localStorage.getItem('accessToken');
-              if (token) {
-                try {
-                  const tokenParts = token.split('.');
-                  if (tokenParts.length !== 3) {
-                    throw new Error('Invalid JWT token format');
-                  }
-                  const payload = JSON.parse(atob(tokenParts[1]!));
-                  if (payload.role === 'instructor' || payload.role === 'admin') {
-                    console.log(`[AUTH_GUARD] Company check failed but allowing ${payload.role} to proceed`);
-                  } else {
-                    router.push('/company-assign');
-                    return;
-                  }
-                } catch (e) {
-                  router.push('/company-assign');
-                  return;
-                }
-              } else {
-                router.push('/company-assign');
-                return;
-              }
-            }
+          // AuthProvider 프로필 정보 우선 사용
+          let role = user?.role;
+          let isCompanyAssigned = user?.isCompanyAssigned;
+
+          if (!user) {
+            console.log('[AUTH_GUARD] No user in context, refreshing profile...');
+            await refreshProfile();
+          }
+
+          role = role ?? user?.role;
+          isCompanyAssigned = isCompanyAssigned ?? user?.isCompanyAssigned;
+
+          console.log(`  USER_ROLE: ${role}`);
+          console.log(`  USER_COMPANY_ASSIGNED: ${isCompanyAssigned}`);
+
+          // 강사나 관리자는 회사 배정 체크를 건너뜀
+          if (role === 'instructor' || role === 'admin') {
+            console.log(`[AUTH_GUARD] Skipping company check for ${role}`);
+          } else if (!isCompanyAssigned) {
+            console.log(`[AUTH_GUARD REDIRECT] ${currentPath} -> /company-assign`);
+            console.log(`  REASON: Student without company assignment`);
+            router.push('/company-assign');
+            return;
           }
         }
 
-        console.log(`[AUTH_GUARD] Authentication confirmed, setting authenticated state`);
-        setIsAuthenticated(true);
+        console.log(`[AUTH_GUARD] Authentication confirmed (guard finished)`);
       } catch (error) {
         console.error('[AUTH_GUARD ERROR] Auth check failed:', error);
         router.push('/login');
@@ -113,8 +86,11 @@ export const useAuthGuard = () => {
       }
     };
 
-    checkAuth();
-  }, [router]);
+    // AuthProvider가 프로필 로딩을 끝낸 뒤에만 가드를 실행
+    if (!isAuthLoading) {
+      checkAuth();
+    }
+  }, [router, isAuthLoading, isAuthenticated, user, refreshProfile]);
 
   const logout = async () => {
     await authClient.logout();
@@ -122,7 +98,7 @@ export const useAuthGuard = () => {
 
   return {
     isAuthenticated,
-    isLoading,
+    isLoading: isLoading || isAuthLoading,
     logout,
   };
 };
