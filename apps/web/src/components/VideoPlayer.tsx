@@ -74,10 +74,16 @@ export default function VideoPlayer({
 
   useEffect(() => {
     // Make sure Video.js player is only initialized once
-    if (!playerRef.current && videoRef.current) {
-      console.log('🎬 [VideoPlayer] Initializing Video.js player');
+    if (!playerRef.current && videoRef.current && videoUrl) {
+      console.log('🎬 [VideoPlayer] Initializing Video.js player', { videoUrl });
       
       const videoElement = videoRef.current;
+      
+      // Check if element is in DOM
+      if (!videoElement.isConnected) {
+        console.warn('⚠️ [VideoPlayer] Video element not in DOM yet');
+        return;
+      }
       
       const player = videojs(videoElement, {
         controls: true,
@@ -90,7 +96,11 @@ export default function VideoPlayer({
           volumePanel: {
             inline: false
           }
-        }
+        },
+        sources: [{
+          src: videoUrl,
+          type: 'video/mp4'
+        }]
       });
 
       playerRef.current = player;
@@ -203,7 +213,19 @@ export default function VideoPlayer({
         playerRef.current = null;
       }
     };
-  }, [videoUrl, autoPlay, maxReachedSeconds, onProgress]);
+  }, []); // Empty dependency array - only initialize once
+
+  // Update video source when videoUrl changes
+  useEffect(() => {
+    const player = playerRef.current;
+    if (player && videoUrl && !player.isDisposed()) {
+      console.log('🔄 [VideoPlayer] Updating video source', { videoUrl });
+      player.src({
+        src: videoUrl,
+        type: 'video/mp4'
+      });
+    }
+  }, [videoUrl]);
 
   return (
     <div data-vjs-player style={{ width: '100%', maxWidth: '100%' }}>
@@ -212,7 +234,6 @@ export default function VideoPlayer({
         className="video-js vjs-big-play-centered"
         playsInline
       >
-        <source src={videoUrl} type="video/mp4" />
         <p className="vjs-no-js">
           To view this video please enable JavaScript, and consider upgrading to a
           web browser that supports HTML5 video
