@@ -422,6 +422,8 @@ export class AuthService {
       data: { companyId: company.id },
     });
 
+    await this.tryAutoAssignUserToCohort(userId, company.id);
+
     return {
       success: true,
       company: {
@@ -429,6 +431,97 @@ export class AuthService {
         name: company.name,
       },
     };
+  }
+
+  /**
+   * Cohort 자동 배정 기능 on/off 플래그
+   * - COHORT_AUTO_ASSIGN_ENABLED=false 로 설정하면 손쉽게 비활성화 가능
+   */
+  private isCohortAutoAssignEnabled() {
+    return (
+      this.configService.get<string>('COHORT_AUTO_ASSIGN_ENABLED', 'true') !==
+      'false'
+    );
+  }
+
+  /**
+   * 임시 자동 Cohort 배정 로직
+   * - 현재 운영중(start <= now <= end) Cohort 우선
+   * - 없다면 시작 전(start > now) Cohort 중 가장 빠른 기수
+   * - 추후 제거가 쉽도록 별도 메서드로 분리
+   */
+  private async tryAutoAssignUserToCohort(
+    userId: string,
+    companyId: string,
+  ) {
+    if (!this.isCohortAutoAssignEnabled()) {
+      return null;
+    }
+
+    const existingAssignment = await this.prisma.userCohort.findFirst({
+      where: {
+        userId,
+        cohort: {
+          companyId,
+        },
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (existingAssignment) {
+      return null;
+    }
+
+    const now = new Date();
+
+    const activeCohort = await this.prisma.cohort.findFirst({
+      where: {
+        companyId,
+        isActive: true,
+        startDate: { lte: now },
+        endDate: { gte: now },
+      },
+      orderBy: {
+        startDate: 'asc',
+      },
+    });
+
+    let targetCohort = activeCohort;
+
+    if (!targetCohort) {
+      targetCohort = await this.prisma.cohort.findFirst({
+        where: {
+          companyId,
+          isActive: true,
+          startDate: { gt: now },
+        },
+        orderBy: {
+          startDate: 'asc',
+        },
+      });
+    }
+
+    if (!targetCohort) {
+      return null;
+    }
+
+    await this.prisma.userCohort.upsert({
+      where: {
+        userId_cohortId: {
+          userId,
+          cohortId: targetCohort.id,
+        },
+      },
+      create: {
+        userId,
+        cohortId: targetCohort.id,
+      },
+      update: {},
+    });
+
+    return targetCohort;
   }
 
   // Mock 모드용 메서드 (기존 호환성 유지)
