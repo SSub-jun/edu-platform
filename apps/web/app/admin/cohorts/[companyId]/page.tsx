@@ -95,8 +95,9 @@ export default function CohortDashboardPage() {
       setCohorts(Array.isArray(cohortResponse.data) ? cohortResponse.data : []);
 
       // 전체 과목 목록 로드
-      const subjectsResponse = await authClient.getApi().get('/subjects');
-      setAllSubjects(Array.isArray(subjectsResponse.data) ? subjectsResponse.data : []);
+      const subjectsResponse = await authClient.getApi().get('/admin/subjects');
+      const subjectList = subjectsResponse.data?.data ?? subjectsResponse.data;
+      setAllSubjects(Array.isArray(subjectList) ? subjectList : []);
 
       // 회사 소속 학생 목록 로드
       const studentsResponse = await authClient.getApi().get(`/admin/users?role=student&companyId=${companyId}`);
