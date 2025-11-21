@@ -1,304 +1,36 @@
-/* Video.js Player Wrapper */
+/* Video.js player wrapper */
 .playerWrapper {
   width: 100%;
   max-width: 100%;
   margin: 0 auto;
-}
-
-.html5Video {
-  width: 100%;
-  height: auto;
-  border-radius: 12px;
-  background: #000;
-  display: block;
-}
-
-.playerWrapper .video-js {
-  width: 100%;
-  height: auto;
-}
-
-.player {
-  background: var(--bg-primary);
+  background: black;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  border: 1px solid var(--border-primary);
-  transition: all 0.2s ease-in-out;
 }
 
-.player:hover {
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  transform: translateY(-2px);
-}
-
-.videoContainer {
-  position: relative;
-  aspect-ratio: 16 / 9;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--info) 50%, var(--success) 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+/* Video.js default styles are imported in the component */
+/* Additional custom styles can be added here if needed */
 
 .videoPlaceholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
+  padding: 4rem 2rem;
   text-align: center;
-  color: white;
-  height: 100%;
-  width: 100%;
-  position: relative;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 2px dashed #d1d5db;
 }
 
 .videoIcon {
-  font-size: 48px;
-  opacity: 0.9;
-  transition: transform 0.2s ease-in-out;
-}
-
-.videoIcon:hover {
-  transform: scale(1.1);
+  font-size: 3rem;
+  margin-bottom: 1rem;
 }
 
 .videoInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.lessonTitle {
-  font-size: 18px;
+  font-size: 1.25rem;
   font-weight: 600;
-  margin: 0;
-  opacity: 0.9;
+  margin-bottom: 0.5rem;
+  color: #374151;
 }
 
-.partTitle {
-  font-size: 14px;
-  margin: 0;
-  opacity: 0.7;
+.videoPlaceholder p {
+  color: #6b7280;
 }
-
-.completedOverlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-}
-
-.completedIcon {
-  font-size: 64px;
-  animation: bounce 0.6s ease-in-out;
-}
-
-@keyframes bounce {
-  0%, 20%, 50%, 80%, 100% {
-    transform: translateY(0);
-  }
-  40% {
-    transform: translateY(-10px);
-  }
-  60% {
-    transform: translateY(-5px);
-  }
-}
-
-.controls {
-  background: linear-gradient(135deg, var(--text-primary) 0%, #1e293b 100%);
-  padding: 16px 20px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  color: white;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.playButton {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
-  border: none;
-  color: white;
-  font-size: 20px;
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 10px;
-  transition: all 0.2s ease-in-out;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 40px;
-  height: 40px;
-  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
-}
-
-.playButton:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--primary-hover) 0%, #1e40af 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
-}
-
-.playButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.1);
-}
-
-.timeInfo {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 14px;
-  font-family: 'Courier New', monospace;
-  min-width: 80px;
-}
-
-.currentTime,
-.totalTime {
-  color: #e5e7eb;
-}
-
-.separator {
-  color: #9ca3af;
-}
-
-.progressContainer {
-  flex: 1;
-  position: relative;
-  height: 20px;
-  display: flex;
-  align-items: center;
-}
-
-.progressSlider {
-  width: 100%;
-  height: 6px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 6px;
-  outline: none;
-  cursor: pointer;
-  -webkit-appearance: none;
-  appearance: none;
-  transition: height 0.2s ease-in-out;
-}
-
-.progressSlider:hover {
-  height: 8px;
-}
-
-.progressSlider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 16px;
-  height: 16px;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);
-}
-
-.progressSlider::-webkit-slider-thumb:hover {
-  background: linear-gradient(135deg, var(--primary-hover) 0%, #1e40af 100%);
-  transform: scale(1.1);
-  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.4);
-}
-
-.progressSlider::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
-  border-radius: 50%;
-  cursor: pointer;
-  border: none;
-  transition: all 0.2s ease-in-out;
-  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);
-}
-
-.progressSlider::-moz-range-thumb:hover {
-  background: linear-gradient(135deg, var(--primary-hover) 0%, #1e40af 100%);
-  transform: scale(1.1);
-  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.4);
-}
-
-.progressBar {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  height: 6px;
-  background: linear-gradient(90deg, var(--primary) 0%, var(--info) 100%);
-  border-radius: 6px;
-  transform: translateY(-50%);
-  pointer-events: none;
-  transition: width 0.1s ease-in-out;
-  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.2);
-}
-
-.speedControl {
-  display: flex;
-  align-items: center;
-}
-
-.speedSelect {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  padding: 6px 10px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  outline: none;
-  transition: all 0.2s ease-in-out;
-}
-
-.speedSelect:hover {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.3);
-}
-
-.speedSelect:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
-}
-
-/* 반응형 */
-@media (max-width: 640px) {
-  .controls {
-    padding: 8px 12px;
-    gap: 8px;
-  }
-  
-  .videoIcon {
-    font-size: 36px;
-  }
-  
-  .lessonTitle {
-    font-size: 16px;
-  }
-  
-  .partTitle {
-    font-size: 12px;
-  }
-  
-  .timeInfo {
-    font-size: 12px;
-    min-width: 70px;
-  }
-  
-  .speedSelect {
-    font-size: 11px;
-    padding: 2px 6px;
-  }
-}
-
