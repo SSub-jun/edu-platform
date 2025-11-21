@@ -1,11 +1,148 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateLessonDto, UpdateLessonDto, CreateLessonPartDto, UpdateLessonPartDto } from './dto/lesson.dto';
+import {
+  CreateLessonDto,
+  UpdateLessonDto,
+  CreateLessonPartDto,
+  UpdateLessonPartDto,
+} from './dto/lesson.dto';
 import { CreateQuestionDto, UpdateQuestionDto } from './dto/question.dto';
+import { CreateSubjectDto, UpdateSubjectDto } from './dto/subject.dto';
 
 @Injectable()
 export class AdminLessonService {
   constructor(private readonly prisma: PrismaService) {}
+
+  // =============== 과목 관리 ===============
+
+  async createSubject(dto: CreateSubjectDto) {
+    const subject = await this.prisma.subject.create({
+      data: {
+        name: dto.name,
+        description: dto.description,
+        order: dto.order ?? 0,
+        isActive: dto.isActive ?? true,
+      },
+    });
+
+    return subject;
+  }
+
+  async getSubjects() {
+    const subjects = await this.prisma.subject.findMany({
+      include: {
+        lessons: {
+          where: { isActive: true },
+        },
+        questions: {
+          where: { isActive: true },
+        },
+        _count: {
+          select: {
+            subjectProgress: true,
+            examAttempts: true,
+          },
+        },
+      },
+      orderBy: { order: 'asc' },
+    });
+
+    return subjects.map((subject) => ({
+      id: subject.id,
+      name: subject.name,
+      description: subject.description,
+      order: subject.order,
+      isActive: subject.isActive,
+      lessonsCount: subject.lessons.length,
+      questionsCount: subject.questions.length,
+      studentsCount: subject._count.subjectProgress,
+      examAttemptsCount: subject._count.examAttempts,
+      createdAt: subject.createdAt,
+    }));
+  }
+
+  async getSubjectDetail(subjectId: string) {
+    const subject = await this.prisma.subject.findUnique({
+      where: { id: subjectId },
+      include: {
+        lessons: {
+          orderBy: { order: 'asc' },
+          include: {
+            videoParts: {
+              orderBy: { order: 'asc' },
+            },
+          },
+        },
+        questions: {
+          orderBy: { createdAt: 'desc' },
+          include: {
+            choices: {
+              orderBy: { order: 'asc' },
+            },
+          },
+        },
+        _count: {
+          select: {
+            subjectProgress: true,
+            examAttempts: true,
+          },
+        },
+      },
+    });
+
+    if (!subject) {
+      throw new NotFoundException(`Subject with ID ${subjectId} not found`);
+    }
+
+    return {
+      ...subject,
+      studentsCount: subject._count.subjectProgress,
+      examAttemptsCount: subject._count.examAttempts,
+    };
+  }
+
+  async updateSubject(subjectId: string, dto: UpdateSubjectDto) {
+    const subject = await this.prisma.subject.findUnique({
+      where: { id: subjectId },
+    });
+
+    if (!subject) {
+      throw new NotFoundException(`Subject with ID ${subjectId} not found`);
+    }
+
+    const updated = await this.prisma.subject.update({
+      where: { id: subjectId },
+      data: {
+        name: dto.name ?? subject.name,
+        description: dto.description ?? subject.description,
+        order: dto.order ?? subject.order,
+        isActive: dto.isActive ?? subject.isActive,
+      },
+    });
+
+    return updated;
+  }
+
+  async deleteSubject(subjectId: string) {
+    const subject = await this.prisma.subject.findUnique({
+      where: { id: subjectId },
+    });
+
+    if (!subject) {
+      throw new NotFoundException(`Subject with ID ${subjectId} not found`);
+    }
+
+    await this.prisma.subject.update({
+      where: { id: subjectId },
+      data: { isActive: false },
+    });
+
+    return { success: true, message: 'Subject deactivated successfully' };
+  }
 
   // =============== 레슨 관리 ===============
 
@@ -204,7 +341,9 @@ export class AdminLessonService {
 
     // 정답 인덱스 유효성 검증
     if (dto.correctAnswer < 0 || dto.correctAnswer >= dto.choices.length) {
-      throw new BadRequestException('correctAnswer must be a valid index of choices array');
+      throw new BadRequestException(
+        'correctAnswer must be a valid index of choices array',
+      );
     }
 
     // Choice 생성을 위한 데이터 준비
@@ -293,10 +432,15 @@ export class AdminLessonService {
 
     // 정답 인덱스 유효성 검증
     const finalChoices = dto.choices || question.choices.map((c) => c.text);
-    const finalCorrectAnswer = dto.correctAnswer !== undefined ? dto.correctAnswer : question.answerIndex;
+    const finalCorrectAnswer =
+      dto.correctAnswer !== undefined
+        ? dto.correctAnswer
+        : question.answerIndex;
 
     if (finalCorrectAnswer < 0 || finalCorrectAnswer >= finalChoices.length) {
-      throw new BadRequestException('correctAnswer must be a valid index of choices array');
+      throw new BadRequestException(
+        'correctAnswer must be a valid index of choices array',
+      );
     }
 
     // 기존 choices 삭제 후 새로 생성 (choices가 제공된 경우)
@@ -397,4 +541,3 @@ export class AdminLessonService {
     };
   }
 }
-

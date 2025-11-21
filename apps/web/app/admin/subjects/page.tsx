@@ -31,10 +31,9 @@ export default function AdminSubjectsPage() {
 
   const loadSubjects = async () => {
     try {
-      // 강사 API를 통해 모든 과목 조회 (관리자는 모든 과목 접근 가능)
-      const response = await authClient.getApi().get('/instructor/subjects');
-      if (response.data.success) {
-        setSubjects(response.data.data || []);
+      const response = await authClient.getApi().get('/admin/subjects');
+      if (response.data?.success && Array.isArray(response.data.data)) {
+        setSubjects(response.data.data);
       } else {
         setSubjects([]);
       }
@@ -53,10 +52,11 @@ export default function AdminSubjectsPage() {
     }
 
     try {
-      await authClient.getApi().post('/instructor/subjects', {
+      await authClient.getApi().post('/admin/subjects', {
         name: newSubject.name.trim(),
         description: newSubject.description.trim() || undefined,
-        order: newSubject.order || 0
+        order: newSubject.order || 0,
+        isActive: true,
       });
 
       alert('과목이 성공적으로 생성되었습니다.');
@@ -70,7 +70,7 @@ export default function AdminSubjectsPage() {
   };
 
   const updateSubject = async (subjectId: string, updates: Partial<Subject>) => {
-    await authClient.getApi().put(`/instructor/subjects/${subjectId}`, updates);
+    await authClient.getApi().patch(`/admin/subjects/${subjectId}`, updates);
   };
 
   const handleDeleteSubject = async (subjectId: string, subjectName: string) => {
@@ -79,7 +79,7 @@ export default function AdminSubjectsPage() {
     }
 
     try {
-      await authClient.getApi().delete(`/instructor/subjects/${subjectId}`);
+      await authClient.getApi().delete(`/admin/subjects/${subjectId}`);
       alert('과목이 삭제되었습니다.');
       loadSubjects();
     } catch (error) {

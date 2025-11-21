@@ -40,15 +40,15 @@ export default function AdminQuestionsPage() {
   const loadData = async () => {
     try {
       // 전체 과목의 문제들을 로드
-      const subjectsResponse = await authClient.getApi().get('/instructor/subjects');
-      if (subjectsResponse.data.success) {
+      const subjectsResponse = await authClient.getApi().get('/admin/subjects');
+      if (subjectsResponse.data?.success) {
         const allSubjects = subjectsResponse.data.data || [];
         setSubjects(allSubjects);
         
         // 각 과목의 상세 정보(문제 포함)를 로드
         const questionsPromises = allSubjects.map(async (subject: Subject) => {
           try {
-            const response = await authClient.getApi().get(`/instructor/subjects/${subject.id}`);
+            const response = await authClient.getApi().get(`/admin/subjects/${subject.id}`);
             if (response.data.success && response.data.data.questions) {
               return response.data.data.questions.map((q: any) => ({
                 ...q,
@@ -84,7 +84,7 @@ export default function AdminQuestionsPage() {
 
     try {
       // 문제 상태 업데이트 (instructor API 사용)
-      await authClient.getApi().patch(`/instructor/questions/${questionId}`, {
+      await authClient.getApi().patch(`/admin/questions/${questionId}`, {
         isActive: newStatus
       });
       
@@ -102,7 +102,7 @@ export default function AdminQuestionsPage() {
     }
 
     try {
-      await authClient.getApi().delete(`/instructor/questions/${questionId}`);
+      await authClient.getApi().delete(`/admin/questions/${questionId}`);
       alert('문제가 삭제되었습니다.');
       loadData();
     } catch (error) {

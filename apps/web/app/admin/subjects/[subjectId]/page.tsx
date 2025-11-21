@@ -111,7 +111,7 @@ export default function SubjectManagePage() {
     setLoading(true);
     setError(null);
     try {
-      const response = await authClient.getApi().get(`/instructor/subjects/${subjectId}`);
+      const response = await authClient.getApi().get(`/admin/subjects/${subjectId}`);
       if (response.data?.success && response.data.data) {
         const data = response.data.data;
         setSubject(data);
@@ -154,7 +154,7 @@ export default function SubjectManagePage() {
     if (!subject) return;
     setSaving(true);
     try {
-      await authClient.getApi().put(`/instructor/subjects/${subject.id}`, {
+      await authClient.getApi().patch(`/admin/subjects/${subject.id}`, {
         name: form.name.trim(),
         description: form.description.trim() || undefined,
         order: form.order,

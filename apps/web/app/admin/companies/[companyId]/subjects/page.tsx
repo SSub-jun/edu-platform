@@ -53,8 +53,8 @@ export default function CompanySubjectsPage() {
       }
 
       // 전체 과목 목록 로드
-      const allSubjectsResponse = await authClient.getApi().get('/instructor/subjects');
-      if (allSubjectsResponse.data.success) {
+      const allSubjectsResponse = await authClient.getApi().get('/admin/subjects');
+      if (allSubjectsResponse.data?.success) {
         setAllSubjects(allSubjectsResponse.data.data || []);
       }
     } catch (error) {

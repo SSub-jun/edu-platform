@@ -43,8 +43,8 @@ export default function SubjectQuestionsPage() {
 
   const loadSubjectData = async () => {
     try {
-      const response = await authClient.getApi().get(`/instructor/subjects/${subjectId}`);
-      if (response.data.success) {
+      const response = await authClient.getApi().get(`/admin/subjects/${subjectId}`);
+      if (response.data?.success) {
         setSubject(response.data.data);
       } else {
         setSubject(null);
@@ -66,7 +66,7 @@ export default function SubjectQuestionsPage() {
     }
 
     try {
-      await authClient.getApi().patch(`/instructor/questions/${questionId}`, {
+      await authClient.getApi().patch(`/admin/questions/${questionId}`, {
         isActive: newStatus
       });
       
@@ -84,7 +84,7 @@ export default function SubjectQuestionsPage() {
     }
 
     try {
-      await authClient.getApi().delete(`/instructor/questions/${questionId}`);
+      await authClient.getApi().delete(`/admin/questions/${questionId}`);
       alert('문제가 삭제되었습니다.');
       loadSubjectData();
     } catch (error) {

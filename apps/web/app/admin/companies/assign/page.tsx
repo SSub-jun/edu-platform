@@ -38,9 +38,9 @@ export default function AdminSubjectAssignPage() {
       const companiesData = Array.isArray(companiesResponse.data) ? companiesResponse.data : [];
       setCompanies(companiesData.filter(c => c.isActive));
 
-      // 전체 과목 목록 로드 (강사 API 활용)
-      const subjectsResponse = await authClient.getApi().get('/instructor/subjects');
-      if (subjectsResponse.data.success) {
+      // 전체 과목 목록 로드
+      const subjectsResponse = await authClient.getApi().get('/admin/subjects');
+      if (subjectsResponse.data?.success) {
         setAllSubjects(subjectsResponse.data.data || []);
       }
 
