@@ -326,6 +326,10 @@ export class AuthService {
       },
     });
 
+    if (companyId) {
+      await this.tryAutoAssignUserToCohort(user.id, companyId);
+    }
+
     // 9. 로그인 토큰 발급 (기존 로그인 로직 재사용)
     const deviceInfo = req?.headers['user-agent'] || 'Unknown';
     const ip = req?.ip || req?.connection?.remoteAddress || 'Unknown';
