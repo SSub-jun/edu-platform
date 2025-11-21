@@ -26,7 +26,6 @@ export default function AdminCompaniesPage() {
     name: '',
     startDate: '',
     endDate: '',
-    description: ''
   });
 
   const loadCompanies = async () => {
@@ -127,11 +126,10 @@ export default function AdminCompaniesPage() {
         name: newCompany.name.trim(),
         startDate: newCompany.startDate || undefined,
         endDate: newCompany.endDate || undefined,
-        description: newCompany.description || undefined
       });
 
       alert('기관이 성공적으로 생성되었습니다.');
-      setNewCompany({ name: '', startDate: '', endDate: '', description: '' });
+      setNewCompany({ name: '', startDate: '', endDate: '' });
       setShowCreateForm(false);
       loadCompanies();
     } catch (error) {
@@ -272,26 +270,6 @@ export default function AdminCompaniesPage() {
                   value={newCompany.name}
                   onChange={(e) => setNewCompany({ ...newCompany, name: e.target.value })}
                   placeholder="기관명을 입력하세요"
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px',
-                    fontSize: '14px',
-                    boxSizing: 'border-box'
-                  }}
-                />
-              </div>
-
-              <div>
-                <label style={{ display: 'block', marginBottom: '6px', color: '#555', fontSize: '14px', fontWeight: '500' }}>
-                  설명
-                </label>
-                <input
-                  type="text"
-                  value={newCompany.description}
-                  onChange={(e) => setNewCompany({ ...newCompany, description: e.target.value })}
-                  placeholder="기관 설명 (선택사항)"
                   style={{
                     width: '100%',
                     padding: '10px 12px',
