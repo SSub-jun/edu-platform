@@ -60,6 +60,12 @@ export default function CompanyAssignPage() {
         setAssignedCompany(response.data.company);
         setSuccess(true);
         
+        try {
+          await authClient.refresh();
+        } catch (refreshError) {
+          console.error('토큰 갱신 실패 (회사 배정 후):', refreshError);
+        }
+        
         // 3초 후 자동으로 커리큘럼 페이지로 이동
         setTimeout(() => {
           router.push('/curriculum');

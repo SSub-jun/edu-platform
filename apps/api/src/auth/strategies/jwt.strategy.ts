@@ -20,9 +20,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(payload: any) {
     const { sub: userId, sessionId } = payload;
     // Debug logging for smoke investigation
-    // eslint-disable-next-line no-console
+
     console.log('[JwtStrategy.validate] payload', { userId, sessionId });
-    
+
     if (!userId || !sessionId) {
       throw new UnauthorizedException('Invalid token payload');
     }
@@ -50,8 +50,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       username: user.username,
       role: user.role,
       sessionId: session.id,
+      companyId: user.companyId,
+      companyAssigned: !!user.companyId,
     };
-    // eslint-disable-next-line no-console
+
     console.log('[JwtStrategy.validate] validated', validated);
     return validated;
   }

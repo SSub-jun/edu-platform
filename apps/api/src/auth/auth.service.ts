@@ -1,4 +1,10 @@
-import { Injectable, UnauthorizedException, BadRequestException, ConflictException, UnprocessableEntityException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  BadRequestException,
+  ConflictException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
@@ -40,7 +46,11 @@ export class AuthService {
     return this.prismaService as any; // TODO: Prisma 타입 해결 시 개선 필요
   }
 
-  async login(username: string, password: string, req: Request): Promise<LoginResponse> {
+  async login(
+    username: string,
+    password: string,
+    req: Request,
+  ): Promise<LoginResponse> {
     // 사용자 조회
     const user = await this.prisma.user.findUnique({
       where: { username },
@@ -76,16 +86,18 @@ export class AuthService {
 
     // JWT 토큰 발급
     const accessToken = this.jwtService.sign(
-      { 
-        sub: user.id, 
-        username: user.username, 
+      {
+        sub: user.id,
+        username: user.username,
         role: user.role,
         sessionId: session.id,
+        companyId: user.companyId,
+        companyAssigned: !!user.companyId,
       },
       {
         secret: this.configService.get<string>('JWT_SECRET'),
         expiresIn: this.configService.get<string>('ACCESS_TOKEN_TTL', '15m'),
-      }
+      },
     );
 
     // 사용자 마지막 로그인 시간 업데이트
@@ -129,7 +141,10 @@ export class AuthService {
     }
 
     // Refresh 토큰 해시 검증
-    const isTokenValid = await bcrypt.compare(refreshToken, session.refreshTokenHash);
+    const isTokenValid = await bcrypt.compare(
+      refreshToken,
+      session.refreshTokenHash,
+    );
     if (!isTokenValid) {
       throw new UnauthorizedException('Invalid refresh token');
     }
@@ -141,7 +156,7 @@ export class AuthService {
     // 세션 업데이트 (기존 토큰 무효화)
     await this.prisma.session.update({
       where: { id: session.id },
-      data: { 
+      data: {
         refreshTokenHash: newRefreshTokenHash,
         revokedAt: new Date(), // 기존 토큰 무효화
       },
@@ -158,16 +173,18 @@ export class AuthService {
     });
 
     const accessToken = this.jwtService.sign(
-      { 
-        sub: session.user.id, 
-        username: session.user.username, 
+      {
+        sub: session.user.id,
+        username: session.user.username,
         role: session.user.role,
         sessionId: newSession.id,
+        companyId: session.user.companyId,
+        companyAssigned: !!session.user.companyId,
       },
       {
         secret: this.configService.get<string>('JWT_SECRET'),
         expiresIn: this.configService.get<string>('ACCESS_TOKEN_TTL', '15m'),
-      }
+      },
     );
 
     return {
@@ -176,7 +193,10 @@ export class AuthService {
     };
   }
 
-  async logout(userId: string, sessionId: string): Promise<{ message: string }> {
+  async logout(
+    userId: string,
+    sessionId: string,
+  ): Promise<{ message: string }> {
     // 현재 세션 폐기
     await this.prisma.session.update({
       where: { id: sessionId },
@@ -208,14 +228,14 @@ export class AuthService {
 
   private generateRefreshToken(): string {
     return this.jwtService.sign(
-      { 
+      {
         type: 'refresh',
         timestamp: Date.now(),
       },
       {
         secret: this.configService.get<string>('JWT_SECRET'),
         expiresIn: this.configService.get<string>('REFRESH_TOKEN_TTL', '7d'),
-      }
+      },
     );
   }
 
@@ -247,11 +267,13 @@ export class AuthService {
     }
 
     // 3. 비밀번호 정책 서버측 검증
-    const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+    const passwordPattern =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
     if (!passwordPattern.test(password)) {
       throw new UnprocessableEntityException({
         code: 'WEAK_PASSWORD',
-        message: '비밀번호는 최소 8자이며, 대문자/소문자/숫자/특수문자를 각각 1개 이상 포함해야 합니다.',
+        message:
+          '비밀번호는 최소 8자이며, 대문자/소문자/숫자/특수문자를 각각 1개 이상 포함해야 합니다.',
       });
     }
 
@@ -320,16 +342,18 @@ export class AuthService {
     });
 
     const accessToken = this.jwtService.sign(
-      { 
-        sub: user.id, 
-        username: user.username, 
+      {
+        sub: user.id,
+        username: user.username,
         role: user.role,
         sessionId: session.id,
+        companyId: user.companyId,
+        companyAssigned: !!user.companyId,
       },
       {
         secret: this.configService.get<string>('JWT_SECRET'),
         expiresIn: this.configService.get<string>('ACCESS_TOKEN_TTL', '15m'),
-      }
+      },
     );
 
     // 10. 마지막 로그인 시간 업데이트
@@ -352,7 +376,10 @@ export class AuthService {
     };
   }
 
-  async assignCompany(userId: string, inviteCode: string): Promise<{ success: boolean; company: { id: string; name: string } }> {
+  async assignCompany(
+    userId: string,
+    inviteCode: string,
+  ): Promise<{ success: boolean; company: { id: string; name: string } }> {
     // 1. 사용자 조회
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
@@ -405,14 +432,17 @@ export class AuthService {
   }
 
   // Mock 모드용 메서드 (기존 호환성 유지)
-  async loginWithMock(username: string, password: string): Promise<LoginResponse> {
+  async loginWithMock(
+    username: string,
+    password: string,
+  ): Promise<LoginResponse> {
     const mockUsers = [
       { id: 'admin', pwd: 'admin123', role: 'admin' as const },
       { id: 'teacher', pwd: 'teach123', role: 'instructor' as const },
       { id: 'user', pwd: 'user123', role: 'student' as const },
     ];
 
-    const user = mockUsers.find(u => u.id === username && u.pwd === password);
+    const user = mockUsers.find((u) => u.id === username && u.pwd === password);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -431,4 +461,3 @@ export class AuthService {
     };
   }
 }
-
