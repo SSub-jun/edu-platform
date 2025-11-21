@@ -100,8 +100,11 @@ export default function CohortDashboardPage() {
       setAllSubjects(Array.isArray(subjectList) ? subjectList : []);
 
       // 회사 소속 학생 목록 로드
-      const studentsResponse = await authClient.getApi().get(`/admin/users?role=student&companyId=${companyId}`);
-      setAllStudents(Array.isArray(studentsResponse.data) ? studentsResponse.data : []);
+      const studentsResponse = await authClient
+        .getApi()
+        .get('/admin/users/students', { params: { companyId } });
+      const studentList = studentsResponse.data?.data ?? studentsResponse.data;
+      setAllStudents(Array.isArray(studentList) ? studentList : []);
     } catch (err: any) {
       console.error('[ADMIN/COHORTS] 데이터 로드 실패', err);
       setError('데이터를 불러오는 데 실패했습니다. 잠시 후 다시 시도해 주세요.');
