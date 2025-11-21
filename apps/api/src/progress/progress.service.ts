@@ -21,6 +21,11 @@ export class ProgressService {
               }
             }
           }
+        },
+        userCohorts: {
+          include: {
+            cohort: true
+          }
         }
       }
     });
@@ -33,11 +38,7 @@ export class ProgressService {
       throw new ForbiddenException('회사에 소속되지 않은 사용자입니다.');
     }
 
-    // 회사 수강기간 확인
-    const now = new Date();
-    if (user.company.startDate && user.company.endDate && (now < user.company.startDate || now > user.company.endDate)) {
-      throw new ForbiddenException('수강기간이 아닙니다.');
-    }
+    this.ensureActiveLearningWindow(user);
 
     // 레슨이 회사 활성화 레슨에 포함되는지 확인
     const isActiveLesson = user.company.activeLessons.some(cl => cl.lessonId === lessonId);
@@ -130,6 +131,11 @@ export class ProgressService {
               }
             }
           }
+        },
+        userCohorts: {
+          include: {
+            cohort: true
+          }
         }
       }
     });
@@ -138,11 +144,7 @@ export class ProgressService {
       throw new ForbiddenException('회사에 소속되지 않은 사용자입니다.');
     }
 
-    // 회사 수강기간 확인
-    const now = new Date();
-    if (user.company.startDate && user.company.endDate && (now < user.company.startDate || now > user.company.endDate)) {
-      throw new ForbiddenException('수강기간이 아닙니다.');
-    }
+    this.ensureActiveLearningWindow(user);
 
     const activeLessons = user.company.activeLessons.map(cl => cl.lesson);
     const subjectIds = Array.from(new Set(activeLessons.map(lesson => lesson.subjectId)));
@@ -260,6 +262,11 @@ export class ProgressService {
               }
             }
           }
+        },
+        userCohorts: {
+          include: {
+            cohort: true
+          }
         }
       }
     });
@@ -272,12 +279,7 @@ export class ProgressService {
     let activeLessons: any[] = [];
     
     if (user.company) {
-      // 회사 수강기간 확인
-      const now = new Date();
-      if (user.company.startDate && user.company.endDate && (now < user.company.startDate || now > user.company.endDate)) {
-        throw new ForbiddenException('수강기간이 아닙니다.');
-      }
-
+      this.ensureActiveLearningWindow(user);
       activeLessons = user.company.activeLessons
         .map(cl => cl.lesson)
         .sort((a, b) => a.order - b.order);
@@ -389,6 +391,11 @@ export class ProgressService {
               }
             }
           }
+        },
+        userCohorts: {
+          include: {
+            cohort: true
+          }
         }
       }
     });
@@ -396,6 +403,8 @@ export class ProgressService {
     if (!user) {
       throw new NotFoundException('사용자를 찾을 수 없습니다.');
     }
+
+    this.ensureActiveLearningWindow(user);
 
     // 회사가 없는 경우 모든 레슨에 접근 가능 (테스트/개발용)
     let isActiveLesson = true;
@@ -667,5 +676,34 @@ export class ProgressService {
       allLessonsAbove90,
       completedAt: subjectProgress.completedAt ?? null
     };
+  }
+
+  private ensureActiveLearningWindow(user: any) {
+    const now = new Date();
+
+    if (user?.userCohorts && user.userCohorts.length > 0) {
+      const activeCohort = user.userCohorts.find((uc: any) => {
+        const cohort = uc.cohort;
+        if (!cohort || cohort.isActive === false) {
+          return false;
+        }
+
+        const startOk = !cohort.startDate || now >= cohort.startDate;
+        const endOk = !cohort.endDate || now <= cohort.endDate;
+        return startOk && endOk;
+      });
+
+      if (!activeCohort) {
+        throw new ForbiddenException('현재 진행 중인 교육 기수가 아닙니다.');
+      }
+
+      return;
+    }
+
+    if (user?.company?.startDate && user.company?.endDate) {
+      if (now < user.company.startDate || now > user.company.endDate) {
+        throw new ForbiddenException('수강기간이 아닙니다.');
+      }
+    }
   }
 }

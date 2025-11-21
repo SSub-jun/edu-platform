@@ -171,6 +171,10 @@ export class AdminCohortService {
       },
     });
 
+    if (dto.isActive !== undefined) {
+      await this.syncCompanyLessonsForCompany(updated.companyId);
+    }
+
     return updated;
   }
 
@@ -191,6 +195,8 @@ export class AdminCohortService {
       where: { id: cohortId },
       data: { isActive: false },
     });
+
+    await this.syncCompanyLessonsForCompany(cohort.companyId);
 
     return { success: true, message: 'Cohort deactivated successfully' };
   }
@@ -228,6 +234,8 @@ export class AdminCohortService {
         subjectId,
       })),
     });
+
+    await this.syncCompanyLessonsForCompany(cohort.companyId);
 
     // 업데이트된 Cohort 반환
     return this.getCohortById(cohortId);
@@ -333,6 +341,72 @@ export class AdminCohortService {
     }
 
     return cohort.userCohorts.map((uc) => uc.user);
+  }
+  /**
+   * Cohort 설정을 기반으로 회사별 활성 레슨 동기화
+   */
+  private async syncCompanyLessonsForCompany(companyId: string) {
+    const activeCohorts = await this.prisma.cohort.findMany({
+      where: { companyId, isActive: true },
+      include: {
+        cohortSubjects: true,
+      },
+    });
+
+    const subjectIds = Array.from(
+      new Set(
+        activeCohorts.flatMap((cohort) =>
+          cohort.cohortSubjects.map((cs) => cs.subjectId),
+        ),
+      ),
+    );
+
+    const lessons = subjectIds.length
+      ? await this.prisma.lesson.findMany({
+          where: {
+            subjectId: { in: subjectIds },
+            isActive: true,
+          },
+          select: { id: true },
+        })
+      : [];
+
+    const targetLessonIds = new Set(lessons.map((lesson) => lesson.id));
+
+    const existingAssignments = await this.prisma.companyLesson.findMany({
+      where: { companyId },
+      select: { id: true, lessonId: true },
+    });
+
+    const existingLessonIds = new Set(
+      existingAssignments.map((assignment) => assignment.lessonId),
+    );
+
+    // 제거할 레슨 (현재 Cohort 구성에 없는 레슨)
+    const lessonIdsToRemove = existingAssignments
+      .filter((assignment) => !targetLessonIds.has(assignment.lessonId))
+      .map((assignment) => assignment.id);
+
+    if (lessonIdsToRemove.length > 0) {
+      await this.prisma.companyLesson.deleteMany({
+        where: { id: { in: lessonIdsToRemove } },
+      });
+    }
+
+    // 새로 추가할 레슨
+    const lessonIdsToAdd = Array.from(targetLessonIds).filter(
+      (lessonId) => !existingLessonIds.has(lessonId),
+    );
+
+    if (lessonIdsToAdd.length > 0) {
+      await this.prisma.companyLesson.createMany({
+        data: lessonIdsToAdd.map((lessonId) => ({
+          companyId,
+          lessonId,
+        })),
+        skipDuplicates: true,
+      });
+    }
   }
 }
 
