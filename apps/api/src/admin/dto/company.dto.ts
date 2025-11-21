@@ -51,14 +51,16 @@ export class CreateCompanyDto {
 
 export class UpdateInviteCodeDto {
   @ApiProperty({
-    description: '새 초대코드 (6자리 영대문자+숫자, 필수 입력)',
+    description: '새 초대코드 (6자리 영대문자+숫자, 비워두면 자동 생성)',
     example: 'NEWCODE',
+    required: false,
   })
+  @IsOptional()
   @IsString()
   @Matches(/^[A-Z0-9]{6}$/, {
     message: '초대코드는 6자리 영대문자와 숫자 조합이어야 합니다',
   })
-  inviteCode: string;
+  inviteCode?: string;
 }
 
 export class CompanyResponseDto {

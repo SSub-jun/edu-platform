@@ -96,6 +96,18 @@ export class AdminCompanyController {
     return this.adminCompanyService.getCompany(id);
   }
 
+  @Get(':id/overview')
+  @Roles('admin')
+  @ApiOperation({ 
+    summary: '회사 개요 조회',
+    description: '회사별 학습 현황, Cohort, 과목, 학생 통계 등을 조회합니다.'
+  })
+  @ApiParam({ name: 'id', description: '회사 ID' })
+  @ApiResponse({ status: 200, description: '회사 개요 조회 성공' })
+  async getCompanyOverview(@Param('id') id: string) {
+    return this.adminCompanyService.getCompanyOverview(id);
+  }
+
   @Patch(':id/invite-code')
   @Roles('admin')
   @ApiOperation({ 

@@ -21,6 +21,7 @@ export default function AdminCompaniesPage() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [inviteActionId, setInviteActionId] = useState<string | null>(null);
   const [newCompany, setNewCompany] = useState({
     name: '',
     startDate: '',
@@ -46,6 +47,72 @@ export default function AdminCompaniesPage() {
       setCompanies([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const updateCompanyInviteCode = (companyId: string, inviteCode: string) => {
+    setCompanies(prev =>
+      prev.map(company =>
+        company.id === companyId ? { ...company, inviteCode } : company
+      )
+    );
+  };
+
+  const handleCopyInviteCode = async (inviteCode?: string | null) => {
+    if (!inviteCode) {
+      alert('초대코드가 없습니다.');
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(inviteCode);
+      alert('초대코드가 복사되었습니다.');
+    } catch (error) {
+      console.error('초대코드 복사 실패:', error);
+      alert('초대코드를 복사할 수 없습니다.');
+    }
+  };
+
+  const handleRegenerateInviteCode = async (companyId: string) => {
+    if (!confirm('새로운 초대코드를 발급하시겠습니까?\n기존 코드는 즉시 사용할 수 없게 됩니다.')) {
+      return;
+    }
+    setInviteActionId(companyId);
+    try {
+      const response = await authClient.getApi().patch(`/admin/companies/${companyId}/invite-code`, {});
+      if (response.data?.inviteCode) {
+        updateCompanyInviteCode(companyId, response.data.inviteCode);
+        alert('새 초대코드가 발급되었습니다.');
+      }
+    } catch (error) {
+      console.error('초대코드 재발급 실패:', error);
+      alert('초대코드 재발급에 실패했습니다.');
+    } finally {
+      setInviteActionId(null);
+    }
+  };
+
+  const handleManualInviteCode = async (companyId: string, current?: string) => {
+    const next = prompt('새 초대코드를 입력하세요 (6자리 영대문자+숫자)', current || '');
+    if (next === null) return;
+    const trimmed = next.trim().toUpperCase();
+    if (!/^[A-Z0-9]{6}$/.test(trimmed)) {
+      alert('초대코드는 6자리 영대문자와 숫자 조합이어야 합니다.');
+      return;
+    }
+    setInviteActionId(companyId);
+    try {
+      const response = await authClient.getApi().patch(`/admin/companies/${companyId}/invite-code`, {
+        inviteCode: trimmed,
+      });
+      if (response.data?.inviteCode) {
+        updateCompanyInviteCode(companyId, response.data.inviteCode);
+        alert('초대코드가 변경되었습니다.');
+      }
+    } catch (error) {
+      console.error('초대코드 변경 실패:', error);
+      alert('초대코드 변경에 실패했습니다.');
+    } finally {
+      setInviteActionId(null);
     }
   };
 
@@ -375,11 +442,29 @@ export default function AdminCompaniesPage() {
                       )}
                     </h3>
                     <div style={{ color: '#666', fontSize: '13px' }}>
-                      생성일 {new Date(company.createdAt).toLocaleDateString('ko-KR')} · 초대코드 {company.inviteCode}
+                      생성일 {new Date(company.createdAt).toLocaleDateString('ko-KR')}
                     </div>
                   </div>
 
                   <div style={{ display: 'flex', gap: '10px' }}>
+                    <button
+                      onClick={() => router.push(`/admin/companies/${company.id}/overview`)}
+                      style={{
+                        padding: '10px 16px',
+                        backgroundColor: '#4c6ef5',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px'
+                      }}
+                    >
+                      📊 Overview
+                    </button>
                     <button
                       onClick={() => router.push(`/admin/cohorts/${company.id}`)}
                       style={{
@@ -434,6 +519,95 @@ export default function AdminCompaniesPage() {
                   <div style={{ background: '#fff', padding: '12px', borderRadius: '8px', border: '1px solid #eee' }}>
                     <div style={{ fontSize: '12px', color: '#888', marginBottom: '4px' }}>활성 레슨</div>
                     <strong>{company.activeLessonCount ?? 0}개</strong>
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    marginTop: '4px',
+                    padding: '12px',
+                    borderRadius: '8px',
+                    border: '1px solid #e1e4e8',
+                    backgroundColor: '#fff',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      flexWrap: 'wrap',
+                      gap: '10px',
+                    }}
+                  >
+                    <div>
+                      <div
+                        style={{
+                          fontSize: '12px',
+                          color: '#6b7280',
+                          marginBottom: '4px',
+                        }}
+                      >
+                        초대코드
+                      </div>
+                      <div
+                        style={{
+                          fontSize: '22px',
+                          fontWeight: 'bold',
+                          letterSpacing: '0.25rem',
+                          color: company.inviteCode ? '#111827' : '#9ca3af',
+                        }}
+                      >
+                        {company.inviteCode || '미발급'}
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                      <button
+                        onClick={() => handleCopyInviteCode(company.inviteCode)}
+                        style={{
+                          padding: '8px 12px',
+                          backgroundColor: '#e5e7eb',
+                          color: '#111827',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontSize: '13px',
+                        }}
+                        disabled={!company.inviteCode}
+                      >
+                        복사
+                      </button>
+                      <button
+                        onClick={() => handleManualInviteCode(company.id, company.inviteCode)}
+                        style={{
+                          padding: '8px 12px',
+                          backgroundColor: '#f97316',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontSize: '13px',
+                        }}
+                      >
+                        직접 입력
+                      </button>
+                      <button
+                        onClick={() => handleRegenerateInviteCode(company.id)}
+                        style={{
+                          padding: '8px 12px',
+                          backgroundColor: '#111827',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontSize: '13px',
+                          opacity: inviteActionId === company.id ? 0.7 : 1,
+                        }}
+                        disabled={inviteActionId === company.id}
+                      >
+                        {inviteActionId === company.id ? '발급 중...' : '재발급'}
+                      </button>
+                    </div>
                   </div>
                 </div>
 
