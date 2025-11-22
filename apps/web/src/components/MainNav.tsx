@@ -61,7 +61,7 @@ export function MainNav() {
     <header className="w-full border-b border-border bg-surface/80 backdrop-blur-sm">
       <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3 md:py-4">
         <Link href="/curriculum" className="flex items-center gap-2">
-          <span className="text-[2rem] md:text-[2.5rem] font-bold text-text-primary tracking-tight">
+          <span className="text-[1.3rem] md:text-[1.5rem] font-bold text-text-primary tracking-tight">
             KIST 교육센터
           </span>
         </Link>
