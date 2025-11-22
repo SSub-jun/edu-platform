@@ -235,12 +235,12 @@ export default function CompanyOverviewPage() {
     {
       label: '등록 학생 수',
       value: `${overview.company.totalStudents.toLocaleString()}명`,
-      detail: `Cohort 배정 ${overview.company.assignedToCohort}명`,
+      detail: `기수 배정 ${overview.company.assignedToCohort}명`,
     },
     {
       label: '미배정 학생',
       value: `${overview.company.unassignedToCohort}명`,
-      detail: 'Cohort에 아직 배정되지 않은 학생',
+      detail: '기수에 아직 배정되지 않은 학생',
     },
     {
       label: '최근 30일 활동',
@@ -253,7 +253,7 @@ export default function CompanyOverviewPage() {
         overview.company.remainingDays != null
           ? `${overview.company.remainingDays}일`
           : '기간 정보 없음',
-      detail: '진행 중 Cohort 또는 회사 기간 기준',
+      detail: '진행 중 기수 또는 회사 기간 기준',
     },
   ];
 
@@ -321,7 +321,7 @@ export default function CompanyOverviewPage() {
                 fontSize: '14px',
               }}
             >
-              Cohort 관리
+              기수 관리
             </button>
             <button
               onClick={() => router.push(`/admin/companies/${overview.company.id}/subjects`)}
@@ -461,14 +461,14 @@ export default function CompanyOverviewPage() {
               marginBottom: '16px',
             }}
           >
-            <h3 style={{ margin: 0, fontSize: '18px' }}>Cohort 현황</h3>
+            <h3 style={{ margin: 0, fontSize: '18px' }}>기수 현황</h3>
             <div style={{ color: '#6b7280', fontSize: '13px' }}>
               총 {overview.cohorts.total}개 · 진행 중 {overview.cohorts.activeCount}개 · 예정{' '}
               {overview.cohorts.upcomingCount}개
             </div>
           </div>
           {overview.cohorts.items.length === 0 ? (
-            <div style={{ padding: '20px', color: '#6b7280' }}>등록된 Cohort가 없습니다.</div>
+            <div style={{ padding: '20px', color: '#6b7280' }}>등록된 기수가 없습니다.</div>
           ) : (
             <div style={{ display: 'grid', gap: '12px' }}>
               {overview.cohorts.items.map((cohort) => (
@@ -557,7 +557,7 @@ export default function CompanyOverviewPage() {
                   >
                     <div style={{ fontWeight: 600 }}>{subject.name}</div>
                     <div style={{ fontSize: '13px', color: '#6b7280' }}>
-                      레슨 {subject.lessonCount}개 · Cohort {subject.cohortCount}회 배정
+                      레슨 {subject.lessonCount}개 · 기수 {subject.cohortCount}회 배정
                     </div>
                   </div>
                 ))}
@@ -616,9 +616,9 @@ export default function CompanyOverviewPage() {
           }}
         >
           <div>
-            <h3 style={{ margin: '0 0 12px 0', fontSize: '18px' }}>Cohort 미배정 학생</h3>
+            <h3 style={{ margin: '0 0 12px 0', fontSize: '18px' }}>기수 미배정 학생</h3>
             {overview.students.unassigned.length === 0 ? (
-              <div style={{ color: '#6b7280', fontSize: '14px' }}>모든 학생이 Cohort에 배정되어 있습니다.</div>
+              <div style={{ color: '#6b7280', fontSize: '14px' }}>모든 학생이 기수에 배정되어 있습니다.</div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {overview.students.unassigned.map((student) => (

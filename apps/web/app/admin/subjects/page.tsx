@@ -175,7 +175,7 @@ export default function AdminSubjectsPage() {
                 📚 과목 · 레슨 · 시험 관리
               </h1>
               <p style={{ marginTop: '6px', color: '#666', fontSize: '14px' }}>
-                과목을 생성하고, Cohort에 배정할 커리큘럼 콘텐츠를 준비하세요.
+                과목을 생성하고, 기수에 배정할 커리큘럼 콘텐츠를 준비하세요.
               </p>
             </div>
 

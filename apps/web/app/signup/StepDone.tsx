@@ -78,7 +78,7 @@ export default function StepDone({ onComplete, signupData }: StepDoneProps) {
 
       <button
         onClick={onComplete}
-        className="w-full max-w-[200px] h-12 bg-primary text-text-primary rounded-lg text-base font-semibold transition-all hover:bg-primary-600 active:bg-primary-700 mx-auto"
+        className="w-full max-w-[200px] h-12 bg-primary text-white rounded-lg text-base font-semibold transition-all hover:bg-primary-600 active:bg-primary-700 mx-auto"
       >
         바로 시작하기
       </button>

@@ -90,7 +90,7 @@ export default function CohortDashboardPage() {
       const currentCompany = companies.find((c: Company) => c.id === companyId) || null;
       setCompany(currentCompany);
 
-      // Cohort 목록 로드
+      // 기수 목록 로드
       const cohortResponse = await authClient.getApi().get(`/admin/cohorts/company/${companyId}`);
       setCohorts(Array.isArray(cohortResponse.data) ? cohortResponse.data : []);
 
@@ -132,13 +132,13 @@ export default function CohortDashboardPage() {
         endDate: new Date(formData.endDate).toISOString(),
         isActive: formData.isActive,
       });
-      alert('Cohort가 생성되었습니다.');
+      alert('기수가 생성되었습니다.');
       setShowCreateModal(false);
       setFormData({ name: '', startDate: '', endDate: '', isActive: true });
       loadData();
     } catch (err: any) {
-      console.error('[ADMIN/COHORTS] Cohort 생성 실패', err);
-      alert('Cohort 생성에 실패했습니다: ' + (err.response?.data?.message || err.message));
+      console.error('[ADMIN/COHORTS] 기수 생성 실패', err);
+      alert('기수 생성에 실패했습니다: ' + (err.response?.data?.message || err.message));
     }
   };
 
@@ -152,27 +152,27 @@ export default function CohortDashboardPage() {
         endDate: formData.endDate ? new Date(formData.endDate).toISOString() : undefined,
         isActive: formData.isActive,
       });
-      alert('Cohort가 수정되었습니다.');
+      alert('기수가 수정되었습니다.');
       setShowEditModal(false);
       setSelectedCohort(null);
       setFormData({ name: '', startDate: '', endDate: '', isActive: true });
       loadData();
     } catch (err: any) {
-      console.error('[ADMIN/COHORTS] Cohort 수정 실패', err);
-      alert('Cohort 수정에 실패했습니다: ' + (err.response?.data?.message || err.message));
+      console.error('[ADMIN/COHORTS] 기수 수정 실패', err);
+      alert('기수 수정에 실패했습니다: ' + (err.response?.data?.message || err.message));
     }
   };
 
   const handleDeleteCohort = async (cohortId: string) => {
-    if (!confirm('이 Cohort를 비활성화하시겠습니까?')) return;
+    if (!confirm('이 기수를 비활성화하시겠습니까?')) return;
 
     try {
       await authClient.getApi().delete(`/admin/cohorts/${cohortId}`);
-      alert('Cohort가 비활성화되었습니다.');
+      alert('기수가 비활성화되었습니다.');
       loadData();
     } catch (err: any) {
-      console.error('[ADMIN/COHORTS] Cohort 삭제 실패', err);
-      alert('Cohort 삭제에 실패했습니다: ' + (err.response?.data?.message || err.message));
+      console.error('[ADMIN/COHORTS] 기수 삭제 실패', err);
+      alert('기수 삭제에 실패했습니다: ' + (err.response?.data?.message || err.message));
     }
   };
 
@@ -304,7 +304,7 @@ export default function CohortDashboardPage() {
               ← 회사 목록으로
             </button>
             <h1 style={{ margin: 0, fontSize: '26px', fontWeight: 700 }}>
-              {company.name} Cohort 관리
+              {company.name} 기수 관리
             </h1>
             <p style={{ margin: '6px 0 0', color: '#666', fontSize: '14px' }}>
               초대코드 <strong>{company.inviteCode}</strong>
@@ -324,12 +324,12 @@ export default function CohortDashboardPage() {
                 fontWeight: 600
               }}
             >
-              + Cohort 생성
+              + 기수 생성
             </button>
           </div>
         </div>
 
-        {/* Cohort 목록 */}
+        {/* 기수 목록 */}
         <div style={{
           display: 'grid',
           gap: '16px'
@@ -344,9 +344,9 @@ export default function CohortDashboardPage() {
               lineHeight: 1.6,
               textAlign: 'center'
             }}>
-              <h3 style={{ marginTop: 0, marginBottom: '10px' }}>등록된 Cohort가 없습니다</h3>
+              <h3 style={{ marginTop: 0, marginBottom: '10px' }}>등록된 기수가 없습니다</h3>
               <p style={{ margin: 0 }}>
-                "+ Cohort 생성" 버튼을 눌러 새로운 기수를 만들어보세요.
+                "+ 기수 생성" 버튼을 눌러 새로운 기수를 만들어보세요.
               </p>
             </div>
           ) : (
@@ -458,7 +458,7 @@ export default function CohortDashboardPage() {
         </div>
       </div>
 
-      {/* Cohort 생성 모달 */}
+      {/* 기수 생성 모달 */}
       {showCreateModal && (
         <div style={{
           position: 'fixed',
@@ -481,7 +481,7 @@ export default function CohortDashboardPage() {
             maxHeight: '90vh',
             overflow: 'auto'
           }}>
-            <h2 style={{ marginTop: 0 }}>Cohort 생성</h2>
+            <h2 style={{ marginTop: 0 }}>기수 생성</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
                 <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600 }}>기수 이름 *</label>
@@ -574,7 +574,7 @@ export default function CohortDashboardPage() {
         </div>
       )}
 
-      {/* Cohort 수정 모달 */}
+      {/* 기수 수정 모달 */}
       {showEditModal && selectedCohort && (
         <div style={{
           position: 'fixed',
@@ -597,7 +597,7 @@ export default function CohortDashboardPage() {
             maxHeight: '90vh',
             overflow: 'auto'
           }}>
-            <h2 style={{ marginTop: 0 }}>Cohort 수정</h2>
+            <h2 style={{ marginTop: 0 }}>기수 수정</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
                 <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600 }}>기수 이름</label>

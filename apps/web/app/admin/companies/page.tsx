@@ -214,10 +214,10 @@ export default function AdminCompaniesPage() {
                 alignItems: 'center',
                 gap: '10px'
               }}>
-                🏢 회사 목록 / Cohort 준비
+                🏢 회사 목록 / 기수 준비
               </h1>
               <p style={{ marginTop: '6px', color: '#666', fontSize: '14px' }}>
-                회사를 선택하면 새로운 Cohort 관리 화면으로 이동할 수 있습니다.
+                회사를 선택하면 새로운 기수 관리 화면으로 이동할 수 있습니다.
               </p>
             </div>
           </div>
@@ -459,7 +459,7 @@ export default function AdminCompaniesPage() {
                         gap: '8px'
                       }}
                     >
-                      📅 Cohort 관리
+                      📅 기수 관리
                     </button>
                     <button
                       onClick={() => handleDeleteCompany(company.id, company.name)}
@@ -598,7 +598,7 @@ export default function AdminCompaniesPage() {
                   fontSize: '13px',
                   lineHeight: '1.6'
                 }}>
-                  앞으로 이 회사에 속한 기수, 배정된 과목/학생 현황을 Cohort 관리 페이지에서 확인할 수 있습니다.
+                  앞으로 이 회사에 속한 기수, 배정된 과목/학생 현황을 기수 관리 페이지에서 확인할 수 있습니다.
                 </div>
               </div>
             ))}

@@ -125,7 +125,7 @@ export default function AdminPage() {
               fontSize: '14px',
               lineHeight: '1.5'
             }}>
-              교육 기관 등록, 초대코드 발급, 기수(Cohort) 생성 및 과목/학생 배정
+              교육 기관 등록, 초대코드 발급, 기수 생성 및 과목/학생 배정
             </p>
             <div style={{
               display: 'flex',
@@ -396,11 +396,11 @@ export default function AdminPage() {
             <div style={{ fontSize: '20px' }}>ℹ️</div>
             <div>
               <div style={{ fontSize: '14px', fontWeight: '600', color: '#1565c0', marginBottom: '4px' }}>
-                Cohort 기반 운영 시스템
+                기수 기반 운영 시스템
               </div>
               <div style={{ fontSize: '13px', color: '#1976d2', lineHeight: '1.5' }}>
-                회사별 기수(Cohort)를 생성하고, 각 기수에 과목과 학생을 배정하여 6개월 단위 교육을 효율적으로 관리할 수 있습니다.
-                회사 관리 페이지에서 "Cohort 관리" 버튼을 눌러 시작하세요.
+                회사별 기수를 생성하고, 각 기수에 과목과 학생을 배정하여 6개월 단위 교육을 효율적으로 관리할 수 있습니다.
+                회사 관리 페이지에서 "기수 관리" 버튼을 눌러 시작하세요.
               </div>
             </div>
           </div>

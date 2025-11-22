@@ -291,7 +291,7 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
             !formData.confirmPassword ||
             !isPasswordValid(formData.password)
           }
-          className="w-full h-12 bg-primary text-text-primary rounded-lg text-base font-semibold transition-all hover:bg-primary-600 active:bg-primary-700 disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600 focus-visible:outline-offset-2"
+          className="w-full h-12 bg-primary text-white rounded-lg text-base font-semibold transition-all hover:bg-primary-600 active:bg-primary-700 disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600 focus-visible:outline-offset-2"
         >
           {loading ? (
             <span className="inline-flex items-center gap-2">
