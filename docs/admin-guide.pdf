@@ -1,0 +1,151 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+2 0 obj
+<< /Length 3038 >>
+stream
+BT
+/F1 11 Tf
+1 0 0 1 50 750 Tm
+(관리자 운영 가이드) Tj
+0 -16 Td
+(=================) Tj
+0 -16 Td
+0 -16 Td
+(1. 접속 전 준비) Tj
+0 -16 Td
+(- 관리자 ID와 임시 비밀번호를 발급받습니다.) Tj
+0 -16 Td
+(- Chrome 최신 버전 사용을 권장합니다.) Tj
+0 -16 Td
+(- 운영팀이 ALLOWED_ORIGINS 등 필수 환경변수를 사전 설정합니다.) Tj
+0 -16 Td
+0 -16 Td
+(2. 로그인과 기본 구조) Tj
+0 -16 Td
+(- /login 페이지에서 관리자 자격으로 로그인합니다.) Tj
+0 -16 Td
+(- 로그인하면 JWT 토큰에 role, companyId, companyAssigned 정보가 포함됩니다.) Tj
+0 -16 Td
+(- /admin 대시보드에는 회사 관리, 과목 관리, 학생 관리, Q&A 관리 카드가 표시됩니다.) Tj
+0 -16 Td
+0 -16 Td
+(3. 회사\\(기관\\) 관리 절차) Tj
+0 -16 Td
+(- /admin/companies 에서 "새 기관 추가"로 기관을 등록합니다.) Tj
+0 -16 Td
+(- 기관 카드의 📊 Overview 버튼으로 요약 지표를 확인합니다.) Tj
+0 -16 Td
+(- 📅 기수 관리 버튼으로 회사별 기수 관리 화면으로 이동합니다.) Tj
+0 -16 Td
+(- 초대코드 영역에서 복사, 직접입력, 재발급을 수행할 수 있습니다.) Tj
+0 -16 Td
+0 -16 Td
+(4. 기수\\(코호트\\) 운영) Tj
+0 -16 Td
+(- 기수 생성 시 이름, 시작일, 종료일, 활성 여부를 입력합니다.) Tj
+0 -16 Td
+(- 과목 배정 버튼으로 /admin/subjects 목록에서 과목을 연결합니다.) Tj
+0 -16 Td
+(- 학생 배정 버튼으로 /admin/users/students API 기반 목록에서 학생을 선택합니다.) Tj
+0 -16 Td
+(- 기수 삭제는 실제로 비활성화 처리이므로 안심하고 사용할 수 있습니다.) Tj
+0 -16 Td
+0 -16 Td
+(5. 과목과 콘텐츠 관리) Tj
+0 -16 Td
+(- /admin/subjects 에서 과목을 생성, 수정, 삭제합니다.) Tj
+0 -16 Td
+(- 과목 상세 페이지에서 이름, 설명, 순서, 활성 여부를 조정합니다.) Tj
+0 -16 Td
+(- 질문 관리 화면\\(/admin/subjects/[id]/questions 혹은 /admin/questions\\)에서 시험 문항을 다룹니다.) Tj
+0 -16 Td
+(- 영상 업로드는 /media/videos/upload API를 사용하며 500MB 이하만 허용합니다.) Tj
+0 -16 Td
+0 -16 Td
+(6. 학생 관리와 회사 배정) Tj
+0 -16 Td
+(- /admin/students 에서 학생 계정을 조회하고 검색할 수 있습니다.) Tj
+0 -16 Td
+(- 학생이 회사에 속하지 않았다면 회사 배정 버튼으로 연결합니다.) Tj
+0 -16 Td
+(- 기수 배정은 회사별 기수 관리 화면에서 진행합니다.) Tj
+0 -16 Td
+(- 학생이 직접 초대코드를 입력하려면 /company-assign 페이지를 안내합니다.) Tj
+0 -16 Td
+0 -16 Td
+(7. 진도 및 시험 모니터링) Tj
+0 -16 Td
+(- Progress API는 기수 기간\\(startDate~endDate\\) 안에서만 학습을 허용합니다.) Tj
+0 -16 Td
+(- 회사 Overview 화면에서 기수별 과목, 학생, 진행률을 한 번에 확인합니다.) Tj
+0 -16 Td
+(- 포털/분석 페이지에서는 role 기반 접근 제어가 적용됩니다.) Tj
+0 -16 Td
+0 -16 Td
+(8. 권한 및 라우팅 가드) Tj
+ET
+endstream
+endobj
+3 0 obj
+<< /Length 1265 >>
+stream
+BT
+/F1 11 Tf
+1 0 0 1 50 750 Tm
+(- apps/web/middleware.ts 가 JWT 내 role과 companyAssigned 상태를 검사합니다.) Tj
+0 -16 Td
+(- /admin/** 는 admin, /instructor/** 는 instructor 권한만 접근 가능합니다.) Tj
+0 -16 Td
+(- 회사 미배정 학생이 학생용 페이지에 접근하면 /company-assign 으로 리다이렉트됩니다.) Tj
+0 -16 Td
+0 -16 Td
+(9. 테스트와 배포 체크리스트) Tj
+0 -16 Td
+(- 기능 수정 후 pnpm test, pnpm lint 실행을 권장합니다.) Tj
+0 -16 Td
+(- pnpm-lock.yaml 을 항상 package.json 과 동기화합니다.) Tj
+0 -16 Td
+(- 배포 대상\\(Railway, Vercel 등\\)에서 환경변수와 파일 업로드 경로를 점검합니다.) Tj
+0 -16 Td
+(- Git 작업 시 커밋까지만 진행하고 push 는 담당자가 별도로 수행합니다.) Tj
+0 -16 Td
+0 -16 Td
+(10. 자주 묻는 질문) Tj
+0 -16 Td
+(- 영상 업로드 413 오류: 파일이 500MB 제한을 초과하면 발생합니다.) Tj
+0 -16 Td
+(- 기수 자동 배정 실패: 회원가입 시 초대코드를 사용했는지와 tryAutoAssignUserToCohort 호출 여부를 확인하세요.) Tj
+0 -16 Td
+(- 과목 목록 404: 관리자 UI는 /admin/subjects API 를 사용해야 하며 이전 /instructor 경로는 사용하지 않습니다.) Tj
+ET
+endstream
+endobj
+4 0 obj
+<< /Type /Page /Parent 6 0 R /MediaBox [0 0 612 792] /Contents 2 0 R /Resources << /Font << /F1 1 0 R >> >> >>
+endobj
+5 0 obj
+<< /Type /Page /Parent 6 0 R /MediaBox [0 0 612 792] /Contents 3 0 R /Resources << /Font << /F1 1 0 R >> >> >>
+endobj
+6 0 obj
+<< /Type /Pages /Count 2 /Kids [4 0 R 5 0 R] >>
+endobj
+7 0 obj
+<< /Type /Catalog /Pages 6 0 R >>
+endobj
+xref
+0 8
+0000000000 65535 f 
+0000000009 00000 n 
+0000000079 00000 n 
+0000003169 00000 n 
+0000004486 00000 n 
+0000004612 00000 n 
+0000004738 00000 n 
+0000004801 00000 n 
+trailer
+<< /Size 8 /Root 7 0 R >>
+startxref
+4850
+%%EOF
