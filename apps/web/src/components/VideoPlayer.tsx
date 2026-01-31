@@ -109,9 +109,9 @@ export default function VideoPlayer({
       preload: 'metadata',
       fluid: true,
       responsive: true,
-      playbackRates: [0.5, 0.75, 1, 1.25, 1.5, 2],
       controlBar: {
-        volumePanel: { inline: false }
+        volumePanel: { inline: false },
+        playbackRateMenuButton: false  // 배속 메뉴 비활성화
       },
       sources: [{ src: videoUrl, type: 'video/mp4' }]
     });
