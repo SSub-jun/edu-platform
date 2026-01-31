@@ -13,18 +13,74 @@ datasource db {
 model Company {
   id            String   @id @default(cuid())
   name          String
-  startDate     DateTime // 수강 시작일
-  endDate       DateTime // 수강 종료일
+  startDate     DateTime? // 구버전 호환용 (deprecated, Cohort 사용 권장)
+  endDate       DateTime? // 구버전 호환용 (deprecated, Cohort 사용 권장)
   isActive      Boolean  @default(true)
   inviteCode    String?  @unique // 초대코드 (관리자가 생성/설정)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
   // Relations
-  users         User[]
-  activeLessons CompanyLesson[]
+  users           User[]
+  cohorts         Cohort[]          // 교육 기수 관리
+  activeLessons   CompanyLesson[]   // 구버전 호환용 (deprecated)
+  activeSubjects  CompanySubject[]  // 구버전 호환용 (deprecated, Cohort로 대체)
 
   @@map("companies")
+}
+
+// 교육 기수 (6개월 단위 교육 과정)
+model Cohort {
+  id          String   @id @default(cuid())
+  companyId   String
+  name        String   // "2025년 1기", "2025년 상반기" 등
+  startDate   DateTime // 수강 시작일
+  endDate     DateTime // 수강 종료일
+  isActive    Boolean  @default(true) // 현재 진행 중인 기수인지
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  company        Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  cohortSubjects CohortSubject[] // 이 기수에 배정된 과목들
+  userCohorts    UserCohort[]    // 이 기수에 속한 학생들
+  subjectProgress SubjectProgress[] // 기수별 진도 추적
+
+  @@index([companyId, isActive])
+  @@map("cohorts")
+}
+
+// 기수별 과목 배정
+model CohortSubject {
+  id        String   @id @default(cuid())
+  cohortId  String
+  subjectId String
+  createdAt DateTime @default(now())
+
+  // Relations
+  cohort  Cohort  @relation(fields: [cohortId], references: [id], onDelete: Cascade)
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  @@unique([cohortId, subjectId])
+  @@map("cohort_subjects")
+}
+
+// 학생의 기수 참여 (한 학생이 여러 기수에 참여 가능)
+model UserCohort {
+  id        String   @id @default(cuid())
+  userId    String
+  cohortId  String
+  enrolledAt DateTime @default(now())
+  createdAt DateTime @default(now())
+
+  // Relations
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cohort Cohort @relation(fields: [cohortId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, cohortId])
+  @@index([userId])
+  @@index([cohortId])
+  @@map("user_cohorts")
 }
 
 model CompanyLesson {
@@ -41,11 +97,27 @@ model CompanyLesson {
   @@map("company_lessons")
 }
 
+// 신규: 회사에 Subject(과목) 단위로 배정
+model CompanySubject {
+  id        String   @id @default(cuid())
+  companyId String
+  subjectId String
+  createdAt DateTime @default(now())
+
+  // Relations
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, subjectId])
+  @@map("company_subjects")
+}
+
 model User {
   id              String    @id @default(cuid())
   username        String    @unique
   passwordHash    String    // BCrypt 해시
   role            UserRole  @default(student)
+  name            String?   // 실명 (학생 필수, 기존 데이터 호환을 위해 nullable)
   phone           String?   @unique // 휴대폰 번호 (회원가입 시 필수)
   phoneVerifiedAt DateTime? // 휴대폰 인증 완료 시간
   email           String?   // 이메일 (선택사항)
@@ -57,9 +129,12 @@ model User {
   // Relations
   company        Company?  @relation(fields: [companyId], references: [id])
   sessions       Session[]
+  userCohorts    UserCohort[]      // 참여 중인 기수들
   subjectProgress SubjectProgress[]
   progress       Progress[]
   examAttempts   ExamAttempt[]
+  qnaPosts       QnaPost[]
+  qnaReplies     QnaReply[]
 
   @@map("users")
 }
@@ -94,6 +169,8 @@ model Subject {
   subjectProgress  SubjectProgress[]
   examAttempts     ExamAttempt[]
   questions        Question[]
+  companySubjects  CompanySubject[]  // 구버전 호환용 (deprecated)
+  cohortSubjects   CohortSubject[]   // 신규: 기수별 과목 배정
 
   @@map("subjects")
 }
@@ -126,6 +203,10 @@ model VideoPart {
   description String?
   order       Int       @default(0)
   durationMs  Int       // 재생 시간 (밀리초)
+  videoUrl    String?   // 영상 파일 URL (로컬: /uploads/videos/..., 클라우드: https://...)
+  thumbnailUrl String?  // 썸네일 이미지 URL
+  fileSize    Int?      // 파일 크기 (bytes)
+  mimeType    String?   // video/mp4, video/webm 등
   isActive    Boolean   @default(true)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -140,29 +221,47 @@ model SubjectProgress {
   id              String   @id @default(cuid())
   userId          String
   subjectId       String
-  progressPercent Float    @default(0) // 0.0 ~ 100.0
+  cohortId        String?  // 어느 기수에서 수강 중인지 (nullable: 기존 데이터 호환)
+  progressPercent Float    @default(0) // 0.0 ~ 100.0 (Lesson들의 평균 수강률)
   lastLessonId    String?
   lastPartId      String?
   lastPlayedMs    Int      @default(0)
+  // 신규: Subject 수료 관련 필드
+  finalScore      Float?   // Subject 총점 (진도 20% + 시험 80%)
+  passed          Boolean? // Subject 수료 여부
+  completedAt     DateTime? // Subject 수료 시각
+  examAttemptCount Int     @default(0) // 현재 사이클 기준 시험 시도 횟수 (캐시용)
+  lastExamScore   Float?   // 마지막 시험 점수 (캐시용)
+  cycle           Int      @default(1) // 재수강 사이클 (다시 수강하기 시 +1)
   updatedAt       DateTime @updatedAt
 
   // Relations
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  cohort  Cohort? @relation(fields: [cohortId], references: [id], onDelete: SetNull)
 
   @@unique([userId, subjectId])
+  @@index([userId, cohortId])
+  @@index([userId, subjectId, cohortId])
   @@map("subject_progress")
 }
 
 model Progress {
-  id              String       @id @default(cuid())
-  userId          String
-  lessonId        String
-  progressPercent Float        @default(0) // 0.0 ~ 100.0
-  status          ProgressStatus @default(inProgress)
-  completedAt     DateTime?
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
+  id                 String       @id @default(cuid())
+  userId             String
+  lessonId           String
+  progressPercent    Float        @default(0) // 0.0 ~ 100.0 (maxReachedSeconds / videoDuration * 100)
+  maxReachedSeconds  Float        @default(0) // 사용자가 도달한 최대 시청 시점 (초 단위)
+  videoDuration      Float        @default(0) // 비디오 총 길이 (초 단위)
+  status             ProgressStatus @default(inProgress)
+  completedAt        DateTime?
+  // 강의(레슨) 단위 이수 판정을 위한 필드
+  // - finalScore: 진도 20% + 시험 80%가 반영된 최종 점수 (0.0 ~ 100.0)
+  // - passed: 해당 강의 이수 여부 (finalScore >= 70 && progressPercent >= 90 기준으로 활용 예정)
+  finalScore         Float?
+  passed             Boolean?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
 
   // Relations
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -174,8 +273,8 @@ model Progress {
 
 model Question {
   id          String   @id @default(cuid())
-  lessonId    String   // Lesson 단위 문제
-  subjectId   String   // 참조용 (Lesson.subjectId)
+  subjectId   String   // Subject 단위 문제 (메인)
+  lessonId    String?  // 옵션 (특정 Lesson 연관 시)
   stem        String   // 문제 내용
   explanation String?  // 해설
   answerIndex Int      @default(0) // 정답 선택지 인덱스 (0-3)
@@ -184,10 +283,11 @@ model Question {
   updatedAt   DateTime @updatedAt
 
   // Relations
-  lesson  Lesson  @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  lesson  Lesson? @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   choices Choice[]
 
+  @@index([subjectId])
   @@index([lessonId])
   @@map("questions")
 }
@@ -208,29 +308,32 @@ model Choice {
 }
 
 model ExamAttempt {
-  id           String        @id @default(cuid())
-  userId       String
-  lessonId     String        // Lesson 단위 시험
-  subjectId    String        // 참조용 (Lesson.subjectId)
-  cycle        Int           @default(1) // 1차 시험, 2차 시험 등
-  tryIndex     Int           @default(1) // 각 차수 내에서의 시도 횟수
-  status       ExamStatus    @default(inProgress)
-  score        Float?        // 시험 점수 (0.0 ~ 100.0)
-  passed       Boolean?      // 합격 여부
-  questionIds  Json?         // 응시 당시 출제된 문제 ID 목록
-  answers      Json?         // 제출 답변 (questionId와 선택한 choiceId 매핑)
-  startedAt    DateTime      @default(now())
-  submittedAt  DateTime?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  id            String        @id @default(cuid())
+  userId        String
+  subjectId     String        // Subject 단위 시험 (메인)
+  lessonId      String?       // 옵션 (구버전 호환용)
+  // 사이클/시도 관리
+  // - cycle: 재학습 사이클 번호 (1사이클 당 최대 3회 응시, 3회 미통과 시 재학습 후 cycle+1)
+  // - attemptNumber: 해당 과목/강의에서의 시도 횟수 (1, 2, 3 ...)
+  cycle         Int           @default(1)
+  attemptNumber Int           @default(1) // 시도 횟수 (1, 2, 3 - 최대 3회)
+  status        ExamStatus    @default(inProgress)
+  score         Float?        // 시험 점수 (0.0 ~ 100.0)
+  passed        Boolean?      // 합격 여부
+  questionIds   Json?         // 응시 당시 출제된 문제 ID 목록
+  answers       Json?         // 제출 답변 (questionId와 선택한 choiceId 매핑)
+  startedAt     DateTime      @default(now())
+  submittedAt   DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 
   // Relations
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  lesson  Lesson  @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  lesson  Lesson? @relation(fields: [lessonId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, lessonId, cycle, tryIndex])
-  @@index([userId, lessonId, cycle])
+  @@index([userId, subjectId])
+  @@index([userId, subjectId, attemptNumber])
   @@map("exam_attempts")
 }
 
@@ -315,6 +418,7 @@ model PortalExamSession {
   bank          PortalExamBank? @relation(fields: [bankId], references: [id])
   mode          PortalSelectionMode
   questionCount Int      @default(20)           // 세션별 출제 수(가변)
+  timeLimitMinutes Int   @default(30)           // 제한시간(분)
   isPublished   Boolean  @default(false)
   closedAt      DateTime?
   createdAt     DateTime @default(now())
@@ -388,4 +492,32 @@ model PortalAnswer {
   @@index([attemptId])
   @@index([questionId])
   @@map("portal_answers")
+}
+
+// QNA System Models (Simple)
+model QnaPost {
+  id        String     @id @default(cuid())
+  userId    String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  body      String
+  createdAt DateTime   @default(now())
+  replies   QnaReply[]
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("qna_posts")
+}
+
+model QnaReply {
+  id        String   @id @default(cuid())
+  postId    String
+  post      QnaPost  @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  body      String
+  createdAt DateTime @default(now())
+
+  @@index([postId])
+  @@map("qna_replies")
 }

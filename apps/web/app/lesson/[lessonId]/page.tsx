@@ -208,8 +208,15 @@ export default function LessonPage() {
             maxReachedSeconds={maxReachedSeconds || 0}
             videoDuration={0} // VideoPlayer가 로드 후 실제 duration을 onProgress로 전달
             onProgress={(data) => {
-              console.log('🎯 [LessonPage] VideoPlayer onProgress:', data);
-              handleVideoProgress(data.maxReachedSeconds, data.videoDuration);
+              // watchedSeconds: 진도 인정용 (실제 시청한 최대 시점)
+              // positionSeconds: 이어보기용 (현재 재생 헤드 위치)
+              console.log('🎯 [LessonPage] VideoPlayer onProgress:', {
+                watchedSeconds: data.watchedSeconds,
+                positionSeconds: data.positionSeconds,
+                videoDuration: data.videoDuration
+              });
+              // 진도율 계산에는 watchedSeconds 사용 (점프로 인한 오염 방지)
+              handleVideoProgress(data.watchedSeconds, data.videoDuration);
             }}
             autoPlay={false}
           />
