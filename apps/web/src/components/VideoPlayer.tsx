@@ -45,7 +45,7 @@ export default function VideoPlayer({
   const playerRef = useRef<Player | null>(null);
 
   // ============================================
-  // 핵심 상태 변수 5개
+  // 핵심 상태 변수
   // ============================================
   const maxWatchedTimeRef = useRef(maxReachedSeconds || 0);
   const lastValidTimeRef = useRef(maxReachedSeconds || 0);
@@ -53,6 +53,14 @@ export default function VideoPlayer({
   const isSeekingRef = useRef(false);
   const isRevertingRef = useRef(false);
   const revertCooldownRef = useRef<NodeJS.Timeout | null>(null);
+
+  // 🔑 onProgress를 ref로 관리 (의존성 배열에서 제거하기 위함)
+  const onProgressRef = useRef(onProgress);
+  onProgressRef.current = onProgress;
+
+  // 🔑 maxReachedSeconds를 ref로도 관리 (이벤트 핸들러에서 최신값 참조)
+  const maxReachedSecondsRef = useRef(maxReachedSeconds);
+  maxReachedSecondsRef.current = maxReachedSeconds;
 
   // API 서버 URL
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
@@ -66,21 +74,34 @@ export default function VideoPlayer({
     }
   }, [maxReachedSeconds]);
 
-  // 메인 플레이어 초기화 effect
+  // 🔑 플레이어 초기화 (videoUrl이 있을 때 한 번만)
   useEffect(() => {
-    // videoUrl이 없으면 초기화하지 않음
-    if (!videoUrl || !videoRef.current || playerRef.current) {
+    // videoUrl이 없거나 이미 플레이어가 있으면 스킵
+    if (!videoUrl) {
+      return;
+    }
+
+    // 이미 플레이어가 있으면 소스만 변경
+    if (playerRef.current && !playerRef.current.isDisposed()) {
+      console.log('🔄 [VideoPlayer] Updating source', { videoUrl });
+      playerRef.current.src({ src: videoUrl, type: 'video/mp4' });
+      // 상태 초기화
+      maxWatchedTimeRef.current = maxReachedSecondsRef.current || 0;
+      lastValidTimeRef.current = maxReachedSecondsRef.current || 0;
+      prevTimeRef.current = 0;
+      isSeekingRef.current = false;
+      isRevertingRef.current = false;
+      return;
+    }
+
+    // video element가 없으면 스킵
+    if (!videoRef.current) {
       return;
     }
 
     console.log('🎬 [VideoPlayer] Initializing player', { videoUrl });
 
     const videoElement = videoRef.current;
-
-    if (!videoElement.isConnected) {
-      console.warn('⚠️ [VideoPlayer] Video element not in DOM yet');
-      return;
-    }
 
     const player = videojs(videoElement, {
       controls: true,
@@ -101,7 +122,6 @@ export default function VideoPlayer({
     // UI 레벨 progress bar 클릭 차단 (해결책 B)
     // ============================================
     player.ready(() => {
-      // Video.js의 controlBar는 타입에 없으므로 타입 단언 사용
       const playerWithControls = player as Player & {
         controlBar?: {
           progressControl?: {
@@ -114,7 +134,6 @@ export default function VideoPlayer({
       if (progressControl) {
         const progressEl = progressControl.el();
 
-        // mousedown에서 allowed 밖이면 차단
         progressEl.addEventListener('mousedown', (e: MouseEvent) => {
           const rect = progressEl.getBoundingClientRect();
           const clickRatio = (e.clientX - rect.left) / rect.width;
@@ -130,14 +149,14 @@ export default function VideoPlayer({
             e.preventDefault();
             e.stopPropagation();
           }
-        }, true); // capture phase
+        }, true);
       }
 
       console.log('✅ [VideoPlayer] Player ready');
     });
 
     // ============================================
-    // 1. timeupdate: 연속 재생(Δt)일 때만 진도 인정 (해결책 C)
+    // 1. timeupdate: 연속 재생(Δt)일 때만 진도 인정
     // ============================================
     player.on('timeupdate', () => {
       if (!player || player.isDisposed()) return;
@@ -145,7 +164,6 @@ export default function VideoPlayer({
       const currentTime = player.currentTime() || 0;
       const duration = player.duration() || 0;
 
-      // 🔒 seeking 중이거나 되돌리기 락 중이면 무시
       if (isSeekingRef.current || isRevertingRef.current) {
         return;
       }
@@ -153,37 +171,31 @@ export default function VideoPlayer({
       const delta = currentTime - prevTimeRef.current;
       prevTimeRef.current = currentTime;
 
-      // 🎯 연속 재생 조건: delta가 0 ~ DELTA_TOLERANCE 사이
       const isContinuousPlay = delta > 0 && delta <= DELTA_TOLERANCE;
 
       if (isContinuousPlay && currentTime > maxWatchedTimeRef.current) {
-        // 진도 인정: maxWatchedTime 업데이트
         maxWatchedTimeRef.current = currentTime;
         lastValidTimeRef.current = currentTime;
 
-        // onProgress 콜백
-        if (onProgress) {
-          onProgress({
-            currentTime,
-            maxReachedSeconds: maxWatchedTimeRef.current,
-            videoDuration: duration,
-            positionSeconds: currentTime,
-            watchedSeconds: maxWatchedTimeRef.current
-          });
-        }
+        // ref를 통해 최신 콜백 호출
+        onProgressRef.current?.({
+          currentTime,
+          maxReachedSeconds: maxWatchedTimeRef.current,
+          videoDuration: duration,
+          positionSeconds: currentTime,
+          watchedSeconds: maxWatchedTimeRef.current
+        });
       } else if (isContinuousPlay) {
-        // 연속 재생이지만 이미 본 구간: lastValidTime만 업데이트
         lastValidTimeRef.current = currentTime;
       }
     });
 
     // ============================================
-    // 2. seeking: seek-lock + lastValidTime으로 되돌리기 (해결책 A)
+    // 2. seeking: seek-lock + lastValidTime으로 되돌리기
     // ============================================
     player.on('seeking', () => {
       if (!player || player.isDisposed()) return;
 
-      // 이미 되돌리기 중이면 무시 (레이스 방지)
       if (isRevertingRef.current) {
         return;
       }
@@ -192,18 +204,15 @@ export default function VideoPlayer({
       const targetTime = player.currentTime() || 0;
       const maxAllowed = maxWatchedTimeRef.current + FORWARD_EPSILON;
 
-      // 앞으로 점프 시도 → 되돌리기
       if (targetTime > maxAllowed) {
         console.warn('🔒 [VideoPlayer] Forward seek blocked', {
           requested: targetTime.toFixed(2),
           revertTo: lastValidTimeRef.current.toFixed(2)
         });
 
-        // 🔒 락 걸고 되돌리기
         isRevertingRef.current = true;
         player.currentTime(lastValidTimeRef.current);
 
-        // 쿨다운: 되돌린 직후 잠시 업데이트 금지
         if (revertCooldownRef.current) {
           clearTimeout(revertCooldownRef.current);
         }
@@ -222,10 +231,8 @@ export default function VideoPlayer({
 
       const currentTime = player.currentTime() || 0;
 
-      // 되돌리기 중이 아니면 seeking 플래그 해제
       if (!isRevertingRef.current) {
         isSeekingRef.current = false;
-        // 유효한 위치로 이동했으면 lastValidTime, prevTime 업데이트
         if (currentTime <= maxWatchedTimeRef.current + FORWARD_EPSILON) {
           lastValidTimeRef.current = currentTime;
           prevTimeRef.current = currentTime;
@@ -239,7 +246,7 @@ export default function VideoPlayer({
     player.on('loadedmetadata', () => {
       if (!player || player.isDisposed()) return;
 
-      const resumeTime = maxReachedSeconds || 0;
+      const resumeTime = maxReachedSecondsRef.current || 0;
       if (resumeTime > 0) {
         console.log('🎯 [VideoPlayer] Resuming from', resumeTime.toFixed(2));
         maxWatchedTimeRef.current = resumeTime;
@@ -261,15 +268,13 @@ export default function VideoPlayer({
 
       const safePosition = Math.min(currentTime, maxWatchedTimeRef.current);
 
-      if (onProgress) {
-        onProgress({
-          currentTime: safePosition,
-          maxReachedSeconds: maxWatchedTimeRef.current,
-          videoDuration: duration,
-          positionSeconds: safePosition,
-          watchedSeconds: maxWatchedTimeRef.current
-        });
-      }
+      onProgressRef.current?.({
+        currentTime: safePosition,
+        maxReachedSeconds: maxWatchedTimeRef.current,
+        videoDuration: duration,
+        positionSeconds: safePosition,
+        watchedSeconds: maxWatchedTimeRef.current
+      });
     });
 
     // ============================================
@@ -283,20 +288,18 @@ export default function VideoPlayer({
       maxWatchedTimeRef.current = duration;
       lastValidTimeRef.current = duration;
 
-      if (onProgress) {
-        onProgress({
-          currentTime: duration,
-          maxReachedSeconds: duration,
-          videoDuration: duration,
-          positionSeconds: duration,
-          watchedSeconds: duration
-        });
-      }
+      onProgressRef.current?.({
+        currentTime: duration,
+        maxReachedSeconds: duration,
+        videoDuration: duration,
+        positionSeconds: duration,
+        watchedSeconds: duration
+      });
 
       console.log('🏁 [VideoPlayer] Video ended, progress = 100%');
     });
 
-    // Cleanup
+    // Cleanup (컴포넌트 언마운트 시에만)
     return () => {
       if (revertCooldownRef.current) {
         clearTimeout(revertCooldownRef.current);
@@ -308,20 +311,7 @@ export default function VideoPlayer({
         playerRef.current = null;
       }
     };
-  }, [videoUrl, autoPlay, maxReachedSeconds, onProgress]);
-
-  // videoUrl 변경 시 소스 업데이트
-  useEffect(() => {
-    const player = playerRef.current;
-    if (player && videoUrl && !player.isDisposed()) {
-      // 상태 초기화
-      maxWatchedTimeRef.current = maxReachedSeconds || 0;
-      lastValidTimeRef.current = maxReachedSeconds || 0;
-      prevTimeRef.current = 0;
-      isSeekingRef.current = false;
-      isRevertingRef.current = false;
-    }
-  }, [videoUrl, maxReachedSeconds]);
+  }, [videoUrl, autoPlay]); // 🔑 onProgress, maxReachedSeconds 제거
 
   // 등록된 영상이 없으면 안내 메시지
   if (!videoUrl) {
