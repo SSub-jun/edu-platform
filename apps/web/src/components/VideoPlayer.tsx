@@ -141,19 +141,7 @@ export default function VideoPlayer({
           const targetTime = clickRatio * duration;
           const maxAllowed = maxWatchedTimeRef.current + FORWARD_EPSILON;
 
-          // 🔍 디버깅: UI 클릭 상태 로그
-          console.log('🔍 [VideoPlayer] UI mousedown:', {
-            targetTime: targetTime.toFixed(2),
-            maxWatchedTime: maxWatchedTimeRef.current.toFixed(2),
-            maxAllowed: maxAllowed.toFixed(2),
-            willBlock: targetTime > maxAllowed
-          });
-
           if (targetTime > maxAllowed) {
-            console.warn('🚫 [VideoPlayer] UI click blocked', {
-              targetTime: targetTime.toFixed(2),
-              maxAllowed: maxAllowed.toFixed(2)
-            });
             e.preventDefault();
             e.stopPropagation();
           }
@@ -212,20 +200,7 @@ export default function VideoPlayer({
       const targetTime = player.currentTime() || 0;
       const maxAllowed = maxWatchedTimeRef.current + FORWARD_EPSILON;
 
-      // 🔍 디버깅: 항상 seeking 상태 로그
-      console.log('🔍 [VideoPlayer] Seeking check:', {
-        targetTime: targetTime.toFixed(2),
-        maxWatchedTime: maxWatchedTimeRef.current.toFixed(2),
-        maxAllowed: maxAllowed.toFixed(2),
-        lastValidTime: lastValidTimeRef.current.toFixed(2),
-        willBlock: targetTime > maxAllowed
-      });
-
       if (targetTime > maxAllowed) {
-        console.warn('🔒 [VideoPlayer] Forward seek blocked', {
-          requested: targetTime.toFixed(2),
-          revertTo: lastValidTimeRef.current.toFixed(2)
-        });
 
         isRevertingRef.current = true;
         player.currentTime(lastValidTimeRef.current);
@@ -248,19 +223,11 @@ export default function VideoPlayer({
 
       const currentTime = player.currentTime() || 0;
 
-      // 🔍 디버깅: seeked 상태 로그
-      console.log('🔍 [VideoPlayer] Seeked:', {
-        currentTime: currentTime.toFixed(2),
-        maxWatchedTime: maxWatchedTimeRef.current.toFixed(2),
-        isReverting: isRevertingRef.current
-      });
-
       if (!isRevertingRef.current) {
         isSeekingRef.current = false;
         if (currentTime <= maxWatchedTimeRef.current + FORWARD_EPSILON) {
           lastValidTimeRef.current = currentTime;
           prevTimeRef.current = currentTime;
-          console.log('🔍 [VideoPlayer] lastValidTime updated to:', currentTime.toFixed(2));
         }
       }
     });
