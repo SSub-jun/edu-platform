@@ -50,7 +50,8 @@ export default function ExamPage() {
   const loadSubjectStatus = async () => {
     try {
       // 먼저 Subject 상태 확인
-      const statusResponse = await fetch(`http://localhost:4000/me/curriculum`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const statusResponse = await fetch(`${apiUrl}/me/curriculum`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
         },
@@ -92,7 +93,8 @@ export default function ExamPage() {
 
   const startExam = async (subjectName?: string) => {
     try {
-      const response = await fetch(`http://localhost:4000/exam/subjects/${subjectId}/start`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const response = await fetch(`${apiUrl}/exam/subjects/${subjectId}/start`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -171,7 +173,8 @@ export default function ExamPage() {
         choiceIndex
       }));
 
-      const response = await fetch(`http://localhost:4000/exam/attempts/${examData.attemptId}/submit`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const response = await fetch(`${apiUrl}/exam/attempts/${examData.attemptId}/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
