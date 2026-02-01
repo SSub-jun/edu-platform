@@ -82,15 +82,22 @@ export class SmsGateway {
         this.logger.log(`[SOLAPI] SMS group created successfully. GroupId: ${result.groupInfo.groupId}, Status: ${result.groupInfo.status}`);
       }
 
-    } catch (error) {
-      this.logger.error(`[SOLAPI] Failed to send SMS to ${message.phone}: ${error.message}`);
-      
+    } catch (error: any) {
+      // 상세 에러 로깅
+      this.logger.error(`[SOLAPI] Failed to send SMS to ${message.phone}`);
+      this.logger.error(`[SOLAPI] Error details: ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`);
+
+      if (error.response) {
+        this.logger.error(`[SOLAPI] Response status: ${error.response.status}`);
+        this.logger.error(`[SOLAPI] Response data: ${JSON.stringify(error.response.data)}`);
+      }
+
       // 프로덕션에서는 실패해도 사용자에게 성공으로 보이게 함 (보안상 이유)
       if (process.env.NODE_ENV === 'production') {
         this.logger.warn('[SOLAPI] SMS sending failed in production, but returning success to prevent user enumeration');
         return;
       }
-      
+
       throw error;
     }
   }
