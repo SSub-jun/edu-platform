@@ -55,6 +55,14 @@ export class SubmitExamResponseDto {
 
   @ApiProperty({ description: '합격 여부 (70점 이상)' })
   passed: boolean;
+
+  @ApiProperty({ 
+    description: '과목 총점 (진도율 20% + 시험 점수 80%)', 
+    minimum: 0, 
+    maximum: 100,
+    required: false 
+  })
+  finalScore?: number;
 }
 
 export class RetakeExamResponseDto {

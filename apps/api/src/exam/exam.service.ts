@@ -268,6 +268,9 @@ export class ExamService {
     // 레슨 단위 수료 로직은 아래에서 별도로 Progress.finalScore / passed에 반영
     const passed = examScore >= 70;
 
+    // finalScore 변수 선언 (Subject/Lesson 단위 시험에서 계산됨)
+    let finalScore: number | undefined = undefined;
+
     // 4-A. Subject 단위 수료 로직 (신규)
     // - Lesson 평균 진도율 20% + 시험 점수 80% = 최종 점수(finalScore)
     // - finalScore >= 70일 때 해당 과목 수료
@@ -303,7 +306,7 @@ export class ExamService {
       // Subject 총점 계산: 진도율 20% + 시험 점수 80%
       const progressScore = avgProgressPercent * 0.2; // 100% 진도 시 20점
       const examScoreComponent = examScore * 0.8;     // 시험 점수(0~100)를 80% 비중으로 반영
-      const finalScore = progressScore + examScoreComponent; // 0 ~ 100
+      finalScore = progressScore + examScoreComponent; // 0 ~ 100
 
       const subjectPassed = finalScore >= 70;
 
@@ -356,7 +359,7 @@ export class ExamService {
 
       const progressScore = clampedProgressPercent * 0.2;
       const examScoreComponent = examScore * 0.8;
-      const finalScore = progressScore + examScoreComponent;
+      finalScore = progressScore + examScoreComponent;
 
       const lessonPassed = finalScore >= 70 && clampedProgressPercent >= 90;
 
@@ -389,7 +392,8 @@ export class ExamService {
 
     return {
       examScore,
-      passed
+      passed,
+      finalScore
     };
   }
 
