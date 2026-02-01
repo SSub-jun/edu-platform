@@ -4,7 +4,7 @@ import React, { useEffect, useCallback, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useLessonStatus } from '../../../src/hooks/useLessonStatus';
-import { useDebouncedProgressPing } from '../../../src/hooks/useProgressPing';
+import { useDebouncedProgressPing, getProgressFromLocalStorage } from '../../../src/hooks/useProgressPing';
 import { useNextAvailable } from '../../../src/hooks/useNextAvailable';
 import VideoPlayer from '../../../src/components/VideoPlayer';
 import StatusBadge from '../../../src/components/ui/StatusBadge';
@@ -25,7 +25,7 @@ export default function LessonPage() {
     isLoading: nextLoading 
   } = useNextAvailable();
   
-  const { debouncedPing, flushPing } = useDebouncedProgressPing();
+  const { debouncedPing, flushPing, flushPingSync } = useDebouncedProgressPing();
 
   // 🎯 낙관적 UI 업데이트: 로컬 진도율 상태
   const [optimisticProgress, setOptimisticProgress] = useState<{
@@ -37,12 +37,48 @@ export default function LessonPage() {
   // ⏱️ 마지막 UI 업데이트 시간 추적 (10초 throttle)
   const lastUIUpdateRef = React.useRef<number>(0);
 
+  // ✅ localStorage에서 진도율 복구 (서버보다 높으면 사용)
+  useEffect(() => {
+    if (lessonId && lessonStatus) {
+      const stored = getProgressFromLocalStorage(lessonId);
+      if (stored && stored.maxReachedSeconds > (lessonStatus.maxReachedSeconds || 0)) {
+        console.log('💾 [LessonPage] Restoring progress from localStorage:', stored);
+        setOptimisticProgress({
+          maxReachedSeconds: stored.maxReachedSeconds,
+          videoDuration: stored.videoDuration,
+          progressPercent: stored.videoDuration > 0
+            ? (stored.maxReachedSeconds / stored.videoDuration) * 100
+            : 0
+        });
+        // 복구된 진도를 서버에도 전송
+        debouncedPing({
+          lessonId,
+          partId: stored.partId || 'part-1',
+          maxReachedSeconds: stored.maxReachedSeconds,
+          videoDuration: stored.videoDuration
+        });
+      }
+    }
+  }, [lessonId, lessonStatus, debouncedPing]);
+
   // 컴포넌트 언마운트 시 남은 진도 전송
   useEffect(() => {
     return () => {
       flushPing();
     };
-  }, []); // flushPing이 안정적이므로 의존성에서 제거
+  }, [flushPing]);
+
+  // ✅ 페이지 종료/새로고침 시 sendBeacon으로 확실히 저장
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      flushPingSync();
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [flushPingSync]);
 
   const handleVideoProgress = useCallback((maxReachedSeconds: number, videoDuration: number) => {
     const now = Date.now();
