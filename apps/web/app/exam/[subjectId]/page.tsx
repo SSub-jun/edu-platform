@@ -62,9 +62,15 @@ export default function ExamPage() {
       }
 
       const curriculum = await statusResponse.json();
-      const subject = curriculum.subjects?.find((s: any) => s.id === subjectId);
+      // API 응답 구조: { success: true, data: [{ subject: {...}, lessons: [...], remainingDays: number }] }
+      const data = curriculum.data || [];
+      const curriculumItem = data.find((item: any) => item.subject?.id === subjectId);
+      const subject = curriculumItem?.subject;
       
       if (!subject) {
+        console.error('[EXAM] Curriculum data:', curriculum);
+        console.error('[EXAM] Looking for subjectId:', subjectId);
+        console.error('[EXAM] Available subjects:', data.map((item: any) => item.subject?.id));
         throw new Error('과목을 찾을 수 없습니다');
       }
 
