@@ -122,8 +122,8 @@ export class SmsGateway {
       return digits;
     }
     
-    // 기본적으로 입력된 형식 그대로 반환
-    return phone;
+    // 기본적으로 숫자만 반환 (하이픈 제거)
+    return digits;
   }
 
   createOtpMessage(code: string): string {
