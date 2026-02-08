@@ -4,7 +4,7 @@ import React, { useEffect, useCallback, useState, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useLessonStatus } from '../../../src/hooks/useLessonStatus';
-import { useDebouncedProgressPing } from '../../../src/hooks/useProgressPing';
+import { useDebouncedProgressPing, getProgressFromLocalStorage } from '../../../src/hooks/useProgressPing';
 import { useNextAvailable } from '../../../src/hooks/useNextAvailable';
 import VideoPlayer from '../../../src/components/VideoPlayer';
 import StatusBadge from '../../../src/components/ui/StatusBadge';
@@ -40,6 +40,30 @@ export default function LessonPage() {
   // 비디오 재생 URL (Supabase signed URL) - Hook 순서 보장을 위해 최상단 배치
   const [signedVideoUrl, setSignedVideoUrl] = useState<string | undefined>();
   const signedUrlRefreshRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // ✅ localStorage에서 진도율 복구 (서버보다 높으면 사용)
+  useEffect(() => {
+    if (lessonId && lessonStatus) {
+      const stored = getProgressFromLocalStorage(lessonId);
+      if (stored && stored.maxReachedSeconds > (lessonStatus.maxReachedSeconds || 0)) {
+        console.log('💾 [LessonPage] Restoring progress from localStorage:', stored);
+        setOptimisticProgress({
+          maxReachedSeconds: stored.maxReachedSeconds,
+          videoDuration: stored.videoDuration,
+          progressPercent: stored.videoDuration > 0
+            ? (stored.maxReachedSeconds / stored.videoDuration) * 100
+            : 0
+        });
+        // 복구된 진도를 서버에도 전송
+        debouncedPing({
+          lessonId,
+          partId: stored.partId || 'part-1',
+          maxReachedSeconds: stored.maxReachedSeconds,
+          videoDuration: stored.videoDuration
+        });
+      }
+    }
+  }, [lessonId, lessonStatus, debouncedPing]);
 
   // 컴포넌트 언마운트 시 남은 진도 전송
   useEffect(() => {
