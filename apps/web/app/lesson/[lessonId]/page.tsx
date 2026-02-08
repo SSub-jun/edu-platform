@@ -84,29 +84,71 @@ export default function LessonPage() {
     };
   }, [flushPingSync]);
 
+  // Supabase signed URL 발급 및 갱신
+  const videoPartId = lessonStatus?.videoParts?.[0]?.id;
+  const rawVideoUrl = lessonStatus?.videoParts?.[0]?.videoUrl;
+
+  useEffect(() => {
+    if (!videoPartId) return;
+
+    // 이미 절대 URL인 경우 (Supabase 대시보드에서 직접 입력한 URL)
+    if (rawVideoUrl?.startsWith('http')) {
+      setSignedVideoUrl(rawVideoUrl);
+      return;
+    }
+
+    // API에서 signed URL 발급
+    const fetchSignedUrl = async () => {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+        const token = localStorage.getItem('accessToken');
+        const res = await fetch(`${apiUrl}/media/videos/${videoPartId}/signed-url`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        const json = await res.json();
+        if (json.success && json.data?.signedUrl) {
+          setSignedVideoUrl(json.data.signedUrl);
+        }
+      } catch (error) {
+        console.error('[LessonPage] Signed URL 발급 실패:', error);
+      }
+    };
+
+    fetchSignedUrl();
+
+    // 90분마다 signed URL 갱신 (2시간 만료 대비)
+    signedUrlRefreshRef.current = setInterval(fetchSignedUrl, 90 * 60 * 1000);
+
+    return () => {
+      if (signedUrlRefreshRef.current) {
+        clearInterval(signedUrlRefreshRef.current);
+      }
+    };
+  }, [videoPartId, rawVideoUrl]);
+
   const handleVideoProgress = useCallback((maxReachedSeconds: number, videoDuration: number) => {
     const now = Date.now();
     const timeSinceLastUpdate = now - lastUIUpdateRef.current;
-    
+
     // ✅ 10초마다 한 번씩만 UI 업데이트 (10000ms throttle)
     if (timeSinceLastUpdate >= 10000 || lastUIUpdateRef.current === 0) {
-      console.log('🎯 [LessonPage] UI Progress updated:', { 
-        lessonId, 
-        maxReachedSeconds, 
+      console.log('🎯 [LessonPage] UI Progress updated:', {
+        lessonId,
+        maxReachedSeconds,
         videoDuration,
         timeSinceLastUpdate: `${(timeSinceLastUpdate / 1000).toFixed(1)}s`
       });
-      
+
       const progressPercent = videoDuration > 0 ? (maxReachedSeconds / videoDuration) * 100 : 0;
       setOptimisticProgress({
         maxReachedSeconds,
         videoDuration,
         progressPercent
       });
-      
+
       lastUIUpdateRef.current = now;
     }
-    
+
     // ⏱️ 백그라운드에서 서버 동기화 (3초 디바운스) - 항상 실행
     debouncedPing({
       lessonId,
@@ -168,58 +210,9 @@ export default function LessonPage() {
   }
 
   const { progressPercent, unlocked, remainingTries, blockers, maxReachedSeconds, subjectId, videoParts } = lessonStatus;
-  
-  // 🔍 디버깅: 서버에서 받은 데이터 확인
-  console.log('🔍 [LessonPage] lessonStatus:', {
-    lessonId,
-    progressPercent,
-    maxReachedSeconds,
-    videoParts: videoParts?.length
-  });
-  
+
   // 🎯 실제 표시할 진도율: 낙관적 상태 우선, 없으면 서버 상태
   const displayProgressPercent = optimisticProgress?.progressPercent ?? progressPercent;
-
-  const videoPartId = videoParts?.[0]?.id;
-  const rawVideoUrl = videoParts?.[0]?.videoUrl;
-
-  useEffect(() => {
-    if (!videoPartId) return;
-
-    // 이미 절대 URL인 경우 (Supabase 대시보드에서 직접 입력한 URL)
-    if (rawVideoUrl?.startsWith('http')) {
-      setSignedVideoUrl(rawVideoUrl);
-      return;
-    }
-
-    // API에서 signed URL 발급
-    const fetchSignedUrl = async () => {
-      try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-        const token = localStorage.getItem('accessToken');
-        const res = await fetch(`${apiUrl}/media/videos/${videoPartId}/signed-url`, {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
-        const json = await res.json();
-        if (json.success && json.data?.signedUrl) {
-          setSignedVideoUrl(json.data.signedUrl);
-        }
-      } catch (error) {
-        console.error('[LessonPage] Signed URL 발급 실패:', error);
-      }
-    };
-
-    fetchSignedUrl();
-
-    // 90분마다 signed URL 갱신 (2시간 만료 대비)
-    signedUrlRefreshRef.current = setInterval(fetchSignedUrl, 90 * 60 * 1000);
-
-    return () => {
-      if (signedUrlRefreshRef.current) {
-        clearInterval(signedUrlRefreshRef.current);
-      }
-    };
-  }, [videoPartId, rawVideoUrl]);
 
   return (
     <div className="min-h-screen py-4 px-4 bg-bg-primary">
