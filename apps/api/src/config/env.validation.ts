@@ -33,6 +33,11 @@ export const envValidationSchema = Joi.object({
   VERIFY_ON_COURSE_START: Joi.boolean().default(false),
   VERIFY_PROVIDER: Joi.string().default('mock'),
   
+  // Supabase Storage 설정
+  SUPABASE_URL: Joi.string().required(),
+  SUPABASE_SERVICE_ROLE_KEY: Joi.string().required(),
+  SUPABASE_STORAGE_BUCKET: Joi.string().default('videos'),
+
   // 환경 설정
   NODE_ENV: Joi.string().valid('development', 'production', 'test').default('development'),
 });

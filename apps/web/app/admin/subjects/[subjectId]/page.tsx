@@ -373,16 +373,35 @@ export default function SubjectManagePage() {
     setUploadProgress(0);
 
     try {
-      const formData = new FormData();
-      formData.append('file', selectedFile);
-      formData.append('lessonId', selectedLessonForVideos.id);
-      formData.append('title', videoPartForm.title.trim());
-      if (videoPartForm.description.trim()) {
-        formData.append('description', videoPartForm.description.trim());
-      }
-      formData.append('order', videoPartForm.order.toString());
+      const token = localStorage.getItem('accessToken');
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
-      // XMLHttpRequest로 업로드 진행률 추적
+      // Step 1: API에서 signed upload URL 발급
+      const requestRes = await fetch(`${apiUrl}/media/videos/request-upload`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          lessonId: selectedLessonForVideos.id,
+          title: videoPartForm.title.trim(),
+          description: videoPartForm.description.trim() || undefined,
+          order: videoPartForm.order,
+          filename: selectedFile.name,
+          mimeType: selectedFile.type,
+          fileSize: selectedFile.size,
+        }),
+      });
+
+      if (!requestRes.ok) {
+        const errData = await requestRes.json().catch(() => ({}));
+        throw new Error(errData.message || '업로드 URL 발급에 실패했습니다.');
+      }
+
+      const { data: uploadData } = await requestRes.json();
+
+      // Step 2: Supabase Storage에 직접 업로드 (진행률 표시)
       await new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
 
@@ -394,22 +413,34 @@ export default function SubjectManagePage() {
         });
 
         xhr.addEventListener('load', () => {
-          if (xhr.status === 200 || xhr.status === 201) {
-            resolve(JSON.parse(xhr.responseText));
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve(null);
           } else {
-            reject(new Error(`Upload failed: ${xhr.statusText}`));
+            reject(new Error(`Supabase 업로드 실패: ${xhr.status}`));
           }
         });
 
-        xhr.addEventListener('error', () => reject(new Error('Upload failed')));
-        xhr.addEventListener('abort', () => reject(new Error('Upload aborted')));
+        xhr.addEventListener('error', () => reject(new Error('업로드 네트워크 오류')));
+        xhr.addEventListener('abort', () => reject(new Error('업로드가 취소되었습니다')));
 
-        const token = localStorage.getItem('accessToken');
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-        xhr.open('POST', `${apiUrl}/media/videos/upload`);
-        xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-        xhr.send(formData);
+        xhr.open('PUT', uploadData.signedUrl);
+        xhr.setRequestHeader('Content-Type', selectedFile.type);
+        xhr.send(selectedFile);
       });
+
+      // Step 3: 업로드 완료 확인
+      const confirmRes = await fetch(`${apiUrl}/media/videos/confirm-upload`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ videoPartId: uploadData.videoPartId }),
+      });
+
+      if (!confirmRes.ok) {
+        throw new Error('업로드 완료 확인에 실패했습니다.');
+      }
 
       alert('영상이 성공적으로 업로드되었습니다!');
       setShowVideoPartModal(false);
@@ -1365,7 +1396,7 @@ export default function SubjectManagePage() {
                     </div>
                   )}
                   <div style={{ fontSize: '12px', color: '#6c757d', marginTop: '8px' }}>
-                    💡 지원 형식: MP4, WebM, OGG, MOV (최대 500MB)
+                    💡 지원 형식: MP4, WebM, OGG, MOV (최대 1GB)
                   </div>
                 </div>
               )}
@@ -1464,7 +1495,7 @@ export default function SubjectManagePage() {
                     type="text"
                     value={videoPartForm.videoUrl}
                     onChange={(e) => setVideoPartForm({ ...videoPartForm, videoUrl: e.target.value })}
-                    placeholder="https://example.com/video.mp4 또는 /uploads/videos/..."
+                    placeholder="https://xxx.supabase.co/storage/v1/object/... 또는 외부 URL"
                     disabled={uploadingFile}
                     style={{
                       width: '100%',

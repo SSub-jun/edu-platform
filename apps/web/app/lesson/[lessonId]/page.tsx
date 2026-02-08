@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useCallback, useState } from 'react';
+import React, { useEffect, useCallback, useState, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useLessonStatus } from '../../../src/hooks/useLessonStatus';
@@ -176,23 +176,50 @@ export default function LessonPage() {
   // 🎯 실제 표시할 진도율: 낙관적 상태 우선, 없으면 서버 상태
   const displayProgressPercent = optimisticProgress?.progressPercent ?? progressPercent;
 
-  // 비디오 URL 추출 (1개 레슨 = 1개 영상)
+  // 비디오 재생 URL (Supabase signed URL)
+  const [signedVideoUrl, setSignedVideoUrl] = useState<string | undefined>();
+  const signedUrlRefreshRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const videoPartId = videoParts?.[0]?.id;
   const rawVideoUrl = videoParts?.[0]?.videoUrl;
-  
-  // videoUrl을 API 서버의 전체 URL로 변환
-  // DB: /uploads/videos/xxx.mp4 → API: /media/videos/xxx.mp4
-  const videoUrl: string | undefined = rawVideoUrl 
-    ? rawVideoUrl.startsWith('http') 
-      ? rawVideoUrl  // 이미 전체 URL
-      : (() => {
-          const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-          // /uploads/videos/xxx.mp4 → /media/videos/xxx.mp4
-          const apiPath = rawVideoUrl.replace('/uploads/videos/', '/media/videos/');
-          return `${apiUrl}${apiPath}`;
-        })()
-    : undefined;
-  
-  // videoDuration은 VideoPlayer가 비디오를 로드한 후 onProgress 콜백으로 제공됩니다
+
+  useEffect(() => {
+    if (!videoPartId) return;
+
+    // 이미 절대 URL인 경우 (Supabase 대시보드에서 직접 입력한 URL)
+    if (rawVideoUrl?.startsWith('http')) {
+      setSignedVideoUrl(rawVideoUrl);
+      return;
+    }
+
+    // API에서 signed URL 발급
+    const fetchSignedUrl = async () => {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+        const token = localStorage.getItem('accessToken');
+        const res = await fetch(`${apiUrl}/media/videos/${videoPartId}/signed-url`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        const json = await res.json();
+        if (json.success && json.data?.signedUrl) {
+          setSignedVideoUrl(json.data.signedUrl);
+        }
+      } catch (error) {
+        console.error('[LessonPage] Signed URL 발급 실패:', error);
+      }
+    };
+
+    fetchSignedUrl();
+
+    // 90분마다 signed URL 갱신 (2시간 만료 대비)
+    signedUrlRefreshRef.current = setInterval(fetchSignedUrl, 90 * 60 * 1000);
+
+    return () => {
+      if (signedUrlRefreshRef.current) {
+        clearInterval(signedUrlRefreshRef.current);
+      }
+    };
+  }, [videoPartId, rawVideoUrl]);
 
   return (
     <div className="min-h-screen py-4 px-4 bg-bg-primary">
@@ -239,7 +266,7 @@ export default function LessonPage() {
           <div className="lg:col-span-2">
             <div className="bg-black rounded-xl overflow-hidden">
           <VideoPlayer
-            src={videoUrl}
+            src={signedVideoUrl}
             title={`레슨 ${lessonId}`}
             maxReachedSeconds={maxReachedSeconds || 0}
             videoDuration={0} // VideoPlayer가 로드 후 실제 duration을 onProgress로 전달

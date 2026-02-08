@@ -110,19 +110,39 @@ export default function LessonVideosManagePage() {
     setUploadProgress(0);
 
     try {
-      const formData = new FormData();
-      formData.append('file', newVideo.file);
-      formData.append('lessonId', lessonId);
-      formData.append('title', newVideo.title.trim());
-      if (newVideo.description.trim()) {
-        formData.append('description', newVideo.description.trim());
-      }
-      formData.append('order', '0'); // 항상 0으로 고정
+      const token = localStorage.getItem('accessToken');
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
-      // XMLHttpRequest를 사용하여 업로드 진행률 추적
+      // Step 1: API에서 signed upload URL 발급
+      const requestRes = await fetch(`${apiUrl}/media/videos/request-upload`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          lessonId,
+          title: newVideo.title.trim(),
+          description: newVideo.description.trim() || undefined,
+          order: 0,
+          filename: newVideo.file.name,
+          mimeType: newVideo.file.type,
+          fileSize: newVideo.file.size,
+        }),
+      });
+
+      if (!requestRes.ok) {
+        const errData = await requestRes.json().catch(() => ({}));
+        throw new Error(errData.message || '업로드 URL 발급에 실패했습니다.');
+      }
+
+      const { data: uploadData } = await requestRes.json();
+
+      // Step 2: Supabase Storage에 직접 업로드 (진행률 표시)
+      const fileToUpload = newVideo.file;
       await new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
-        
+
         xhr.upload.addEventListener('progress', (e) => {
           if (e.lengthComputable) {
             const percentComplete = Math.round((e.loaded / e.total) * 100);
@@ -131,30 +151,42 @@ export default function LessonVideosManagePage() {
         });
 
         xhr.addEventListener('load', () => {
-          if (xhr.status === 200 || xhr.status === 201) {
-            resolve(JSON.parse(xhr.responseText));
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve(null);
           } else {
-            reject(new Error(`Upload failed: ${xhr.statusText}`));
+            reject(new Error(`Supabase 업로드 실패: ${xhr.status}`));
           }
         });
 
-        xhr.addEventListener('error', () => reject(new Error('Upload failed')));
-        xhr.addEventListener('abort', () => reject(new Error('Upload aborted')));
+        xhr.addEventListener('error', () => reject(new Error('업로드 네트워크 오류')));
+        xhr.addEventListener('abort', () => reject(new Error('업로드가 취소되었습니다')));
 
-        const token = localStorage.getItem('accessToken');
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-        xhr.open('POST', `${apiUrl}/media/videos/upload`);
-        xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-        xhr.send(formData);
+        xhr.open('PUT', uploadData.signedUrl);
+        xhr.setRequestHeader('Content-Type', fileToUpload.type);
+        xhr.send(fileToUpload);
       });
+
+      // Step 3: 업로드 완료 확인
+      const confirmRes = await fetch(`${apiUrl}/media/videos/confirm-upload`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ videoPartId: uploadData.videoPartId }),
+      });
+
+      if (!confirmRes.ok) {
+        throw new Error('업로드 완료 확인에 실패했습니다.');
+      }
 
       alert('영상이 성공적으로 업로드되었습니다!');
       setNewVideo({ title: '', description: '', file: null });
       setShowUploadForm(false);
       loadData();
-    } catch (error) {
+    } catch (error: any) {
       console.error('업로드 실패:', error);
-      alert('영상 업로드에 실패했습니다.');
+      alert('영상 업로드에 실패했습니다: ' + (error.message || '알 수 없는 오류'));
     } finally {
       setUploading(false);
       setUploadProgress(0);
@@ -338,7 +370,7 @@ export default function LessonVideosManagePage() {
             
             <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'block', marginBottom: '6px', color: '#555', fontSize: '14px', fontWeight: '500' }}>
-                영상 파일 * (최대 500MB)
+                영상 파일 * (최대 1GB)
               </label>
               <input
                 type="file"
@@ -546,14 +578,9 @@ export default function LessonVideosManagePage() {
                   <div><strong>형식:</strong> {video.mimeType?.split('/')[1]?.toUpperCase() || 'N/A'}</div>
                   {video.videoUrl && (
                     <div>
-                      <a 
-                        href={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}${video.videoUrl}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ color: '#0070f3', textDecoration: 'underline' }}
-                      >
-                        🎬 미리보기
-                      </a>
+                      <span style={{ color: '#28a745' }}>
+                        ✅ Supabase Storage에 저장됨
+                      </span>
                     </div>
                   )}
                 </div>
