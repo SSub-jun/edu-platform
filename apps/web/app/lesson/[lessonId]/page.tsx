@@ -37,6 +37,10 @@ export default function LessonPage() {
   // ⏱️ 마지막 UI 업데이트 시간 추적 (10초 throttle)
   const lastUIUpdateRef = React.useRef<number>(0);
 
+  // 비디오 재생 URL (Supabase signed URL) - Hook 순서 보장을 위해 최상단 배치
+  const [signedVideoUrl, setSignedVideoUrl] = useState<string | undefined>();
+  const signedUrlRefreshRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
   // ✅ localStorage에서 진도율 복구 (서버보다 높으면 사용)
   useEffect(() => {
     if (lessonId && lessonStatus) {
@@ -175,10 +179,6 @@ export default function LessonPage() {
   
   // 🎯 실제 표시할 진도율: 낙관적 상태 우선, 없으면 서버 상태
   const displayProgressPercent = optimisticProgress?.progressPercent ?? progressPercent;
-
-  // 비디오 재생 URL (Supabase signed URL)
-  const [signedVideoUrl, setSignedVideoUrl] = useState<string | undefined>();
-  const signedUrlRefreshRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const videoPartId = videoParts?.[0]?.id;
   const rawVideoUrl = videoParts?.[0]?.videoUrl;
