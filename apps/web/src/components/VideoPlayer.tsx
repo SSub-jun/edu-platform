@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import videojs from 'video.js';
 import 'video.js/dist/video-js.css';
 import type Player from 'video.js/dist/types/player';
@@ -10,46 +10,300 @@ interface VideoPlayerProps {
   title: string;
   maxReachedSeconds?: number;
   videoDuration?: number;
-  onProgress?: (data: { currentTime: number; maxReachedSeconds: number; videoDuration: number }) => void;
+  onProgress?: (data: {
+    currentTime: number;
+    maxReachedSeconds: number;
+    videoDuration: number;
+    positionSeconds: number;
+    watchedSeconds: number;
+  }) => void;
   autoPlay?: boolean;
 }
 
+// 설정값 (컴포넌트 외부에 상수로 선언)
+const DELTA_TOLERANCE = 1.5;      // 연속 재생 판정: 이 이하면 정상 재생으로 인정 (초)
+const FORWARD_EPSILON = 0.5;      // 앞으로 이동 허용 오차 (초)
+const REVERT_COOLDOWN_MS = 300;   // 되돌리기 후 업데이트 금지 시간 (ms)
+
 /**
- * VideoPlayer - Video.js 기반 비디오 플레이어
- * 
- * 기능:
- * - 이어보기: maxReachedSeconds 위치부터 재생
- * - SeekBar 제한: 수강한 구간만 이동 가능 (method #1: snap-back)
- * - 진도 추적: maxReachedSeconds 실시간 업데이트
+ * VideoPlayer - Video.js 기반 비디오 플레이어 (안정화 버전)
+ *
+ * 핵심 안정화 기능:
+ * 1. seek-lock + lastValidTime: seeking 연타 레이스 방지
+ * 2. 연속 재생(Δt) 조건: 점프가 아닌 정상 재생일 때만 진도 인정
+ * 3. seeking 중 모든 업데이트 금지
+ * 4. UI 레벨 progress bar 클릭 차단
+ * 5. watchedSeconds/positionSeconds 분리
  */
 export default function VideoPlayer({
   src,
-  title,
   maxReachedSeconds = 0,
-  videoDuration = 0,
   onProgress,
   autoPlay = false,
 }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const playerRef = useRef<Player | null>(null);
-  
-  // ✅ No-skip forward logic state
-  const maxWatchedTimeRef = useRef(maxReachedSeconds || 0);
-  const isUserSeekingRef = useRef(false);
-  const FORWARD_TOLERANCE = 2; // seconds
-  
-  const [isReady, setIsReady] = useState(false);
 
-  // Update maxWatchedTime when props change
+  // ============================================
+  // 핵심 상태 변수
+  // ============================================
+  const maxWatchedTimeRef = useRef(maxReachedSeconds || 0);
+  const lastValidTimeRef = useRef(maxReachedSeconds || 0);
+  const prevTimeRef = useRef(0);
+  const isSeekingRef = useRef(false);
+  const isRevertingRef = useRef(false);
+  const revertCooldownRef = useRef<NodeJS.Timeout | null>(null);
+
+  // 🔑 onProgress를 ref로 관리 (의존성 배열에서 제거하기 위함)
+  const onProgressRef = useRef(onProgress);
+  onProgressRef.current = onProgress;
+
+  // 🔑 maxReachedSeconds를 ref로도 관리 (이벤트 핸들러에서 최신값 참조)
+  const maxReachedSecondsRef = useRef(maxReachedSeconds);
+  maxReachedSecondsRef.current = maxReachedSeconds;
+
+  // API 서버 URL
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+  const videoUrl = src ? (src.startsWith('http') ? src : `${apiUrl}${src}`) : undefined;
+
+  // props에서 maxReachedSeconds 변경 시 동기화
   useEffect(() => {
     if (maxReachedSeconds > maxWatchedTimeRef.current) {
       maxWatchedTimeRef.current = maxReachedSeconds;
+      lastValidTimeRef.current = maxReachedSeconds;
     }
   }, [maxReachedSeconds]);
 
-  // API 서버 URL 추가
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-  const videoUrl = src ? (src.startsWith('http') ? src : `${apiUrl}${src}`) : undefined;
+  // 🔑 플레이어 초기화 (videoUrl이 있을 때 한 번만)
+  useEffect(() => {
+    // videoUrl이 없거나 이미 플레이어가 있으면 스킵
+    if (!videoUrl) {
+      return;
+    }
+
+    // 이미 플레이어가 있으면 소스만 변경
+    if (playerRef.current && !playerRef.current.isDisposed()) {
+      console.log('🔄 [VideoPlayer] Updating source', { videoUrl });
+      playerRef.current.src({ src: videoUrl, type: 'video/mp4' });
+      // 상태 초기화
+      maxWatchedTimeRef.current = maxReachedSecondsRef.current || 0;
+      lastValidTimeRef.current = maxReachedSecondsRef.current || 0;
+      prevTimeRef.current = 0;
+      isSeekingRef.current = false;
+      isRevertingRef.current = false;
+      return;
+    }
+
+    // video element가 없으면 스킵
+    if (!videoRef.current) {
+      return;
+    }
+
+    console.log('🎬 [VideoPlayer] Initializing player', { videoUrl });
+
+    const videoElement = videoRef.current;
+
+    const player = videojs(videoElement, {
+      controls: true,
+      autoplay: autoPlay,
+      preload: 'metadata',
+      fluid: true,
+      responsive: true,
+      controlBar: {
+        volumePanel: { inline: false },
+        playbackRateMenuButton: false  // 배속 메뉴 비활성화
+      },
+      sources: [{ src: videoUrl, type: 'video/mp4' }]
+    });
+
+    playerRef.current = player;
+
+    // ============================================
+    // UI 레벨 progress bar 클릭 차단 (해결책 B)
+    // ============================================
+    player.ready(() => {
+      const playerWithControls = player as Player & {
+        controlBar?: {
+          progressControl?: {
+            el: () => HTMLElement;
+          };
+        };
+      };
+
+      const progressControl = playerWithControls.controlBar?.progressControl;
+      if (progressControl) {
+        const progressEl = progressControl.el();
+
+        progressEl.addEventListener('mousedown', (e: MouseEvent) => {
+          const rect = progressEl.getBoundingClientRect();
+          const clickRatio = (e.clientX - rect.left) / rect.width;
+          const duration = player.duration() || 0;
+          const targetTime = clickRatio * duration;
+          const maxAllowed = maxWatchedTimeRef.current + FORWARD_EPSILON;
+
+          if (targetTime > maxAllowed) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        }, true);
+      }
+
+      console.log('✅ [VideoPlayer] Player ready');
+    });
+
+    // ============================================
+    // 1. timeupdate: 연속 재생(Δt)일 때만 진도 인정
+    // ============================================
+    player.on('timeupdate', () => {
+      if (!player || player.isDisposed()) return;
+
+      const currentTime = player.currentTime() || 0;
+      const duration = player.duration() || 0;
+
+      if (isSeekingRef.current || isRevertingRef.current) {
+        return;
+      }
+
+      const delta = currentTime - prevTimeRef.current;
+      prevTimeRef.current = currentTime;
+
+      const isContinuousPlay = delta > 0 && delta <= DELTA_TOLERANCE;
+
+      if (isContinuousPlay && currentTime > maxWatchedTimeRef.current) {
+        maxWatchedTimeRef.current = currentTime;
+        lastValidTimeRef.current = currentTime;
+
+        // ref를 통해 최신 콜백 호출
+        onProgressRef.current?.({
+          currentTime,
+          maxReachedSeconds: maxWatchedTimeRef.current,
+          videoDuration: duration,
+          positionSeconds: currentTime,
+          watchedSeconds: maxWatchedTimeRef.current
+        });
+      } else if (isContinuousPlay) {
+        lastValidTimeRef.current = currentTime;
+      }
+    });
+
+    // ============================================
+    // 2. seeking: seek-lock + lastValidTime으로 되돌리기
+    // ============================================
+    player.on('seeking', () => {
+      if (!player || player.isDisposed()) return;
+
+      if (isRevertingRef.current) {
+        return;
+      }
+
+      isSeekingRef.current = true;
+      const targetTime = player.currentTime() || 0;
+      const maxAllowed = maxWatchedTimeRef.current + FORWARD_EPSILON;
+
+      if (targetTime > maxAllowed) {
+
+        isRevertingRef.current = true;
+        player.currentTime(lastValidTimeRef.current);
+
+        if (revertCooldownRef.current) {
+          clearTimeout(revertCooldownRef.current);
+        }
+        revertCooldownRef.current = setTimeout(() => {
+          isRevertingRef.current = false;
+          isSeekingRef.current = false;
+        }, REVERT_COOLDOWN_MS);
+      }
+    });
+
+    // ============================================
+    // 3. seeked: seeking 플래그 해제
+    // ============================================
+    player.on('seeked', () => {
+      if (!player || player.isDisposed()) return;
+
+      const currentTime = player.currentTime() || 0;
+
+      if (!isRevertingRef.current) {
+        isSeekingRef.current = false;
+        if (currentTime <= maxWatchedTimeRef.current + FORWARD_EPSILON) {
+          lastValidTimeRef.current = currentTime;
+          prevTimeRef.current = currentTime;
+        }
+      }
+    });
+
+    // ============================================
+    // 4. loadedmetadata: 이어보기 위치 설정
+    // ============================================
+    player.on('loadedmetadata', () => {
+      if (!player || player.isDisposed()) return;
+
+      const resumeTime = maxReachedSecondsRef.current || 0;
+      if (resumeTime > 0) {
+        console.log('🎯 [VideoPlayer] Resuming from', resumeTime.toFixed(2));
+        maxWatchedTimeRef.current = resumeTime;
+        lastValidTimeRef.current = resumeTime;
+        prevTimeRef.current = resumeTime;
+        player.currentTime(resumeTime);
+      }
+    });
+
+    // ============================================
+    // 5. pause: 일시정지 시 진도 저장
+    // ============================================
+    player.on('pause', () => {
+      if (!player || player.isDisposed()) return;
+      if (isSeekingRef.current || isRevertingRef.current) return;
+
+      const currentTime = player.currentTime() || 0;
+      const duration = player.duration() || 0;
+
+      const safePosition = Math.min(currentTime, maxWatchedTimeRef.current);
+
+      onProgressRef.current?.({
+        currentTime: safePosition,
+        maxReachedSeconds: maxWatchedTimeRef.current,
+        videoDuration: duration,
+        positionSeconds: safePosition,
+        watchedSeconds: maxWatchedTimeRef.current
+      });
+    });
+
+    // ============================================
+    // 6. ended: 영상 끝까지 시청
+    // ============================================
+    player.on('ended', () => {
+      if (!player || player.isDisposed()) return;
+
+      const duration = player.duration() || 0;
+
+      maxWatchedTimeRef.current = duration;
+      lastValidTimeRef.current = duration;
+
+      onProgressRef.current?.({
+        currentTime: duration,
+        maxReachedSeconds: duration,
+        videoDuration: duration,
+        positionSeconds: duration,
+        watchedSeconds: duration
+      });
+
+      console.log('🏁 [VideoPlayer] Video ended, progress = 100%');
+    });
+
+    // Cleanup (컴포넌트 언마운트 시에만)
+    return () => {
+      if (revertCooldownRef.current) {
+        clearTimeout(revertCooldownRef.current);
+      }
+      const p = playerRef.current;
+      if (p && !p.isDisposed()) {
+        console.log('🗑️ [VideoPlayer] Disposing player');
+        p.dispose();
+        playerRef.current = null;
+      }
+    };
+  }, [videoUrl, autoPlay]); // 🔑 onProgress, maxReachedSeconds 제거
 
   // 등록된 영상이 없으면 안내 메시지
   if (!videoUrl) {
@@ -71,161 +325,6 @@ export default function VideoPlayer({
       </div>
     );
   }
-
-  useEffect(() => {
-    // Make sure Video.js player is only initialized once
-    if (!playerRef.current && videoRef.current && videoUrl) {
-      console.log('🎬 [VideoPlayer] Initializing Video.js player', { videoUrl });
-      
-      const videoElement = videoRef.current;
-      
-      // Check if element is in DOM
-      if (!videoElement.isConnected) {
-        console.warn('⚠️ [VideoPlayer] Video element not in DOM yet');
-        return;
-      }
-      
-      const player = videojs(videoElement, {
-        controls: true,
-        autoplay: autoPlay,
-        preload: 'metadata',
-        fluid: true,
-        responsive: true,
-        playbackRates: [0.5, 0.75, 1, 1.25, 1.5, 2],
-        controlBar: {
-          volumePanel: {
-            inline: false
-          }
-        },
-        sources: [{
-          src: videoUrl,
-          type: 'video/mp4'
-        }]
-      });
-
-      playerRef.current = player;
-
-      // ========================================
-      // No-skip forward logic (method #1)
-      // ========================================
-
-      // 1. timeupdate event: track watched progress
-      player.on('timeupdate', () => {
-        if (!player) return;
-        
-        const currentTime = player.currentTime() || 0;
-        const duration = player.duration() || 0;
-
-        // Only update maxWatchedTime during normal playback (not seeking)
-        if (!isUserSeekingRef.current) {
-          const timeDiff = currentTime - maxWatchedTimeRef.current;
-          
-          // If moving forward smoothly (within tolerance)
-          if (timeDiff > 0 && timeDiff < FORWARD_TOLERANCE) {
-            maxWatchedTimeRef.current = currentTime;
-            
-            // Call onProgress callback
-            if (onProgress) {
-              onProgress({
-                currentTime,
-                maxReachedSeconds: currentTime,
-                videoDuration: duration
-              });
-            }
-            
-            console.log('📊 [VideoPlayer] Progress updated:', {
-              currentTime: currentTime.toFixed(2),
-              maxWatched: maxWatchedTimeRef.current.toFixed(2)
-            });
-          }
-        }
-      });
-
-      // 2. seeking event: prevent forward seeking beyond maxWatchedTime
-      player.on('seeking', () => {
-        if (!player) return;
-        
-        isUserSeekingRef.current = true;
-        const currentTime = player.currentTime() || 0;
-        const maxAllowed = maxWatchedTimeRef.current + 0.1;
-
-        // If trying to seek beyond watched area, snap back
-        if (currentTime > maxAllowed) {
-          console.warn('🔒 [VideoPlayer] Forward seek blocked, snapping back', {
-            requested: currentTime.toFixed(2),
-            maxWatched: maxWatchedTimeRef.current.toFixed(2)
-          });
-          
-          player.currentTime(maxWatchedTimeRef.current);
-        } else {
-          console.log('✅ [VideoPlayer] Backward seek allowed', {
-            requested: currentTime.toFixed(2),
-            maxWatched: maxWatchedTimeRef.current.toFixed(2)
-          });
-        }
-      });
-
-      // 3. seeked event: reset seeking flag
-      player.on('seeked', () => {
-        isUserSeekingRef.current = false;
-        console.log('✅ [VideoPlayer] Seek completed');
-      });
-
-      // 4. loadedmetadata: set initial position if resuming
-      player.on('loadedmetadata', () => {
-        if (!player) return;
-        
-        const resumeTime = maxReachedSeconds || 0;
-        if (resumeTime > 0) {
-          console.log('🎯 [VideoPlayer] Resuming from', resumeTime.toFixed(2));
-          player.currentTime(resumeTime);
-        }
-      });
-
-      // 5. pause event: save progress
-      player.on('pause', () => {
-        if (!player) return;
-        
-        const currentTime = player.currentTime() || 0;
-        const duration = player.duration() || 0;
-        
-        if (onProgress) {
-          onProgress({
-            currentTime,
-            maxReachedSeconds: Math.max(maxWatchedTimeRef.current, currentTime),
-            videoDuration: duration
-          });
-        }
-      });
-
-      player.ready(() => {
-        console.log('✅ [VideoPlayer] Player ready');
-        setIsReady(true);
-      });
-    }
-
-    // Cleanup function
-    return () => {
-      const player = playerRef.current;
-      if (player && !player.isDisposed()) {
-        console.log('🗑️ [VideoPlayer] Disposing player');
-        player.dispose();
-        playerRef.current = null;
-      }
-    };
-  }, []); // Empty dependency array - only initialize once
-
-  // Update video source when videoUrl changes
-  useEffect(() => {
-    const player = playerRef.current;
-    if (player && videoUrl && !player.isDisposed()) {
-      console.log('🔄 [VideoPlayer] Updating video source', { videoUrl });
-      player.src({
-        src: videoUrl,
-        type: 'video/mp4'
-      });
-    }
-  }, [videoUrl]);
 
   return (
     <div data-vjs-player style={{ width: '100%', maxWidth: '100%' }}>

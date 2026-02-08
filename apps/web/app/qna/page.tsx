@@ -6,6 +6,25 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthGuard } from '../hooks/useAuthGuard';
 
+// 전화번호 마스킹 함수 (01012345678 → 010****5678)
+function maskPhone(phone: string): string {
+  if (!phone) return '';
+  // 숫자만 추출
+  const digits = phone.replace(/\D/g, '');
+  if (digits.length === 11) {
+    // 010-1234-5678 형태: 가운데 4자리 마스킹
+    return `${digits.slice(0, 3)}****${digits.slice(7)}`;
+  } else if (digits.length === 10) {
+    // 02-1234-5678 형태: 가운데 마스킹
+    return `${digits.slice(0, 2)}****${digits.slice(6)}`;
+  }
+  // 기타: 앞 3자리, 뒤 4자리만 표시
+  if (digits.length > 7) {
+    return `${digits.slice(0, 3)}****${digits.slice(-4)}`;
+  }
+  return phone; // 짧으면 그대로
+}
+
 interface QnaPost {
   id: string;
   title: string;
@@ -219,7 +238,7 @@ export default function QnaPage() {
                       {post.title}
                     </h3>
                     <div className="text-xs text-text-tertiary whitespace-nowrap">
-                      {post.user.username} ({post.user.role === 'student' ? '학생' : '강사'}) | {new Date(post.createdAt).toLocaleString()}
+                      {maskPhone(post.user.username)} ({post.user.role === 'student' ? '학생' : '강사'}) | {new Date(post.createdAt).toLocaleString()}
                     </div>
                   </div>
                   <p className="m-0 leading-relaxed text-text-secondary">
@@ -233,7 +252,7 @@ export default function QnaPage() {
                     {post.replies.map((reply) => (
                       <div key={reply.id} className="mb-2.5">
                         <div className="text-xs text-text-tertiary mb-1">
-                          {reply.user.username} ({reply.user.role === 'instructor' ? '강사' : '학생'}) | {new Date(reply.createdAt).toLocaleString()}
+                          {maskPhone(reply.user.username)} ({reply.user.role === 'instructor' ? '강사' : '학생'}) | {new Date(reply.createdAt).toLocaleString()}
                         </div>
                         <p className="m-0 text-text-secondary">
                           {reply.body}

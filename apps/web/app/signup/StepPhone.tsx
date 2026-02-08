@@ -58,12 +58,20 @@ export default function StepPhone({ onComplete, initialData }: StepPhoneProps) {
 
     } catch (error) {
       console.error('OTP 전송 실패:', error);
-      
-      const isAxiosError = (err: unknown): err is { response?: { status?: number; data?: { message?: string; remainingSeconds?: number } } } => {
+
+      const isAxiosError = (err: unknown): err is { response?: { status?: number; data?: { code?: string; message?: string; remainingSeconds?: number } } } => {
         return typeof err === 'object' && err !== null && 'response' in err;
       };
-      
-      if (isAxiosError(error) && error.response?.status === 429) {
+
+      if (isAxiosError(error) && error.response?.status === 409) {
+        // 이미 가입된 전화번호
+        const data = error.response.data;
+        if (data?.code === 'PHONE_ALREADY_REGISTERED') {
+          setError('이미 가입된 전화번호입니다. 로그인해주세요.');
+        } else {
+          setError(data?.message || '이미 가입된 전화번호입니다.');
+        }
+      } else if (isAxiosError(error) && error.response?.status === 429) {
         const data = error.response.data;
         setError(data?.message || '잠시 후 다시 시도해주세요');
         if (data?.remainingSeconds) {

@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 
 interface Question {
   id: string;
-  stem: string;
+  content: string; // 백엔드에서 content로 반환됨
   choices: string[];
 }
 
@@ -50,7 +50,8 @@ export default function ExamPage() {
   const loadSubjectStatus = async () => {
     try {
       // 먼저 Subject 상태 확인
-      const statusResponse = await fetch(`http://localhost:4000/me/curriculum`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const statusResponse = await fetch(`${apiUrl}/me/curriculum`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
         },
@@ -61,9 +62,15 @@ export default function ExamPage() {
       }
 
       const curriculum = await statusResponse.json();
-      const subject = curriculum.subjects?.find((s: any) => s.id === subjectId);
+      // API 응답 구조: { success: true, data: [{ subject: {...}, lessons: [...], remainingDays: number }] }
+      const data = curriculum.data || [];
+      const curriculumItem = data.find((item: any) => item.subject?.id === subjectId);
+      const subject = curriculumItem?.subject;
       
       if (!subject) {
+        console.error('[EXAM] Curriculum data:', curriculum);
+        console.error('[EXAM] Looking for subjectId:', subjectId);
+        console.error('[EXAM] Available subjects:', data.map((item: any) => item.subject?.id));
         throw new Error('과목을 찾을 수 없습니다');
       }
 
@@ -92,7 +99,8 @@ export default function ExamPage() {
 
   const startExam = async (subjectName?: string) => {
     try {
-      const response = await fetch(`http://localhost:4000/exam/subjects/${subjectId}/start`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const response = await fetch(`${apiUrl}/exam/subjects/${subjectId}/start`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -101,7 +109,19 @@ export default function ExamPage() {
       });
 
       if (!response.ok) {
-        throw new Error('시험 시작 실패');
+        // 422 오류 등 상세 오류 메시지 추출
+        let errorMessage = '시험 시작 실패';
+        try {
+          const errorData = await response.json();
+          if (errorData.message) {
+            errorMessage = errorData.message;
+          } else if (typeof errorData === 'string') {
+            errorMessage = errorData;
+          }
+        } catch (e) {
+          // JSON 파싱 실패 시 기본 메시지 사용
+        }
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
@@ -110,8 +130,9 @@ export default function ExamPage() {
         subjectName,
       });
     } catch (error) {
-      alert('시험을 시작할 수 없습니다.');
-      console.error(error);
+      const errorMessage = error instanceof Error ? error.message : '시험을 시작할 수 없습니다.';
+      alert(errorMessage);
+      console.error('[EXAM] Start exam error:', error);
       router.push('/curriculum');
     } finally {
       setLoading(false);
@@ -171,7 +192,8 @@ export default function ExamPage() {
         choiceIndex
       }));
 
-      const response = await fetch(`http://localhost:4000/exam/attempts/${examData.attemptId}/submit`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const response = await fetch(`${apiUrl}/exam/attempts/${examData.attemptId}/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -261,7 +283,7 @@ export default function ExamPage() {
           {examData.questions.map((question, index) => (
             <div key={question.id} className="mb-8 p-6 border border-border rounded-xl bg-bg-primary">
               <h3 className="text-lg mb-5 text-text-primary font-semibold">
-                {index + 1}. {question.stem}
+                {index + 1}. {question.content}
               </h3>
               
               <div className="flex flex-col gap-2.5">

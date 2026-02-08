@@ -1,12 +1,13 @@
-import { Controller, Post, Body, HttpStatus, HttpException, Req, UseGuards, HttpCode } from '@nestjs/common';
+import { Controller, Post, Body, HttpStatus, HttpException, Req, UseGuards, HttpCode, ConflictException } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiProperty, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto, RefreshDto, LoginResponseDto, RefreshResponseDto, LogoutResponseDto } from './dto/auth.dto';
 import { RegisterDto, RegisterResponseDto, VerifyOtpResponseDto } from './dto/register.dto';
 import { AssignCompanyDto, AssignCompanyResponseDto } from './dto/assign-company.dto';
-import { SendOtpDto } from '../otp/dto/send-otp.dto';
+import { SendOtpDto, OtpPurpose } from '../otp/dto/send-otp.dto';
 import { VerifyOtpDto as VerifyDto } from '../otp/dto/verify-otp.dto';
 import { OtpService } from '../otp/otp.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import type { Request } from 'express';
 
@@ -25,6 +26,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly otpService: OtpService,
+    private readonly prisma: PrismaService,
   ) {}
 
   @Post('login')
@@ -97,8 +99,18 @@ export class AuthController {
     status: 204, 
     description: 'OTP 전송 성공'
   })
-  @ApiResponse({ 
-    status: 429, 
+  @ApiResponse({
+    status: 409,
+    description: '이미 가입된 전화번호 (회원가입 시)',
+    schema: {
+      example: {
+        code: 'PHONE_ALREADY_REGISTERED',
+        message: '이미 가입된 전화번호입니다. 로그인해주세요.'
+      }
+    }
+  })
+  @ApiResponse({
+    status: 429,
     description: '요청 제한 - 재전송 간격 또는 일일 한도 초과',
     schema: {
       example: {
@@ -109,6 +121,20 @@ export class AuthController {
     }
   })
   async sendOtp(@Body() sendOtpDto: SendOtpDto): Promise<void> {
+    // 회원가입 목적인 경우, 이미 가입된 전화번호인지 확인
+    if (sendOtpDto.purpose === OtpPurpose.SIGNUP) {
+      const existingUser = await this.prisma.user.findUnique({
+        where: { phone: sendOtpDto.phone },
+      });
+
+      if (existingUser) {
+        throw new ConflictException({
+          code: 'PHONE_ALREADY_REGISTERED',
+          message: '이미 가입된 전화번호입니다. 로그인해주세요.',
+        });
+      }
+    }
+
     await this.otpService.sendOtp(sendOtpDto.phone, sendOtpDto.purpose);
   }
 

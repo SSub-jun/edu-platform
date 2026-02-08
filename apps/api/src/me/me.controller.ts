@@ -154,20 +154,16 @@ export class MeController {
         const subject = cs.subject;
         const subjectProgress = subjectProgressMap.get(subject.id);
         const examAttemptCount = examAttemptsMap.get(subject.id) || 0;
-        
-        // Subject 수료 상태 계산
-        const progressPercent = subjectProgress?.progressPercent || 0;
-        const passed = subjectProgress?.passed || false;
-        const finalScore = subjectProgress?.finalScore;
-        const remainingTries = Math.max(0, 3 - examAttemptCount);
-        const canTakeExam = progressPercent >= 90 && remainingTries > 0 && !passed;
-        const canRestart = examAttemptCount >= 3 && !passed;
-        
+
+        // 레슨 목록 및 진도율 계산
         const lessons: any[] = [];
+        let sumLessonProgress = 0;
+
         for (const lesson of subject.lessons) {
           const lessonProgress = lessonProgressMap.get(lesson.id);
           const lessonProgressPercent = lessonProgress?.progressPercent || 0;
-          
+          sumLessonProgress += lessonProgressPercent;
+
           // Lesson 상태 결정 (간단화)
           let status: 'locked' | 'available' | 'passed';
           if (lessonProgressPercent >= 90) {
@@ -175,7 +171,7 @@ export class MeController {
           } else {
             status = 'available';
           }
-          
+
           lessons.push({
             id: lesson.id,
             title: lesson.title,
@@ -189,13 +185,25 @@ export class MeController {
           });
         }
 
+        // ✅ 과목 진도율: 레슨 진도율 평균으로 직접 계산 (SubjectProgress 테이블 대신)
+        const calculatedProgressPercent = subject.lessons.length > 0
+          ? sumLessonProgress / subject.lessons.length
+          : 0;
+
+        // Subject 수료 상태 (passed, finalScore는 SubjectProgress에서 가져옴)
+        const passed = subjectProgress?.passed || false;
+        const finalScore = subjectProgress?.finalScore;
+        const remainingTries = Math.max(0, 3 - examAttemptCount);
+        const canTakeExam = calculatedProgressPercent >= 90 && remainingTries > 0 && !passed;
+        const canRestart = examAttemptCount >= 3 && !passed;
+
         result.push({
           subject: {
             id: subject.id,
             name: subject.name,
             description: subject.description,
             order: subject.order,
-            progressPercent,
+            progressPercent: calculatedProgressPercent,
             passed,
             finalScore,
             examAttemptCount,

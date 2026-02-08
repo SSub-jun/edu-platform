@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { SignupData } from './page';
+import PrivacyPolicyModal from './PrivacyPolicyModal';
 
 interface StepAccountProps {
   onComplete: (data: Partial<SignupData>) => void;
@@ -27,6 +28,8 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [privacyAgreed, setPrivacyAgreed] = useState(false);
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState<PasswordStrength>({
     hasLowerCase: false,
     hasUpperCase: false,
@@ -272,6 +275,29 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
         </div>
       )}
 
+      {/* 개인정보 처리방침 동의 */}
+      <div className="flex items-start gap-3 p-4 bg-bg-primary border border-border rounded-lg">
+        <input
+          type="checkbox"
+          id="privacyAgreement"
+          checked={privacyAgreed}
+          onChange={(e) => setPrivacyAgreed(e.target.checked)}
+          className="w-5 h-5 mt-0.5 rounded border-2 border-border text-primary focus:ring-primary-600 focus:ring-2 cursor-pointer"
+          disabled={loading}
+        />
+        <label htmlFor="privacyAgreement" className="text-sm text-text-secondary cursor-pointer flex-1">
+          <span className="text-text-primary font-semibold">[필수]</span>{' '}
+          <button
+            type="button"
+            onClick={() => setShowPrivacyModal(true)}
+            className="text-primary underline hover:text-primary-600 transition-colors bg-transparent border-0 p-0 cursor-pointer font-medium"
+          >
+            개인정보 처리방침
+          </button>
+          에 동의합니다.
+        </label>
+      </div>
+
       <div className="flex gap-3">
         <button
           type="button"
@@ -289,7 +315,8 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
             !formData.name.trim() ||
             !formData.password ||
             !formData.confirmPassword ||
-            !isPasswordValid(formData.password)
+            !isPasswordValid(formData.password) ||
+            !privacyAgreed
           }
           className="w-full h-12 bg-primary text-white rounded-lg text-base font-semibold transition-all hover:bg-primary-600 active:bg-primary-700 disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600 focus-visible:outline-offset-2"
         >
@@ -303,6 +330,12 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
           )}
         </button>
       </div>
+
+      {/* 개인정보 처리방침 모달 */}
+      <PrivacyPolicyModal
+        isOpen={showPrivacyModal}
+        onClose={() => setShowPrivacyModal(false)}
+      />
     </form>
   );
 }
