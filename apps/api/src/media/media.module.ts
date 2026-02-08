@@ -7,4 +7,3 @@ import { PrismaModule } from '../prisma/prisma.module';
   controllers: [MediaController],
 })
 export class MediaModule {}
-

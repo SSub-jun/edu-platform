@@ -1,222 +1,262 @@
-import { 
-  Controller, 
-  Post, 
+import {
+  Controller,
+  Post,
   Get,
   Delete,
-  UseInterceptors, 
-  UploadedFile, 
   Body,
   Param,
-  Req,
-  Res,
-  StreamableFile,
-  BadRequestException 
+  BadRequestException,
+  InternalServerErrorException,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags, ApiOperation, ApiConsumes, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
-import { diskStorage } from 'multer';
-import { extname, join } from 'path';
-import { createReadStream, existsSync, unlinkSync, statSync } from 'fs';
-import type { Request, Response } from 'express';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+  ApiProperty,
+} from '@nestjs/swagger';
+import { IsString, IsOptional, IsNumber, IsNotEmpty } from 'class-validator';
 import { Roles } from '../auth/decorators/auth.decorator';
 import { PrismaService } from '../prisma/prisma.service';
+import { SupabaseService } from '../supabase/supabase.service';
+
+// ── DTOs ──
+
+class RequestUploadDto {
+  @ApiProperty({ description: '레슨 ID' })
+  @IsString()
+  @IsNotEmpty()
+  lessonId: string;
+
+  @ApiProperty({ description: '영상 제목' })
+  @IsString()
+  @IsNotEmpty()
+  title: string;
+
+  @ApiProperty({ description: '영상 설명', required: false })
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @ApiProperty({ description: '정렬 순서', required: false })
+  @IsNumber()
+  @IsOptional()
+  order?: number;
+
+  @ApiProperty({ description: '파일 이름 (예: lecture-01.mp4)' })
+  @IsString()
+  @IsNotEmpty()
+  filename: string;
+
+  @ApiProperty({ description: 'MIME 타입 (예: video/mp4)' })
+  @IsString()
+  @IsNotEmpty()
+  mimeType: string;
+
+  @ApiProperty({ description: '파일 크기 (bytes)' })
+  @IsNumber()
+  fileSize: number;
+}
+
+class ConfirmUploadDto {
+  @ApiProperty({ description: '업로드 요청 시 받은 videoPartId' })
+  @IsString()
+  @IsNotEmpty()
+  videoPartId: string;
+}
+
+// ── Controller ──
+
+const ALLOWED_MIMES = [
+  'video/mp4',
+  'video/webm',
+  'video/ogg',
+  'video/quicktime',
+];
+
+const MAX_FILE_SIZE = 1 * 1024 * 1024 * 1024; // 1GB
 
 @ApiTags('Media')
 @Controller('media')
 export class MediaController {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private supabase: SupabaseService,
+  ) {}
 
-  @Post('videos/upload')
+  // ────────────────────────────────────────
+  // 1) 업로드 URL 발급 (Signed Upload URL)
+  // ────────────────────────────────────────
+
+  @Post('videos/request-upload')
   @Roles('instructor', 'admin')
   @ApiBearerAuth()
-  @ApiOperation({ summary: '영상 파일 업로드' })
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        file: {
-          type: 'string',
-          format: 'binary',
-        },
-        lessonId: {
-          type: 'string',
-        },
-        title: {
-          type: 'string',
-        },
-        description: {
-          type: 'string',
-        },
-        order: {
-          type: 'number',
-        },
-      },
-    },
+  @ApiOperation({
+    summary: '영상 업로드 URL 발급',
+    description:
+      'Supabase Storage에 직접 업로드할 수 있는 signed URL을 발급합니다. 프론트엔드는 이 URL로 파일을 PUT 요청합니다.',
   })
-  @UseInterceptors(
-    FileInterceptor('file', {
-      storage: diskStorage({
-        destination: (req, file, cb) => {
-          // 모든 비디오를 하나의 폴더에 저장
-          const uploadPath = join(process.cwd(), 'uploads', 'videos');
-          
-          // 폴더가 없으면 생성
-          const fs = require('fs');
-          if (!fs.existsSync(uploadPath)) {
-            fs.mkdirSync(uploadPath, { recursive: true });
-          }
-          
-          cb(null, uploadPath);
-        },
-        filename: (req, file, cb) => {
-          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-          const ext = extname(file.originalname);
-          cb(null, `video-${uniqueSuffix}${ext}`);
-        },
-      }),
-      fileFilter: (req, file, cb) => {
-        // 영상 파일만 허용
-        const allowedMimes = [
-          'video/mp4',
-          'video/webm',
-          'video/ogg',
-          'video/quicktime', // .mov
-        ];
-        
-        if (allowedMimes.includes(file.mimetype)) {
-          cb(null, true);
-        } else {
-          cb(new BadRequestException('영상 파일만 업로드 가능합니다. (mp4, webm, ogg, mov)'), false);
-        }
-      },
-      limits: {
-        fileSize: 500 * 1024 * 1024, // 500MB 제한
-      },
-    }),
-  )
-  async uploadVideo(
-    @UploadedFile() file: Express.Multer.File,
-    @Body() body: { lessonId: string; title: string; description?: string; order?: number },
-  ) {
-    if (!file) {
-      throw new BadRequestException('파일이 업로드되지 않았습니다.');
+  async requestUpload(@Body() dto: RequestUploadDto) {
+    // 검증: MIME 타입
+    if (!ALLOWED_MIMES.includes(dto.mimeType)) {
+      throw new BadRequestException(
+        '영상 파일만 업로드 가능합니다. (mp4, webm, ogg, mov)',
+      );
     }
 
-    // 영상의 실제 길이를 가져오기 위해서는 ffprobe 같은 도구가 필요하지만,
-    // 여기서는 간단히 0으로 설정하고 프론트엔드에서 전달받거나 나중에 처리
-    const durationMs = 0; // TODO: ffprobe로 실제 길이 측정
+    // 검증: 파일 크기
+    if (dto.fileSize > MAX_FILE_SIZE) {
+      throw new BadRequestException(
+        '파일 크기는 1GB를 초과할 수 없습니다.',
+      );
+    }
 
-    // DB에 VideoPart 생성
+    // 검증: 레슨 존재 여부
+    const lesson = await this.prisma.lesson.findUnique({
+      where: { id: dto.lessonId },
+    });
+    if (!lesson) {
+      throw new BadRequestException('레슨을 찾을 수 없습니다.');
+    }
+
+    // 스토리지 경로 생성
+    const sanitizedFilename = dto.filename
+      .replace(/[^a-zA-Z0-9.\-_]/g, '_')
+      .toLowerCase();
+    const timestamp = Date.now();
+    const storagePath = `${dto.lessonId}/${timestamp}-${sanitizedFilename}`;
+
+    // Supabase signed upload URL 발급
+    let signedUploadData: { signedUrl: string; token: string };
+    try {
+      signedUploadData = await this.supabase.createSignedUploadUrl(storagePath);
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `업로드 URL 발급에 실패했습니다: ${error.message}`,
+      );
+    }
+
+    // DB에 VideoPart 생성 (아직 비활성 상태)
     const videoPart = await this.prisma.videoPart.create({
       data: {
-        lessonId: body.lessonId,
-        title: body.title,
-        description: body.description,
-        order: body.order ? parseInt(body.order.toString()) : 0,
-        durationMs,
-        videoUrl: `/uploads/videos/${file.filename}`,
-        fileSize: file.size,
-        mimeType: file.mimetype,
-        isActive: true,
+        lessonId: dto.lessonId,
+        title: dto.title,
+        description: dto.description,
+        order: dto.order ?? 0,
+        durationMs: 0,
+        videoUrl: storagePath, // Supabase 스토리지 경로 저장
+        fileSize: dto.fileSize,
+        mimeType: dto.mimeType,
+        isActive: false, // 업로드 완료 전까지 비활성
       },
     });
 
     return {
       success: true,
       data: {
-        id: videoPart.id,
-        title: videoPart.title,
-        videoUrl: videoPart.videoUrl,
-        fileSize: videoPart.fileSize,
-        mimeType: videoPart.mimeType,
+        videoPartId: videoPart.id,
+        signedUrl: signedUploadData.signedUrl,
+        token: signedUploadData.token,
+        storagePath,
       },
     };
   }
 
-  @Get('videos/debug')
-  @ApiOperation({ summary: '비디오 디렉토리 디버그 정보' })
-  async debugVideoDirectory() {
-    const { readdirSync } = require('fs');
-    const uploadsPath = join(process.cwd(), 'uploads');
-    const videosPath = join(process.cwd(), 'uploads', 'videos');
-    
-    return {
-      cwd: process.cwd(),
-      uploadsExists: existsSync(uploadsPath),
-      videosExists: existsSync(videosPath),
-      uploadsPath,
-      videosPath,
-      files: existsSync(videosPath) ? readdirSync(videosPath) : []
-    };
-  }
+  // ────────────────────────────────────────
+  // 2) 업로드 완료 확인
+  // ────────────────────────────────────────
 
-  @Get('videos/:filename')
-  @ApiOperation({ summary: '영상 파일 스트리밍 (Range 요청 지원)' })
-  async streamVideo(
-    @Param('filename') filename: string,
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response,
-  ): Promise<StreamableFile> {
-    const filePath = join(process.cwd(), 'uploads', 'videos', filename);
-
-    console.log('[MEDIA] Streaming video:', {
-      filename,
-      filePath,
-      exists: existsSync(filePath),
-      range: req.headers.range,
-      cwd: process.cwd()
+  @Post('videos/confirm-upload')
+  @Roles('instructor', 'admin')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: '영상 업로드 완료 확인',
+    description:
+      'Supabase Storage 업로드 완료 후 호출합니다. VideoPart를 활성화합니다.',
+  })
+  async confirmUpload(@Body() dto: ConfirmUploadDto) {
+    const videoPart = await this.prisma.videoPart.findUnique({
+      where: { id: dto.videoPartId },
     });
 
-    if (!existsSync(filePath)) {
-      throw new BadRequestException('파일을 찾을 수 없습니다.');
+    if (!videoPart) {
+      throw new BadRequestException('영상 정보를 찾을 수 없습니다.');
     }
 
-    const stat = statSync(filePath);
-    const fileSize = stat.size;
-    const range = req.headers.range;
+    if (videoPart.isActive) {
+      return {
+        success: true,
+        message: '이미 활성화된 영상입니다.',
+      };
+    }
 
-    // MIME 타입 설정
-    const ext = extname(filename).toLowerCase();
-    const mimeTypes = {
-      '.mp4': 'video/mp4',
-      '.webm': 'video/webm',
-      '.ogg': 'video/ogg',
-      '.mov': 'video/quicktime',
+    // 활성화
+    await this.prisma.videoPart.update({
+      where: { id: dto.videoPartId },
+      data: { isActive: true },
+    });
+
+    return {
+      success: true,
+      message: '영상 업로드가 완료되었습니다.',
     };
-    const mimeType = mimeTypes[ext] || 'video/mp4';
+  }
 
-    // Range 요청 처리 (seek 지원)
-    if (range) {
-      const parts = range.replace(/bytes=/, '').split('-');
-      const start = parseInt(parts[0], 10);
-      const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
-      const chunksize = (end - start) + 1;
-      const file = createReadStream(filePath, { start, end });
+  // ────────────────────────────────────────
+  // 3) 재생용 Signed URL 발급
+  // ────────────────────────────────────────
 
-      res.status(206); // Partial Content
-      res.set({
-        'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-        'Accept-Ranges': 'bytes',
-        'Content-Length': chunksize,
-        'Content-Type': mimeType,
-      });
+  @Get('videos/:videoPartId/signed-url')
+  @ApiOperation({
+    summary: '영상 재생 URL 발급',
+    description:
+      '영상 재생을 위한 signed URL을 발급합니다. 2시간 동안 유효합니다.',
+  })
+  async getSignedUrl(@Param('videoPartId') videoPartId: string) {
+    const videoPart = await this.prisma.videoPart.findUnique({
+      where: { id: videoPartId },
+    });
 
-      console.log('[MEDIA] Range request:', { start, end, chunksize, fileSize });
-      return new StreamableFile(file);
-    } else {
-      // 전체 파일 스트리밍
-      const file = createReadStream(filePath);
-      
-      res.set({
-        'Content-Type': mimeType,
-        'Content-Length': fileSize,
-        'Accept-Ranges': 'bytes',
-      });
+    if (!videoPart) {
+      throw new BadRequestException('영상을 찾을 수 없습니다.');
+    }
 
-      return new StreamableFile(file);
+    const videoUrl = videoPart.videoUrl;
+
+    if (!videoUrl) {
+      throw new BadRequestException('영상 URL이 없습니다.');
+    }
+
+    // 이미 절대 URL인 경우 (Supabase 대시보드에서 직접 입력한 URL)
+    if (videoUrl.startsWith('http')) {
+      return {
+        success: true,
+        data: {
+          signedUrl: videoUrl,
+          expiresIn: null, // 만료 없음
+        },
+      };
+    }
+
+    // Supabase 스토리지 경로인 경우 → signed URL 발급
+    try {
+      const signedUrlData = await this.supabase.createSignedUrl(videoUrl, 7200);
+      return {
+        success: true,
+        data: {
+          signedUrl: signedUrlData.signedUrl,
+          expiresIn: 7200,
+        },
+      };
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `재생 URL 발급에 실패했습니다: ${error.message}`,
+      );
     }
   }
+
+  // ────────────────────────────────────────
+  // 4) 영상 삭제
+  // ────────────────────────────────────────
 
   @Delete('videos/:id')
   @Roles('instructor', 'admin')
@@ -231,11 +271,14 @@ export class MediaController {
       throw new BadRequestException('영상을 찾을 수 없습니다.');
     }
 
-    // 실제 파일 삭제
-    if (videoPart.videoUrl) {
-      const filePath = join(process.cwd(), videoPart.videoUrl);
-      if (existsSync(filePath)) {
-        unlinkSync(filePath);
+    // Supabase Storage에서 파일 삭제
+    if (videoPart.videoUrl && !videoPart.videoUrl.startsWith('http')) {
+      try {
+        await this.supabase.removeFile(videoPart.videoUrl);
+      } catch (error) {
+        console.warn(
+          `[MEDIA] Supabase 파일 삭제 실패 (계속 진행): ${error.message}`,
+        );
       }
     }
 
@@ -249,6 +292,10 @@ export class MediaController {
       message: '영상이 삭제되었습니다.',
     };
   }
+
+  // ────────────────────────────────────────
+  // 5) 특정 레슨의 영상 목록 조회
+  // ────────────────────────────────────────
 
   @Get('lessons/:lessonId/videos')
   @ApiOperation({ summary: '특정 레슨의 영상 목록 조회' })

@@ -15,6 +15,7 @@ import { QnaModule } from './qna/qna.module';
 import { InstructorModule } from './instructor/instructor.module';
 import { PortalModule } from './portal/portal.module';
 import { MediaModule } from './media/media.module';
+import { SupabaseModule } from './supabase/supabase.module';
 import { envValidationSchema } from './config/env.validation';
 
 @Module({
@@ -28,6 +29,7 @@ import { envValidationSchema } from './config/env.validation';
         abortEarly: false,
       },
     }),
+    SupabaseModule,
     PrismaModule,
     AuthModule,
     HealthModule,
