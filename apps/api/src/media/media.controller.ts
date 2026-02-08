@@ -68,9 +68,12 @@ class ConfirmUploadDto {
 
 const ALLOWED_MIMES = [
   'video/mp4',
+  'video/mpeg',
   'video/webm',
   'video/ogg',
   'video/quicktime',
+  'video/x-msvideo',
+  'video/x-matroska',
 ];
 
 const MAX_FILE_SIZE = 1 * 1024 * 1024 * 1024; // 1GB
