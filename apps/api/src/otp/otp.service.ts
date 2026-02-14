@@ -30,7 +30,11 @@ export class OtpService {
     const ttlSeconds = this.config.get<number>('OTP_CODE_TTL_SECONDS', 300);
 
     // DTO enum을 Prisma enum으로 변환
-    const prismaPurpose: OtpPurpose = purpose === DtoOtpPurpose.SIGNUP ? OtpPurpose.signup : OtpPurpose.signup;
+    const purposeMap: Record<DtoOtpPurpose, OtpPurpose> = {
+      [DtoOtpPurpose.SIGNUP]: OtpPurpose.signup,
+      [DtoOtpPurpose.PASSWORD_RESET]: OtpPurpose.passwordReset,
+    };
+    const prismaPurpose: OtpPurpose = purposeMap[purpose] ?? OtpPurpose.signup;
 
     // 1. 재전송 간격 체크 (분당 제한)
     const recentRequest = await this.prisma.otpRequest.findFirst({

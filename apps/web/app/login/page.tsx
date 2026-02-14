@@ -179,6 +179,15 @@ export default function LoginPage() {
                 className="w-full h-12 px-4 bg-bg-primary border-2 border-border rounded-lg text-base text-text-primary placeholder:text-text-tertiary transition-all focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20 disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-surface"
               disabled={loading}
             />
+            <div className="flex justify-end mt-1">
+              <button
+                type="button"
+                onClick={() => router.push('/reset-password')}
+                className="text-xs text-text-tertiary hover:text-primary-600 transition-colors"
+              >
+                비밀번호 찾기
+              </button>
+            </div>
           </div>
 
           <button

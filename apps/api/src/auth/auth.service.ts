@@ -9,6 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import { OtpService } from '../otp/otp.service';
+import { OtpPurpose as DtoOtpPurpose } from '../otp/dto/send-otp.dto';
 import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
 
@@ -556,5 +557,85 @@ export class AuthService {
         companyId: undefined, // Mock 사용자는 미배정
       },
     };
+  }
+
+  // ────────────────────────────────────────
+  // 비밀번호 재설정
+  // ────────────────────────────────────────
+
+  async passwordResetSendOtp(phone: string): Promise<void> {
+    // 유저 존재 여부 확인
+    const user = await this.prisma.user.findUnique({
+      where: { phone },
+    });
+
+    // 보안: 유저가 없어도 동일한 응답 (유저 존재 여부 노출 방지)
+    if (!user) {
+      return;
+    }
+
+    // 기존 OTP 발송 로직 재활용
+    await this.otpService.sendOtp(phone, DtoOtpPurpose.PASSWORD_RESET);
+  }
+
+  async passwordResetVerifyOtp(
+    phone: string,
+    code: string,
+  ): Promise<{ resetToken: string }> {
+    const result = await this.otpService.verifyOtp(phone, code);
+    return { resetToken: result.otpToken };
+  }
+
+  async passwordReset(
+    resetToken: string,
+    newPassword: string,
+  ): Promise<void> {
+    // 1. 토큰 검증
+    const { phone, purpose } = await this.otpService.verifyOtpToken(resetToken);
+
+    if (purpose !== 'passwordReset') {
+      throw new UnprocessableEntityException({
+        code: 'INVALID_TOKEN',
+        message: '유효하지 않은 비밀번호 재설정 토큰입니다.',
+      });
+    }
+
+    // 2. 유저 조회
+    const user = await this.prisma.user.findUnique({
+      where: { phone },
+    });
+
+    if (!user) {
+      throw new BadRequestException('사용자를 찾을 수 없습니다.');
+    }
+
+    // 3. 비밀번호 정책 검증
+    const passwordPattern =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+    if (!passwordPattern.test(newPassword)) {
+      throw new UnprocessableEntityException({
+        code: 'WEAK_PASSWORD',
+        message:
+          '비밀번호는 최소 8자이며, 대문자/소문자/숫자/특수문자를 각각 1개 이상 포함해야 합니다.',
+      });
+    }
+
+    // 4. 비밀번호 해싱 및 업데이트
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { passwordHash },
+    });
+
+    // 5. 기존 세션 모두 revoke (보안)
+    await this.prisma.session.updateMany({
+      where: {
+        userId: user.id,
+        revokedAt: null,
+      },
+      data: {
+        revokedAt: new Date(),
+      },
+    });
   }
 }
