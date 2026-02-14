@@ -48,6 +48,7 @@ export function MainNav() {
   const hideOnRoutes = [
     "/login",
     "/signup",
+    "/reset-password",
     "/company-assign",
     "/admin",
     "/instructor",
