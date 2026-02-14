@@ -165,12 +165,8 @@ export class ExamService {
       }
     });
 
-    if (questions.length < 10) {
-      throw new UnprocessableEntityException(`문제은행이 부족합니다. 최소 10문항이 필요하지만 현재 ${questions.length}문항만 있습니다.`);
-    }
-
-    // 4. 랜덤 10문항 선택
-    const selectedQuestions = selectRandom(questions, Math.min(10, questions.length));
+    // 4. 랜덤 3문항 선택 (문항 수 검증은 과목 배정 시 수행)
+    const selectedQuestions = selectRandom(questions, Math.min(3, questions.length));
     const questionIds = selectedQuestions.map(q => q.id);
 
     // 5. 현재 사이클의 시도 번호 계산
@@ -493,15 +489,10 @@ export class ExamService {
       },
     });
 
-    if (questions.length < 10) {
-      throw new UnprocessableEntityException(
-        `문제은행이 부족합니다. 최소 10문항이 필요하지만 현재 ${questions.length}문항만 있습니다.`,
-      );
-    }
-
+    // 랜덤 3문항 선택 (문항 수 검증은 과목 배정 시 수행)
     const selectedQuestions = selectRandom(
       questions,
-      Math.min(10, questions.length),
+      Math.min(3, questions.length),
     );
     const questionIds = selectedQuestions.map((q) => q.id);
 
@@ -657,19 +648,10 @@ export class ExamService {
       },
     });
 
-    if (questions.length < 10) {
-      return {
-        allowed: false,
-        cycle,
-        tryIndex,
-        remainingTries,
-        message: `문제은행이 부족합니다. 최소 10문항이 필요하지만 현재 ${questions.length}문항만 있습니다.`,
-      };
-    }
-
+    // 랜덤 3문항 선택 (문항 수 검증은 과목 배정 시 수행)
     const selectedQuestions = selectRandom(
       questions,
-      Math.min(10, questions.length),
+      Math.min(3, questions.length),
     );
     const questionIds = selectedQuestions.map((q) => q.id);
 

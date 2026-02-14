@@ -150,7 +150,7 @@ export default function ExamPage() {
           <div className="text-center mb-8">
             <h1 className="text-[28px] font-bold text-text-primary mb-3">레슨 {lessonId} 시험</h1>
             <p className="text-base text-text-secondary">
-              10문항의 객관식 문제가 출제됩니다. 진도 20점 + 학습평가 80점으로 총점을 계산하며, 총점 70점 이상이면 이 강의를 수료할 수 있습니다.
+              3문항의 객관식 문제가 출제됩니다. 진도 20점 + 학습평가 80점으로 총점을 계산하며, 총점 70점 이상이면 이 강의를 수료할 수 있습니다.
             </p>
           </div>
 
