@@ -138,7 +138,7 @@ export function ExamPage({
             <div className="bg-blue-50 p-4 rounded-lg">
               <h3 className="font-semibold mb-2">시험 정보</h3>
               <ul className="text-sm space-y-1 text-gray-700">
-                <li>• 문항 수: 10문항 (객관식)</li>
+                <li>• 문항 수: 3문항 (객관식)</li>
                 <li>• 시험 시간: 제한 없음</li>
                 <li>• 합격 기준: 70점 이상</li>
                 <li>• 응시 제한: 회차당 3회</li>

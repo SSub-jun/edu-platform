@@ -222,6 +222,18 @@ export class AdminCohortService {
       throw new BadRequestException('One or more subjects not found');
     }
 
+    // 각 과목의 문제은행 문항 수 검증 (3배수 = 최소 9문항)
+    for (const subject of subjects) {
+      const questionCount = await this.prisma.question.count({
+        where: { subjectId: subject.id, isActive: true },
+      });
+      if (questionCount < 9) {
+        throw new BadRequestException(
+          `과목 '${subject.name}'의 문제은행이 부족합니다. 최소 9문항이 필요하지만 현재 ${questionCount}문항만 있습니다.`,
+        );
+      }
+    }
+
     // 기존 배정 삭제
     await this.prisma.cohortSubject.deleteMany({
       where: { cohortId },

@@ -198,7 +198,7 @@ export default function ExamResultPage() {
               </div>
               <div className="flex justify-between py-2">
                 <span className="text-sm font-medium text-text-tertiary">총 문항 수</span>
-                <span className="text-sm text-text-primary">10문항</span>
+                <span className="text-sm text-text-primary">3문항</span>
               </div>
             </div>
           )}
