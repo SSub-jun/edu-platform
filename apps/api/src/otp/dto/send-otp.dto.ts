@@ -3,6 +3,7 @@ import { IsString, IsOptional, IsEnum, Matches } from 'class-validator';
 
 export enum OtpPurpose {
   SIGNUP = 'signup',
+  PASSWORD_RESET = 'passwordReset',
 }
 
 export class SendOtpDto {

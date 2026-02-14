@@ -369,6 +369,7 @@ enum ExamStatus {
 
 enum OtpPurpose {
   signup
+  passwordReset
 }
 
 // Portal Exam Models

@@ -4,6 +4,7 @@ import { AuthService } from './auth.service';
 import { LoginDto, RefreshDto, LoginResponseDto, RefreshResponseDto, LogoutResponseDto } from './dto/auth.dto';
 import { RegisterDto, RegisterResponseDto, VerifyOtpResponseDto } from './dto/register.dto';
 import { AssignCompanyDto, AssignCompanyResponseDto } from './dto/assign-company.dto';
+import { PasswordSendOtpDto, PasswordVerifyOtpDto, PasswordResetDto } from './dto/password-reset.dto';
 import { SendOtpDto, OtpPurpose } from '../otp/dto/send-otp.dto';
 import { VerifyOtpDto as VerifyDto } from '../otp/dto/verify-otp.dto';
 import { OtpService } from '../otp/otp.service';
@@ -253,5 +254,58 @@ export class AuthController {
   ): Promise<AssignCompanyResponseDto> {
     const userId = req.user.sub;
     return this.authService.assignCompany(userId, assignCompanyDto.inviteCode);
+  }
+
+  // ────────────────────────────────────────
+  // 비밀번호 재설정
+  // ────────────────────────────────────────
+
+  @Post('password/send-otp')
+  @HttpCode(200)
+  @ApiOperation({
+    summary: '비밀번호 재설정 OTP 전송',
+    description: '등록된 휴대폰 번호로 비밀번호 재설정용 인증번호를 전송합니다.',
+  })
+  @ApiBody({ type: PasswordSendOtpDto })
+  @ApiResponse({ status: 200, description: 'OTP 전송 요청 처리 완료' })
+  async passwordSendOtp(@Body() dto: PasswordSendOtpDto) {
+    await this.authService.passwordResetSendOtp(dto.phone);
+    return {
+      success: true,
+      message: '등록된 번호라면 인증번호가 발송됩니다.',
+    };
+  }
+
+  @Post('password/verify-otp')
+  @ApiOperation({
+    summary: '비밀번호 재설정 OTP 인증',
+    description: '인증번호를 검증하고 비밀번호 재설정 토큰을 발급합니다.',
+  })
+  @ApiBody({ type: PasswordVerifyOtpDto })
+  @ApiResponse({ status: 201, description: '인증 성공 - 재설정 토큰 발급' })
+  async passwordVerifyOtp(@Body() dto: PasswordVerifyOtpDto) {
+    const result = await this.authService.passwordResetVerifyOtp(
+      dto.phone,
+      dto.code,
+    );
+    return {
+      success: true,
+      data: result,
+    };
+  }
+
+  @Post('password/reset')
+  @ApiOperation({
+    summary: '비밀번호 재설정',
+    description: '재설정 토큰과 새 비밀번호로 비밀번호를 변경합니다.',
+  })
+  @ApiBody({ type: PasswordResetDto })
+  @ApiResponse({ status: 201, description: '비밀번호 재설정 성공' })
+  async passwordReset(@Body() dto: PasswordResetDto) {
+    await this.authService.passwordReset(dto.resetToken, dto.newPassword);
+    return {
+      success: true,
+      message: '비밀번호가 성공적으로 변경되었습니다.',
+    };
   }
 }
