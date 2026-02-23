@@ -260,9 +260,8 @@ export class ExamService {
 
     const examScore = (correctCount / questionIds.length) * 100;
 
-    // ✅ 기본 합격 여부(과목 단위 시험용, 기존 로직 유지)
-    // 레슨 단위 수료 로직은 아래에서 별도로 Progress.finalScore / passed에 반영
-    const passed = examScore >= 70;
+    // 기본 합격 여부 (레슨 단위 시험용 - ExamAttempt 기록에 사용)
+    let passed = examScore >= 70;
 
     // finalScore 변수 선언 (Subject/Lesson 단위 시험에서 계산됨)
     let finalScore: number | undefined = undefined;
@@ -305,6 +304,9 @@ export class ExamService {
       finalScore = progressScore + examScoreComponent; // 0 ~ 100
 
       const subjectPassed = finalScore >= 70;
+
+      // 과목 단위 시험에서는 최종 점수(진도율 20% + 시험 80%) 기준으로 합격 판정
+      passed = subjectPassed;
 
       // SubjectProgress 업데이트
       await this.prisma.subjectProgress.update({
