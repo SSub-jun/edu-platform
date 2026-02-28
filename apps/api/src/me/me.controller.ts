@@ -140,12 +140,12 @@ export class MeController {
           where: { userId, lessonId: { in: allLessonIds } }
         }).then(data => new Map(data.map(p => [p.lessonId, p]))),
         
-        // Exam 시도 횟수
+        // Exam 시도 횟수 (사이클별)
         this.prisma.examAttempt.groupBy({
-          by: ['subjectId'],
+          by: ['subjectId', 'cycle'],
           where: { userId, subjectId: { in: allSubjectIds } },
           _count: { id: true }
-        }).then(data => new Map(data.map(e => [e.subjectId, e._count.id])))
+        }).then(data => new Map(data.map(e => [`${e.subjectId}_${e.cycle}`, e._count.id])))
       ]);
 
       const result: any[] = [];
@@ -153,7 +153,8 @@ export class MeController {
       for (const cs of activeCohort.cohortSubjects) {
         const subject = cs.subject;
         const subjectProgress = subjectProgressMap.get(subject.id);
-        const examAttemptCount = examAttemptsMap.get(subject.id) || 0;
+        const currentCycle = subjectProgress?.cycle || 1;
+        const examAttemptCount = examAttemptsMap.get(`${subject.id}_${currentCycle}`) || 0;
 
         // 레슨 목록 및 진도율 계산
         const lessons: any[] = [];
