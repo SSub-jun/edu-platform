@@ -21,6 +21,8 @@ export const envValidationSchema = Joi.object({
   // SMS 설정
   SMS_PROVIDER: Joi.string().valid('mock', 'solapi').default('mock'),
   SMS_SENDER_ID: Joi.string().default('EDU-PLATFORM'),
+  SMS_FAIL_OPEN: Joi.boolean().default(false),
+  SMS_ALLOW_MOCK_IN_PRODUCTION: Joi.boolean().default(false),
   
   // SOLAPI 설정 (SMS_PROVIDER가 'solapi'일 때 필요)
   SOLAPI_API_KEY: Joi.string().optional(),

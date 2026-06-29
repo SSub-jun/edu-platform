@@ -8,6 +8,15 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 type Step = 'phone' | 'otp' | 'password' | 'done';
 
+async function readErrorMessage(res: Response, fallback: string) {
+  try {
+    const json = await res.json();
+    return json.message || json.error?.message || fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 export default function ResetPasswordPage() {
   const router = useRouter();
 
@@ -54,11 +63,20 @@ export default function ResetPasswordPage() {
     setPhoneError('');
 
     try {
-      await fetch(`${API_URL}/auth/password/send-otp`, {
+      const res = await fetch(`${API_URL}/auth/password/send-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone: cleaned }),
       });
+
+      if (!res.ok) {
+        const msg = await readErrorMessage(
+          res,
+          '인증번호 전송에 실패했습니다. 잠시 후 다시 시도해주세요.',
+        );
+        setPhoneError(msg);
+        return;
+      }
 
       // 보안상 항상 다음 단계로 이동 (유저 존재 여부 미노출)
       setPhone(cleaned);
@@ -130,11 +148,21 @@ export default function ResetPasswordPage() {
     if (resendCooldown > 0) return;
 
     try {
-      await fetch(`${API_URL}/auth/password/send-otp`, {
+      const res = await fetch(`${API_URL}/auth/password/send-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone }),
       });
+
+      if (!res.ok) {
+        const msg = await readErrorMessage(
+          res,
+          '인증번호 재전송에 실패했습니다. 잠시 후 다시 시도해주세요.',
+        );
+        setOtpError(msg);
+        return;
+      }
+
       setResendCooldown(30);
       setOtpDigits(['', '', '', '', '', '']);
       setOtpError('');
