@@ -3,16 +3,20 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { localeLabels, supportedLocales, type Locale } from "../i18n/config";
+import { useLocale, useT } from "../i18n/client";
 
 const navItems = [
-  { label: "강의실", href: "/curriculum" },
-  { label: "Q&A", href: "/qna" },
-  { label: "내정보", href: "/student" },
-  { label: "교육안내", href: "/guide" },
+  { labelKey: "nav.classroom", fallback: "강의실", href: "/curriculum" },
+  { labelKey: "nav.qna", fallback: "Q&A", href: "/qna" },
+  { labelKey: "nav.myInfo", fallback: "내정보", href: "/student" },
+  { labelKey: "nav.guide", fallback: "교육안내", href: "/guide" },
 ];
 
 export function MainNav() {
   const pathname = usePathname();
+  const { locale, setLocale } = useLocale();
+  const t = useT(locale);
   const [isReady, setIsReady] = useState(false);
   const [isStudent, setIsStudent] = useState(false);
 
@@ -63,7 +67,7 @@ export function MainNav() {
       <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3 md:py-4">
         <Link href="/curriculum" className="flex items-center gap-2">
           <span className="text-[1.3rem] md:text-[1.5rem] font-bold text-text-primary tracking-tight">
-            KIST 교육센터
+            {t("nav.brand")}
           </span>
         </Link>
         <nav className="flex items-center gap-1 md:gap-2 text-sm md:text-base flex-grow justify-end">
@@ -85,15 +89,26 @@ export function MainNav() {
                       : "text-text-secondary hover:text-text-primary hover:bg-bg-primary"
                     }`}
                 >
-                  {item.label}
+                  {t(item.labelKey) || item.fallback}
                 </Link>
               </div>
             );
           })}
+          <select
+            value={locale}
+            onChange={(event) => setLocale(event.target.value as Locale)}
+            aria-label={t("login.language.label")}
+            className="ml-2 h-9 rounded border border-border bg-bg-primary px-2 text-xs font-semibold text-text-secondary focus:outline-none focus:ring-2 focus:ring-primary-600"
+          >
+            {supportedLocales.map((item) => (
+              <option key={item} value={item}>
+                {localeLabels[item]}
+              </option>
+            ))}
+          </select>
         </nav>
       </div>
     </header>
   );
 }
-
 
