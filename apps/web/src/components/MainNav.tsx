@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Globe2 } from "lucide-react";
 import { localeLabels, supportedLocales, type Locale } from "../i18n/config";
 import { useLocale, useT } from "../i18n/client";
 
@@ -94,21 +95,26 @@ export function MainNav() {
               </div>
             );
           })}
-          <select
-            value={locale}
-            onChange={(event) => setLocale(event.target.value as Locale)}
-            aria-label={t("login.language.label")}
-            className="ml-2 h-9 rounded border border-border bg-bg-primary px-2 text-xs font-semibold text-text-secondary focus:outline-none focus:ring-2 focus:ring-primary-600"
-          >
-            {supportedLocales.map((item) => (
-              <option key={item} value={item}>
-                {localeLabels[item]}
-              </option>
-            ))}
-          </select>
+          <div className="relative ml-2 shrink-0">
+            <Globe2
+              aria-hidden="true"
+              className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-text-secondary"
+            />
+            <select
+              value={locale}
+              onChange={(event) => setLocale(event.target.value as Locale)}
+              aria-label="Language"
+              className="h-9 w-[116px] rounded border border-border bg-bg-primary pl-8 pr-2 text-xs font-semibold text-text-secondary focus:outline-none focus:ring-2 focus:ring-primary-600 md:w-[128px]"
+            >
+              {supportedLocales.map((item) => (
+                <option key={item} value={item}>
+                  {localeLabels[item]}
+                </option>
+              ))}
+            </select>
+          </div>
         </nav>
       </div>
     </header>
   );
 }
-

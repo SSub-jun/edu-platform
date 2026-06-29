@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { authClient } from '../../lib/auth';
 import BrandTrustMini from '../../src/components/BrandTrustMini';
 import Image from 'next/image';
+import { Globe2 } from 'lucide-react';
 import { localeLabels, supportedLocales, type Locale } from '../../src/i18n/config';
 import { useLocale, useT } from '../../src/i18n/client';
 
@@ -163,21 +164,28 @@ export default function LoginPage() {
           {/* Form */}
           <form onSubmit={handleLogin} className="flex flex-col gap-6">
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-semibold text-text-primary">
+              <label className="sr-only">
                 {t('login.language.label')}
               </label>
-              <select
-                value={locale}
-                onChange={(e) => setLocale(e.target.value as Locale)}
-                className="w-full h-12 px-4 bg-bg-primary border-2 border-border rounded-lg text-base text-text-primary transition-all focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20 disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-surface"
-                disabled={loading}
-              >
-                {supportedLocales.map((option) => (
-                  <option key={option} value={option}>
-                    {localeLabels[option]}
-                  </option>
-                ))}
-              </select>
+              <div className="relative">
+                <Globe2
+                  aria-hidden="true"
+                  className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-text-secondary"
+                />
+                <select
+                  value={locale}
+                  onChange={(e) => setLocale(e.target.value as Locale)}
+                  aria-label="Language"
+                  className="w-full h-12 pl-12 pr-4 bg-bg-primary border-2 border-border rounded-lg text-base font-semibold text-text-primary transition-all focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20 disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-surface"
+                  disabled={loading}
+                >
+                  {supportedLocales.map((option) => (
+                    <option key={option} value={option}>
+                      {localeLabels[option]}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             <div className="flex flex-col gap-2">
