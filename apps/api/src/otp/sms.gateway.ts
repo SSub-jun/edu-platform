@@ -17,6 +17,15 @@ export class SmsGateway {
 
     switch (provider) {
       case 'mock':
+        if (
+          process.env.NODE_ENV === 'production' &&
+          !this.config.get<boolean>('SMS_ALLOW_MOCK_IN_PRODUCTION', false)
+        ) {
+          this.logger.error(
+            '[SMS] SMS_PROVIDER is mock in production. Refusing to mark OTP as sent.',
+          );
+          throw new Error('SMS provider is not configured for production');
+        }
         await this.sendMockSms(message);
         break;
       case 'solapi':
@@ -92,9 +101,8 @@ export class SmsGateway {
         this.logger.error(`[SOLAPI] Response data: ${JSON.stringify(error.response.data)}`);
       }
 
-      // 프로덕션에서는 실패해도 사용자에게 성공으로 보이게 함 (보안상 이유)
-      if (process.env.NODE_ENV === 'production') {
-        this.logger.warn('[SOLAPI] SMS sending failed in production, but returning success to prevent user enumeration');
+      if (this.config.get<boolean>('SMS_FAIL_OPEN', false)) {
+        this.logger.warn('[SOLAPI] SMS sending failed, but SMS_FAIL_OPEN=true');
         return;
       }
 
@@ -130,7 +138,6 @@ export class SmsGateway {
     return `[교육플랫폼] 인증번호: ${code} (5분 내 입력)`;
   }
 }
-
 
 
 

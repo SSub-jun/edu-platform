@@ -69,6 +69,13 @@ export class HealthController {
         database: dbHealth.database,
         migrationStatus: dbHealth.migrationStatus || 'unknown'
       },
+      sms: {
+        provider: process.env.SMS_PROVIDER || 'mock',
+        senderConfigured: Boolean(process.env.SMS_SENDER_ID),
+        solapiConfigured: Boolean(process.env.SOLAPI_API_KEY && process.env.SOLAPI_API_SECRET),
+        failOpen: process.env.SMS_FAIL_OPEN === 'true',
+        mockAllowedInProduction: process.env.SMS_ALLOW_MOCK_IN_PRODUCTION === 'true',
+      },
       environment: process.env.NODE_ENV || 'development',
       version: process.env.npm_package_version || '1.0.0'
     };
