@@ -58,10 +58,12 @@ export class SmsGateway {
       
       const apiKey = this.config.get<string>('SOLAPI_API_KEY');
       const apiSecret = this.config.get<string>('SOLAPI_API_SECRET');
-      const fromNumber = this.config.get<string>('SMS_SENDER_ID');
+      const fromNumber =
+        this.config.get<string>('SOLAPI_FROM_NUMBER') ||
+        this.config.get<string>('SMS_SENDER_ID');
 
       if (!apiKey || !apiSecret || !fromNumber) {
-        throw new Error('SOLAPI credentials are not configured. Please set SOLAPI_API_KEY, SOLAPI_API_SECRET, and SMS_SENDER_ID environment variables.');
+        throw new Error('SOLAPI credentials are not configured. Please set SOLAPI_API_KEY, SOLAPI_API_SECRET, and SOLAPI_FROM_NUMBER environment variables.');
       }
 
       const messageService = new SolapiMessageService(apiKey, apiSecret);
@@ -69,6 +71,10 @@ export class SmsGateway {
       // 한국 전화번호 형식 정규화
       const normalizedPhone = this.normalizeKoreanPhoneNumber(message.phone);
       const normalizedFrom = this.normalizeKoreanPhoneNumber(fromNumber);
+
+      if (!this.isKoreanSenderNumber(normalizedFrom)) {
+        throw new Error('SOLAPI sender number is invalid. Set SOLAPI_FROM_NUMBER to an approved sender phone number.');
+      }
 
       const result = await messageService.send([{
         to: normalizedPhone,
@@ -134,11 +140,14 @@ export class SmsGateway {
     return digits;
   }
 
+  private isKoreanSenderNumber(phone: string): boolean {
+    return /^0\d{8,10}$/.test(phone);
+  }
+
   createOtpMessage(code: string): string {
     return `[교육플랫폼] 인증번호: ${code} (5분 내 입력)`;
   }
 }
-
 
 
 

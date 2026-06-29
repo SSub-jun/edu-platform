@@ -24,10 +24,10 @@ export async function sendSMS({ to, message }: SendSMSParams): Promise<SendSMSRe
   try {
     const apiKey = process.env.SOLAPI_API_KEY;
     const apiSecret = process.env.SOLAPI_API_SECRET;
-    const fromNumber = process.env.SMS_SENDER_ID;
+    const fromNumber = process.env.SOLAPI_FROM_NUMBER || process.env.SMS_SENDER_ID;
 
     if (!apiKey || !apiSecret || !fromNumber) {
-      throw new Error('SOLAPI credentials are not configured. Please set SOLAPI_API_KEY, SOLAPI_API_SECRET, and SMS_SENDER_ID environment variables.');
+      throw new Error('SOLAPI credentials are not configured. Please set SOLAPI_API_KEY, SOLAPI_API_SECRET, and SOLAPI_FROM_NUMBER environment variables.');
     }
 
     const messageService = new SolapiMessageService(apiKey, apiSecret);
@@ -35,6 +35,10 @@ export async function sendSMS({ to, message }: SendSMSParams): Promise<SendSMSRe
     // 한국 전화번호 형식 정규화
     const normalizedTo = normalizeKoreanPhoneNumber(to);
     const normalizedFrom = normalizeKoreanPhoneNumber(fromNumber);
+
+    if (!/^0\d{8,10}$/.test(normalizedFrom)) {
+      throw new Error('SOLAPI sender number is invalid. Set SOLAPI_FROM_NUMBER to an approved sender phone number.');
+    }
 
     console.log(`[SOLAPI] Sending SMS to ${normalizedTo} from ${normalizedFrom}`);
     console.log(`[SOLAPI] Message: ${message}`);

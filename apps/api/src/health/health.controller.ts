@@ -60,6 +60,8 @@ export class HealthController {
   async check() {
     const dbHealth = await this.prismaService.healthCheck();
     const isProduction = process.env.NODE_ENV === 'production';
+    const smsFromNumber = process.env.SOLAPI_FROM_NUMBER || process.env.SMS_SENDER_ID || '';
+    const smsFromDigits = smsFromNumber.replace(/\D/g, '');
     
     const response: any = {
       ok: dbHealth.status === 'healthy',
@@ -71,7 +73,13 @@ export class HealthController {
       },
       sms: {
         provider: process.env.SMS_PROVIDER || 'mock',
-        senderConfigured: Boolean(process.env.SMS_SENDER_ID),
+        senderConfigured: Boolean(smsFromNumber),
+        senderLooksLikePhone: /^0\d{8,10}$/.test(smsFromDigits),
+        fromNumberSource: process.env.SOLAPI_FROM_NUMBER
+          ? 'SOLAPI_FROM_NUMBER'
+          : process.env.SMS_SENDER_ID
+            ? 'SMS_SENDER_ID'
+            : 'none',
         solapiConfigured: Boolean(process.env.SOLAPI_API_KEY && process.env.SOLAPI_API_SECRET),
         failOpen: process.env.SMS_FAIL_OPEN === 'true',
         mockAllowedInProduction: process.env.SMS_ALLOW_MOCK_IN_PRODUCTION === 'true',
