@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import videojs from 'video.js';
 import 'video.js/dist/video-js.css';
 import type Player from 'video.js/dist/types/player';
+import styles from './VideoPlayer.module.css';
 
 interface VideoPlayerProps {
   src?: string;
@@ -24,6 +25,7 @@ interface VideoPlayerProps {
 const DELTA_TOLERANCE = 1.5;      // 연속 재생 판정: 이 이하면 정상 재생으로 인정 (초)
 const FORWARD_EPSILON = 0.5;      // 앞으로 이동 허용 오차 (초)
 const REVERT_COOLDOWN_MS = 300;   // 되돌리기 후 업데이트 금지 시간 (ms)
+const INITIAL_LOAD_RETRY_DELAY_MS = 900;
 
 /**
  * VideoPlayer - Video.js 기반 비디오 플레이어 (안정화 버전)
@@ -53,6 +55,12 @@ export default function VideoPlayer({
   const isSeekingRef = useRef(false);
   const isRevertingRef = useRef(false);
   const revertCooldownRef = useRef<NodeJS.Timeout | null>(null);
+  const initialLoadRetryCountRef = useRef(0);
+  const initialLoadRetryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const [loadState, setLoadState] = useState<'loading' | 'retrying' | 'ready' | 'error'>(
+    src ? 'loading' : 'ready',
+  );
 
   // 🔑 onProgress를 ref로 관리 (의존성 배열에서 제거하기 위함)
   const onProgressRef = useRef(onProgress);
@@ -65,6 +73,17 @@ export default function VideoPlayer({
   // API 서버 URL
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
   const videoUrl = src ? (src.startsWith('http') ? src : `${apiUrl}${src}`) : undefined;
+
+  const retryVideoLoad = () => {
+    const player = playerRef.current;
+    if (!player || player.isDisposed() || !videoUrl) return;
+
+    setLoadState('retrying');
+    player.controls(false);
+    player.error(undefined);
+    player.src({ src: videoUrl, type: 'video/mp4' });
+    player.load();
+  };
 
   // props에서 maxReachedSeconds 변경 시 동기화
   useEffect(() => {
@@ -81,10 +100,16 @@ export default function VideoPlayer({
       return;
     }
 
+    setLoadState('loading');
+    initialLoadRetryCountRef.current = 0;
+
     // 이미 플레이어가 있으면 소스만 변경
     if (playerRef.current && !playerRef.current.isDisposed()) {
       console.log('🔄 [VideoPlayer] Updating source', { videoUrl });
+      playerRef.current.controls(false);
+      playerRef.current.error(undefined);
       playerRef.current.src({ src: videoUrl, type: 'video/mp4' });
+      playerRef.current.load();
       // 상태 초기화
       maxWatchedTimeRef.current = maxReachedSecondsRef.current || 0;
       lastValidTimeRef.current = maxReachedSecondsRef.current || 0;
@@ -117,6 +142,7 @@ export default function VideoPlayer({
     });
 
     playerRef.current = player;
+    player.controls(false);
 
     // ============================================
     // UI 레벨 progress bar 클릭 차단 (해결책 B)
@@ -149,6 +175,43 @@ export default function VideoPlayer({
       }
 
       console.log('✅ [VideoPlayer] Player ready');
+    });
+
+    // ============================================
+    // 0. 초기 로딩 상태: 메타데이터 로드 전 클릭 방지
+    // ============================================
+    player.one('loadedmetadata', () => {
+      if (!player || player.isDisposed()) return;
+
+      setLoadState('ready');
+      player.controls(true);
+    });
+
+    player.on('error', () => {
+      if (!player || player.isDisposed()) return;
+
+      if (initialLoadRetryCountRef.current < 1) {
+        initialLoadRetryCountRef.current += 1;
+        setLoadState('retrying');
+        player.controls(false);
+
+        if (initialLoadRetryTimeoutRef.current) {
+          clearTimeout(initialLoadRetryTimeoutRef.current);
+        }
+
+        initialLoadRetryTimeoutRef.current = setTimeout(() => {
+          if (!playerRef.current || playerRef.current.isDisposed() || !videoUrl) return;
+
+          console.warn('🔄 [VideoPlayer] Retrying initial video load', { videoUrl });
+          playerRef.current.error(undefined);
+          playerRef.current.src({ src: videoUrl, type: 'video/mp4' });
+          playerRef.current.load();
+        }, INITIAL_LOAD_RETRY_DELAY_MS);
+        return;
+      }
+
+      setLoadState('error');
+      player.controls(false);
     });
 
     // ============================================
@@ -296,6 +359,9 @@ export default function VideoPlayer({
       if (revertCooldownRef.current) {
         clearTimeout(revertCooldownRef.current);
       }
+      if (initialLoadRetryTimeoutRef.current) {
+        clearTimeout(initialLoadRetryTimeoutRef.current);
+      }
       const p = playerRef.current;
       if (p && !p.isDisposed()) {
         console.log('🗑️ [VideoPlayer] Disposing player');
@@ -327,7 +393,7 @@ export default function VideoPlayer({
   }
 
   return (
-    <div data-vjs-player style={{ width: '100%', maxWidth: '100%' }}>
+    <div data-vjs-player className={styles.playerShell}>
       <video
         ref={videoRef}
         className="video-js vjs-big-play-centered"
@@ -338,6 +404,37 @@ export default function VideoPlayer({
           web browser that supports HTML5 video
         </p>
       </video>
+      {loadState !== 'ready' && (
+        <div className={styles.loadingOverlay} aria-live="polite">
+          <div className={styles.loadingPanel}>
+            {loadState === 'error' ? (
+              <>
+                <h3 className={styles.loadingTitle}>영상을 불러오지 못했습니다</h3>
+                <p className={styles.loadingText}>
+                  네트워크 상태를 확인한 뒤 다시 시도해주세요.
+                </p>
+                <button
+                  type="button"
+                  className={styles.retryButton}
+                  onClick={retryVideoLoad}
+                >
+                  다시 불러오기
+                </button>
+              </>
+            ) : (
+              <>
+                <div className={styles.spinner} aria-hidden="true" />
+                <h3 className={styles.loadingTitle}>
+                  {loadState === 'retrying' ? '영상을 다시 준비 중입니다' : '영상 준비 중입니다'}
+                </h3>
+                <p className={styles.loadingText}>
+                  준비가 끝나면 재생 버튼이 활성화됩니다.
+                </p>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
