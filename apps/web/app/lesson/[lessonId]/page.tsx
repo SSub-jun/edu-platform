@@ -9,6 +9,7 @@ import { useNextAvailable } from '../../../src/hooks/useNextAvailable';
 import VideoPlayer from '../../../src/components/VideoPlayer';
 import StatusBadge from '../../../src/components/ui/StatusBadge';
 import { getErrorMessage } from '../../../src/utils/errorMap';
+import { getStoredLocale } from '../../../src/i18n/client';
 
 export default function LessonPage() {
   const params = useParams();
@@ -39,6 +40,13 @@ export default function LessonPage() {
 
   // 비디오 재생 URL (Supabase signed URL) - Hook 순서 보장을 위해 최상단 배치
   const [signedVideoUrl, setSignedVideoUrl] = useState<string | undefined>();
+  const [subtitleTracks, setSubtitleTracks] = useState<Array<{
+    id: string;
+    locale: string;
+    label: string;
+    signedUrl: string;
+    isDefault?: boolean;
+  }>>([]);
   const signedUrlRefreshRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // ✅ localStorage에서 진도율 복구 (서버보다 높으면 사용)
@@ -125,6 +133,46 @@ export default function LessonPage() {
       }
     };
   }, [videoPartId, rawVideoUrl]);
+
+  useEffect(() => {
+    if (!videoPartId) {
+      setSubtitleTracks([]);
+      return;
+    }
+
+    const fetchSubtitles = async () => {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+        const token = localStorage.getItem('accessToken');
+        const locale = getStoredLocale();
+        const res = await fetch(`${apiUrl}/media/videos/${videoPartId}/subtitles?signed=true`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        const json = await res.json();
+        const subtitles = Array.isArray(json.data) ? json.data : [];
+        const hasSelectedLocale = subtitles.some((subtitle: any) => subtitle.locale === locale);
+
+        setSubtitleTracks(
+          subtitles
+            .filter((subtitle: any) => subtitle.signedUrl)
+            .map((subtitle: any) => ({
+              id: subtitle.id,
+              locale: subtitle.locale,
+              label: subtitle.label,
+              signedUrl: subtitle.signedUrl,
+              isDefault: hasSelectedLocale
+                ? subtitle.locale === locale
+                : subtitle.isDefault || subtitle.locale === 'ko',
+            })),
+        );
+      } catch (error) {
+        console.error('[LessonPage] 자막 목록 로드 실패:', error);
+        setSubtitleTracks([]);
+      }
+    };
+
+    fetchSubtitles();
+  }, [videoPartId]);
 
   const handleVideoProgress = useCallback((maxReachedSeconds: number, videoDuration: number) => {
     const now = Date.now();
@@ -261,6 +309,7 @@ export default function LessonPage() {
           <VideoPlayer
             src={signedVideoUrl}
             title={`레슨 ${lessonId}`}
+            subtitles={subtitleTracks}
             maxReachedSeconds={maxReachedSeconds || 0}
             videoDuration={0} // VideoPlayer가 로드 후 실제 duration을 onProgress로 전달
             onProgress={(data) => {

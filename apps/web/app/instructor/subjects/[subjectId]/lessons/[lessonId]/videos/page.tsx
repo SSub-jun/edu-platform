@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { authClient } from '../../../../../../../lib/auth';
+import { localeLabels, supportedLocales, type Locale } from '../../../../../../../src/i18n/config';
 
 interface VideoPart {
   id: string;
@@ -16,6 +17,16 @@ interface VideoPart {
   mimeType: string | null;
   isActive: boolean;
   createdAt: string;
+}
+
+interface VideoSubtitle {
+  id: string;
+  videoPartId: string;
+  locale: Locale;
+  label: string;
+  fileUrl: string;
+  format: string;
+  isDefault: boolean;
 }
 
 interface Lesson {
@@ -38,12 +49,20 @@ export default function LessonVideosManagePage() {
   const [video, setVideo] = useState<VideoPart | null>(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [subtitleUploading, setSubtitleUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [showUploadForm, setShowUploadForm] = useState(false);
+  const [showSubtitleForm, setShowSubtitleForm] = useState(false);
+  const [subtitles, setSubtitles] = useState<VideoSubtitle[]>([]);
   const [newVideo, setNewVideo] = useState({
     title: '',
     description: '',
     file: null as File | null
+  });
+  const [newSubtitle, setNewSubtitle] = useState({
+    locale: 'en' as Locale,
+    file: null as File | null,
+    isDefault: false,
   });
 
   const loadData = async () => {
@@ -68,14 +87,25 @@ export default function LessonVideosManagePage() {
       // 영상 로드 (첫 번째 영상만)
       const videosResponse = await authClient.getApi().get(`/media/lessons/${lessonId}/videos`);
       if (videosResponse.data.success && videosResponse.data.data && videosResponse.data.data.length > 0) {
-        setVideo(videosResponse.data.data[0]); // 첫 번째 영상만 사용
+        const firstVideo = videosResponse.data.data[0];
+        setVideo(firstVideo); // 첫 번째 영상만 사용
+
+        const subtitlesResponse = await authClient.getApi().get(`/media/videos/${firstVideo.id}/subtitles`);
+        setSubtitles(subtitlesResponse.data?.data || []);
       } else {
         setVideo(null);
+        setSubtitles([]);
       }
     } catch (error) {
       console.error('데이터 로드 실패:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSubtitleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setNewSubtitle({ ...newSubtitle, file: e.target.files[0] });
     }
   };
 
@@ -205,6 +235,100 @@ export default function LessonVideosManagePage() {
     } catch (error) {
       console.error('영상 삭제 실패:', error);
       alert('영상 삭제에 실패했습니다.');
+    }
+  };
+
+  const handleSubtitleUpload = async () => {
+    if (!video || !newSubtitle.file) {
+      alert('자막 파일을 선택해주세요.');
+      return;
+    }
+
+    setSubtitleUploading(true);
+
+    try {
+      const token = localStorage.getItem('accessToken');
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const localeLabel = localeLabels[newSubtitle.locale];
+
+      const requestRes = await fetch(`${apiUrl}/media/subtitles/request-upload`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          videoPartId: video.id,
+          locale: newSubtitle.locale,
+          label: localeLabel,
+          filename: newSubtitle.file.name,
+          mimeType: newSubtitle.file.type || 'text/vtt',
+          fileSize: newSubtitle.file.size,
+          isDefault: newSubtitle.isDefault,
+        }),
+      });
+
+      if (!requestRes.ok) {
+        const errData = await requestRes.json().catch(() => ({}));
+        throw new Error(errData.message || '자막 업로드 URL 발급에 실패했습니다.');
+      }
+
+      const { data: uploadData } = await requestRes.json();
+
+      await fetch(uploadData.signedUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': newSubtitle.file.type || 'text/vtt' },
+        body: newSubtitle.file,
+      }).then((res) => {
+        if (!res.ok) {
+          throw new Error(`Supabase 자막 업로드 실패: ${res.status}`);
+        }
+      });
+
+      const confirmRes = await fetch(`${apiUrl}/media/subtitles/confirm-upload`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          videoPartId: video.id,
+          locale: newSubtitle.locale,
+          label: localeLabel,
+          storagePath: uploadData.storagePath,
+          format: 'vtt',
+          isDefault: newSubtitle.isDefault,
+        }),
+      });
+
+      if (!confirmRes.ok) {
+        throw new Error('자막 업로드 완료 확인에 실패했습니다.');
+      }
+
+      alert('자막이 업로드되었습니다.');
+      setNewSubtitle({ locale: 'en', file: null, isDefault: false });
+      setShowSubtitleForm(false);
+      loadData();
+    } catch (error: any) {
+      console.error('자막 업로드 실패:', error);
+      alert('자막 업로드에 실패했습니다: ' + (error.message || '알 수 없는 오류'));
+    } finally {
+      setSubtitleUploading(false);
+    }
+  };
+
+  const handleDeleteSubtitle = async (subtitleId: string) => {
+    if (!confirm('이 자막을 삭제하시겠습니까?')) {
+      return;
+    }
+
+    try {
+      await authClient.getApi().delete(`/media/subtitles/${subtitleId}`);
+      alert('자막이 삭제되었습니다.');
+      loadData();
+    } catch (error) {
+      console.error('자막 삭제 실패:', error);
+      alert('자막 삭제에 실패했습니다.');
     }
   };
 
@@ -603,6 +727,149 @@ export default function LessonVideosManagePage() {
                 🗑️ 삭제
               </button>
             </div>
+          </div>
+        )}
+
+        {video && (
+          <div style={{
+            marginTop: '24px',
+            border: '1px solid #e0e0e0',
+            borderRadius: '8px',
+            padding: '20px',
+            backgroundColor: '#fff'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 'bold', color: '#333' }}>
+                언어별 자막
+              </h3>
+              <button
+                onClick={() => setShowSubtitleForm(true)}
+                disabled={subtitleUploading}
+                style={{
+                  padding: '8px 12px',
+                  backgroundColor: '#0070f3',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: subtitleUploading ? 'not-allowed' : 'pointer',
+                  fontSize: '13px',
+                  fontWeight: 500
+                }}
+              >
+                자막 업로드
+              </button>
+            </div>
+
+            {showSubtitleForm && (
+              <div style={{ padding: '16px', backgroundColor: '#f8f9fa', borderRadius: '6px', marginBottom: '16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '160px 1fr', gap: '12px', marginBottom: '12px' }}>
+                  <select
+                    value={newSubtitle.locale}
+                    onChange={(e) => setNewSubtitle({ ...newSubtitle, locale: e.target.value as Locale })}
+                    disabled={subtitleUploading}
+                    style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  >
+                    {supportedLocales.map((locale) => (
+                      <option key={locale} value={locale}>{localeLabels[locale]}</option>
+                    ))}
+                  </select>
+                  <input
+                    type="file"
+                    accept=".vtt,text/vtt"
+                    onChange={handleSubtitleFileChange}
+                    disabled={subtitleUploading}
+                    style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: 'white' }}
+                  />
+                </div>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', marginBottom: '12px' }}>
+                  <input
+                    type="checkbox"
+                    checked={newSubtitle.isDefault}
+                    onChange={(e) => setNewSubtitle({ ...newSubtitle, isDefault: e.target.checked })}
+                    disabled={subtitleUploading}
+                  />
+                  기본 자막으로 설정
+                </label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    onClick={handleSubtitleUpload}
+                    disabled={subtitleUploading || !newSubtitle.file}
+                    style={{
+                      padding: '8px 12px',
+                      backgroundColor: subtitleUploading || !newSubtitle.file ? '#6c757d' : '#0070f3',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: subtitleUploading || !newSubtitle.file ? 'not-allowed' : 'pointer',
+                      fontSize: '13px',
+                      fontWeight: 500
+                    }}
+                  >
+                    {subtitleUploading ? '업로드 중...' : '저장'}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowSubtitleForm(false);
+                      setNewSubtitle({ locale: 'en', file: null, isDefault: false });
+                    }}
+                    disabled={subtitleUploading}
+                    style={{
+                      padding: '8px 12px',
+                      backgroundColor: '#6c757d',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: subtitleUploading ? 'not-allowed' : 'pointer',
+                      fontSize: '13px',
+                      fontWeight: 500
+                    }}
+                  >
+                    취소
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {subtitles.length === 0 ? (
+              <div style={{ color: '#666', fontSize: '14px' }}>등록된 자막이 없습니다.</div>
+            ) : (
+              <div style={{ display: 'grid', gap: '10px' }}>
+                {subtitles.map((subtitle) => (
+                  <div
+                    key={subtitle.id}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      padding: '12px',
+                      border: '1px solid #e0e0e0',
+                      borderRadius: '6px',
+                      backgroundColor: '#fafafa'
+                    }}
+                  >
+                    <div style={{ fontSize: '14px', color: '#333' }}>
+                      <strong>{localeLabels[subtitle.locale] || subtitle.label}</strong>
+                      <span style={{ marginLeft: '8px', color: '#666' }}>{subtitle.format.toUpperCase()}</span>
+                      {subtitle.isDefault && <span style={{ marginLeft: '8px', color: '#0070f3' }}>기본</span>}
+                    </div>
+                    <button
+                      onClick={() => handleDeleteSubtitle(subtitle.id)}
+                      style={{
+                        padding: '6px 10px',
+                        backgroundColor: '#dc3545',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '12px'
+                      }}
+                    >
+                      삭제
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>

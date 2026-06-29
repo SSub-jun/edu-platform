@@ -5,6 +5,7 @@ import {
   Delete,
   Body,
   Param,
+  Query,
   BadRequestException,
   InternalServerErrorException,
 } from '@nestjs/common';
@@ -14,7 +15,7 @@ import {
   ApiBearerAuth,
   ApiProperty,
 } from '@nestjs/swagger';
-import { IsString, IsOptional, IsNumber, IsNotEmpty } from 'class-validator';
+import { IsString, IsOptional, IsNumber, IsNotEmpty, IsBoolean, IsIn } from 'class-validator';
 import { Roles } from '../auth/decorators/auth.decorator';
 import { PrismaService } from '../prisma/prisma.service';
 import { SupabaseService } from '../supabase/supabase.service';
@@ -64,6 +65,74 @@ class ConfirmUploadDto {
   videoPartId: string;
 }
 
+class RequestSubtitleUploadDto {
+  @ApiProperty({ description: '영상 파트 ID' })
+  @IsString()
+  @IsNotEmpty()
+  videoPartId: string;
+
+  @ApiProperty({ description: '언어 코드', enum: ['ko', 'en', 'th', 'bn'] })
+  @IsString()
+  @IsIn(['ko', 'en', 'th', 'bn'])
+  locale: string;
+
+  @ApiProperty({ description: '자막 표시 이름', example: 'English' })
+  @IsString()
+  @IsNotEmpty()
+  label: string;
+
+  @ApiProperty({ description: '파일 이름 (예: subtitle-en.vtt)' })
+  @IsString()
+  @IsNotEmpty()
+  filename: string;
+
+  @ApiProperty({ description: 'MIME 타입 (예: text/vtt)' })
+  @IsString()
+  @IsNotEmpty()
+  mimeType: string;
+
+  @ApiProperty({ description: '파일 크기 (bytes)' })
+  @IsNumber()
+  fileSize: number;
+
+  @ApiProperty({ description: '기본 자막 여부', required: false })
+  @IsBoolean()
+  @IsOptional()
+  isDefault?: boolean;
+}
+
+class ConfirmSubtitleUploadDto {
+  @ApiProperty({ description: '영상 파트 ID' })
+  @IsString()
+  @IsNotEmpty()
+  videoPartId: string;
+
+  @ApiProperty({ description: '언어 코드', enum: ['ko', 'en', 'th', 'bn'] })
+  @IsString()
+  @IsIn(['ko', 'en', 'th', 'bn'])
+  locale: string;
+
+  @ApiProperty({ description: '자막 표시 이름', example: 'English' })
+  @IsString()
+  @IsNotEmpty()
+  label: string;
+
+  @ApiProperty({ description: '업로드 요청 시 받은 storagePath' })
+  @IsString()
+  @IsNotEmpty()
+  storagePath: string;
+
+  @ApiProperty({ description: '자막 파일 형식', example: 'vtt', required: false })
+  @IsString()
+  @IsOptional()
+  format?: string;
+
+  @ApiProperty({ description: '기본 자막 여부', required: false })
+  @IsBoolean()
+  @IsOptional()
+  isDefault?: boolean;
+}
+
 // ── Controller ──
 
 const ALLOWED_MIMES = [
@@ -77,6 +146,8 @@ const ALLOWED_MIMES = [
 ];
 
 const MAX_FILE_SIZE = 1 * 1024 * 1024 * 1024; // 1GB
+const ALLOWED_SUBTITLE_MIMES = ['text/vtt', 'text/plain', 'application/octet-stream'];
+const MAX_SUBTITLE_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 @ApiTags('Media')
 @Controller('media')
@@ -255,6 +326,155 @@ export class MediaController {
         `재생 URL 발급에 실패했습니다: ${error.message}`,
       );
     }
+  }
+
+  @Post('subtitles/request-upload')
+  @Roles('instructor', 'admin')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '자막 업로드 URL 발급' })
+  async requestSubtitleUpload(@Body() dto: RequestSubtitleUploadDto) {
+    if (!ALLOWED_SUBTITLE_MIMES.includes(dto.mimeType)) {
+      throw new BadRequestException('WebVTT 자막 파일만 업로드 가능합니다.');
+    }
+
+    if (!dto.filename.toLowerCase().endsWith('.vtt')) {
+      throw new BadRequestException('자막 파일은 .vtt 형식이어야 합니다.');
+    }
+
+    if (dto.fileSize > MAX_SUBTITLE_FILE_SIZE) {
+      throw new BadRequestException('자막 파일 크기는 5MB를 초과할 수 없습니다.');
+    }
+
+    const videoPart = await this.prisma.videoPart.findUnique({
+      where: { id: dto.videoPartId },
+    });
+
+    if (!videoPart) {
+      throw new BadRequestException('영상을 찾을 수 없습니다.');
+    }
+
+    const sanitizedFilename = dto.filename
+      .replace(/[^a-zA-Z0-9.\-_]/g, '_')
+      .toLowerCase();
+    const timestamp = Date.now();
+    const storagePath = `subtitles/${dto.videoPartId}/${dto.locale}/${timestamp}-${sanitizedFilename}`;
+
+    try {
+      const signedUploadData = await this.supabase.createSignedUploadUrl(storagePath);
+      return {
+        success: true,
+        data: {
+          signedUrl: signedUploadData.signedUrl,
+          token: signedUploadData.token,
+          storagePath,
+        },
+      };
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `자막 업로드 URL 발급에 실패했습니다: ${error.message}`,
+      );
+    }
+  }
+
+  @Post('subtitles/confirm-upload')
+  @Roles('instructor', 'admin')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '자막 업로드 완료 확인' })
+  async confirmSubtitleUpload(@Body() dto: ConfirmSubtitleUploadDto) {
+    const videoPart = await this.prisma.videoPart.findUnique({
+      where: { id: dto.videoPartId },
+    });
+
+    if (!videoPart) {
+      throw new BadRequestException('영상을 찾을 수 없습니다.');
+    }
+
+    if (dto.isDefault) {
+      await this.prisma.videoSubtitle.updateMany({
+        where: { videoPartId: dto.videoPartId },
+        data: { isDefault: false },
+      });
+    }
+
+    const subtitle = await this.prisma.videoSubtitle.upsert({
+      where: {
+        videoPartId_locale: {
+          videoPartId: dto.videoPartId,
+          locale: dto.locale,
+        },
+      },
+      create: {
+        videoPartId: dto.videoPartId,
+        locale: dto.locale,
+        label: dto.label,
+        fileUrl: dto.storagePath,
+        format: dto.format || 'vtt',
+        isDefault: dto.isDefault ?? false,
+      },
+      update: {
+        label: dto.label,
+        fileUrl: dto.storagePath,
+        format: dto.format || 'vtt',
+        isDefault: dto.isDefault ?? false,
+      },
+    });
+
+    return { success: true, data: subtitle };
+  }
+
+  @Get('videos/:videoPartId/subtitles')
+  @ApiOperation({ summary: '영상 자막 목록 조회' })
+  async getSubtitlesByVideo(
+    @Param('videoPartId') videoPartId: string,
+    @Query('signed') signed?: string,
+  ) {
+    const subtitles = await this.prisma.videoSubtitle.findMany({
+      where: { videoPartId },
+      orderBy: [{ isDefault: 'desc' }, { locale: 'asc' }],
+    });
+
+    if (signed !== 'true') {
+      return { success: true, data: subtitles };
+    }
+
+    const data = await Promise.all(
+      subtitles.map(async (subtitle) => {
+        if (subtitle.fileUrl.startsWith('http')) {
+          return { ...subtitle, signedUrl: subtitle.fileUrl, expiresIn: null };
+        }
+
+        const signedUrlData = await this.supabase.createSignedUrl(subtitle.fileUrl, 7200);
+        return { ...subtitle, signedUrl: signedUrlData.signedUrl, expiresIn: 7200 };
+      }),
+    );
+
+    return { success: true, data };
+  }
+
+  @Delete('subtitles/:id')
+  @Roles('instructor', 'admin')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '자막 삭제' })
+  async deleteSubtitle(@Param('id') subtitleId: string) {
+    const subtitle = await this.prisma.videoSubtitle.findUnique({
+      where: { id: subtitleId },
+    });
+
+    if (!subtitle) {
+      throw new BadRequestException('자막을 찾을 수 없습니다.');
+    }
+
+    if (subtitle.fileUrl && !subtitle.fileUrl.startsWith('http')) {
+      try {
+        await this.supabase.removeFile(subtitle.fileUrl);
+      } catch (error) {
+        console.warn(`[MEDIA] Supabase 자막 삭제 실패 (계속 진행): ${error.message}`);
+      }
+    }
+
+    await this.prisma.videoSubtitle.delete({ where: { id: subtitleId } });
+
+    return { success: true, message: '자막이 삭제되었습니다.' };
   }
 
   // ────────────────────────────────────────

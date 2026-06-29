@@ -7,6 +7,31 @@ import { selectRandom } from '../utils/shuffle';
 export class ExamService {
   constructor(private prisma: PrismaService) {}
 
+  private normalizeLocale(locale?: string) {
+    return ['en', 'th', 'bn'].includes(locale || '') ? locale : undefined;
+  }
+
+  private localizeQuestion(question: any, locale?: string) {
+    const normalizedLocale = this.normalizeLocale(locale);
+    const translation = normalizedLocale
+      ? question.translations?.find((item: any) => item.locale === normalizedLocale)
+      : null;
+    const choices = [...(question.choices || [])].sort(
+      (a, b) => (a.order ?? 0) - (b.order ?? 0),
+    );
+
+    return {
+      id: question.id,
+      content: translation?.stem || question.stem,
+      choices: choices.map((choice) => {
+        const choiceTranslation = normalizedLocale
+          ? choice.translations?.find((item: any) => item.locale === normalizedLocale)
+          : null;
+        return choiceTranslation?.text || choice.text;
+      }),
+    };
+  }
+
   /**
    * 과목 시험 응시 가능 여부 확인
    * - Subject 단위 시험
@@ -127,7 +152,7 @@ export class ExamService {
    * TODO: 레슨 단위 시험(cycle/tryIndex)은 /exam/lessons/:id/start로 분리 설계되어 있다.
    *       본 메서드는 Subject 단위 구버전 플로우를 지원하며, cycle 로직과는 분리해서 유지한다.
    */
-  async startExam(userId: string, subjectId: string): Promise<StartExamResponseDto> {
+  async startExam(userId: string, subjectId: string, locale?: string): Promise<StartExamResponseDto> {
     // 회사 수강기간 체크
     await this.ensureWithinCompanyPeriod(userId);
 
@@ -160,8 +185,10 @@ export class ExamService {
       },
       include: {
         choices: {
-          orderBy: { order: 'asc' }
-        }
+          orderBy: { order: 'asc' },
+          include: { translations: true },
+        },
+        translations: true,
       }
     });
 
@@ -193,11 +220,7 @@ export class ExamService {
     });
 
     // 7. 응답 구성
-    const responseQuestions = selectedQuestions.map(q => ({
-      id: q.id,
-      content: q.stem,
-      choices: q.choices.map(c => c.text)
-    }));
+    const responseQuestions = selectedQuestions.map((q) => this.localizeQuestion(q, locale));
 
     return {
       attemptId: attempt.id,
@@ -403,7 +426,7 @@ export class ExamService {
    *   - 회사 활성 레슨
    *   - 레슨 진도율 ≥ 90%
    */
-  async startLessonExam(userId: string, lessonId: string) {
+  async startLessonExam(userId: string, lessonId: string, locale?: string) {
     // 회사 수강기간 체크
     await this.ensureWithinCompanyPeriod(userId);
 
@@ -487,7 +510,9 @@ export class ExamService {
       include: {
         choices: {
           orderBy: { order: 'asc' },
+          include: { translations: true },
         },
+        translations: true,
       },
     });
 
@@ -511,11 +536,7 @@ export class ExamService {
       },
     });
 
-    const responseQuestions = selectedQuestions.map((q) => ({
-      id: q.id,
-      content: q.stem,
-      choices: q.choices.map((c) => c.text),
-    }));
+    const responseQuestions = selectedQuestions.map((q) => this.localizeQuestion(q, locale));
 
     return {
       attemptId: attempt.id,

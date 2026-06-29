@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Delete, Body, Param, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Get, Delete, Body, Param, UseGuards, Request, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiBody, ApiParam } from '@nestjs/swagger';
 import { ExamService } from './exam.service';
 import { ModeAwareAuthGuard } from '../auth/guards/mode-aware-auth.guard';
@@ -64,9 +64,10 @@ export class ExamController {
   @ApiResponse({ status: 403, description: 'PROGRESS_NOT_ENOUGH | ATTEMPT_LIMIT_EXCEEDED' })
   async startExam(
     @Param('subjectId') subjectId: string,
-    @Request() req: any
+    @Request() req: any,
+    @Query('locale') locale?: string,
   ): Promise<StartExamResponseDto> {
-    return await this.examService.startExam(req.user.sub, subjectId);
+    return await this.examService.startExam(req.user.sub, subjectId, locale);
   }
 
   @Post('attempts/:attemptId/submit')
@@ -128,9 +129,10 @@ export class ExamController {
   })
   async startLessonExam(
     @Param('lessonId') lessonId: string,
-    @Request() req: any
+    @Request() req: any,
+    @Query('locale') locale?: string,
   ) {
-    const data = await this.examService.startLessonExam(req.user.sub, lessonId);
+    const data = await this.examService.startLessonExam(req.user.sub, lessonId, locale);
     return {
       success: true,
       data,

@@ -1,5 +1,22 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsNumber, IsOptional, IsArray, IsBoolean } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsArray,
+  IsBoolean,
+  IsObject,
+} from 'class-validator';
+
+export type QuestionTranslationInput = Record<
+  string,
+  {
+    content?: string;
+    explanation?: string;
+    choices?: string[];
+  }
+>;
 
 export class CreateQuestionDto {
   @ApiProperty({ description: '문제 내용' })
@@ -32,6 +49,11 @@ export class CreateQuestionDto {
   @IsString()
   @IsOptional()
   tags?: string;
+
+  @ApiProperty({ description: '언어별 문제 번역', required: false })
+  @IsObject()
+  @IsOptional()
+  translations?: QuestionTranslationInput;
 }
 
 export class UpdateQuestionDto {
@@ -70,5 +92,9 @@ export class UpdateQuestionDto {
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;
-}
 
+  @ApiProperty({ description: '언어별 문제 번역', required: false })
+  @IsObject()
+  @IsOptional()
+  translations?: QuestionTranslationInput;
+}

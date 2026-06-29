@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { getStoredLocale } from '../../../src/i18n/client';
 
 interface Question {
   id: string;
@@ -100,7 +101,8 @@ export default function ExamPage() {
   const startExam = async (subjectName?: string) => {
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-      const response = await fetch(`${apiUrl}/exam/subjects/${subjectId}/start`, {
+      const locale = getStoredLocale();
+      const response = await fetch(`${apiUrl}/exam/subjects/${subjectId}/start?locale=${locale}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

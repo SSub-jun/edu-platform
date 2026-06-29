@@ -7,13 +7,15 @@ import {
   SubmitExamResponse, 
   RetakeExamResponse 
 } from '../types/api';
+import { getStoredLocale } from '../i18n/client';
 
 export function useStartExam() {
   const queryClient = useQueryClient();
   
   return useMutation({
     mutationFn: async (lessonId: string): Promise<StartExamResponse['data']> => {
-      const response = await http.post<StartExamResponse>(`/exam/lessons/${lessonId}/start`);
+      const locale = getStoredLocale();
+      const response = await http.post<StartExamResponse>(`/exam/lessons/${lessonId}/start?locale=${locale}`);
       
       console.log('🔍 [useStartExam] Response:', {
         status: response.status,
