@@ -5,6 +5,7 @@ import QueryProvider from "../src/components/QueryProvider";
 import { MainNav } from "../src/components/MainNav";
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from "../src/components/AuthProvider";
+import StudentLocaleRuntime from "../src/components/StudentLocaleRuntime";
 
 const geistSans = localFont({
   src: [{ path: "./fonts/GeistVF.woff", weight: "100 900" }],
@@ -32,6 +33,7 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <QueryProvider>
           <AuthProvider>
+            <StudentLocaleRuntime />
             <MainNav />
             {children}
             <Toaster
