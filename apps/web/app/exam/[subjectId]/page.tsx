@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { getStoredLocale } from '../../../src/i18n/client';
+import { useLocale } from '../../../src/i18n/client';
+import { translateStudentText } from '../../../src/i18n/studentTranslations';
 
 interface Question {
   id: string;
@@ -29,6 +31,8 @@ export default function ExamPage() {
   const params = useParams();
   const router = useRouter();
   const subjectId = params.subjectId as string;
+  const { locale } = useLocale();
+  const t = (source: string) => translateStudentText(source, locale);
   
   const [examData, setExamData] = useState<ExamData | null>(null);
   const [subjectStatus, setSubjectStatus] = useState<SubjectStatus | null>(null);
@@ -59,7 +63,7 @@ export default function ExamPage() {
       });
 
       if (!statusResponse.ok) {
-        throw new Error('과목 상태 조회 실패');
+        throw new Error(t('과목 상태 조회 실패'));
       }
 
       const curriculum = await statusResponse.json();
@@ -72,11 +76,11 @@ export default function ExamPage() {
         console.error('[EXAM] Curriculum data:', curriculum);
         console.error('[EXAM] Looking for subjectId:', subjectId);
         console.error('[EXAM] Available subjects:', data.map((item: any) => item.subject?.id));
-        throw new Error('과목을 찾을 수 없습니다');
+        throw new Error(t('과목을 찾을 수 없습니다'));
       }
 
       if (!subject.canTakeExam) {
-        alert('시험 응시 조건을 만족하지 않습니다.\n모든 강의를 90% 이상 수강해주세요.');
+        alert(t('시험 응시 조건을 만족하지 않습니다.\n모든 강의를 90% 이상 수강해주세요.'));
         router.push('/curriculum');
         return;
       }
@@ -91,7 +95,7 @@ export default function ExamPage() {
       // 시험 시작
       await startExam(subject.name);
     } catch (error) {
-      alert('시험을 준비할 수 없습니다.');
+      alert(t('시험을 준비할 수 없습니다.'));
       console.error(error);
       router.push('/curriculum');
       setLoading(false);
@@ -112,7 +116,7 @@ export default function ExamPage() {
 
       if (!response.ok) {
         // 422 오류 등 상세 오류 메시지 추출
-        let errorMessage = '시험 시작 실패';
+        let errorMessage = t('시험 시작 실패');
         try {
           const errorData = await response.json();
           if (errorData.message) {
@@ -132,7 +136,7 @@ export default function ExamPage() {
         subjectName,
       });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : '시험을 시작할 수 없습니다.';
+      const errorMessage = error instanceof Error ? error.message : t('시험을 시작할 수 없습니다.');
       alert(errorMessage);
       console.error('[EXAM] Start exam error:', error);
       router.push('/curriculum');
@@ -181,7 +185,7 @@ export default function ExamPage() {
 
     const unansweredCount = examData.questions.length - Object.keys(answers).length;
     if (unansweredCount > 0) {
-      if (!confirm(`${unansweredCount}개 문제가 답변되지 않았습니다. 제출하시겠습니까?`)) {
+      if (!confirm(t(`${unansweredCount}개 문제가 답변되지 않았습니다. 제출하시겠습니까?`))) {
         return;
       }
     }
@@ -205,7 +209,7 @@ export default function ExamPage() {
       });
 
       if (!response.ok) {
-        throw new Error('시험 제출 실패');
+        throw new Error(t('시험 제출 실패'));
       }
 
       const data = await response.json();
@@ -213,7 +217,7 @@ export default function ExamPage() {
       // Subject 기반 결과 페이지로 이동
       router.push(`/exam/result?subjectId=${subjectId}&attemptId=${examData.attemptId}&score=${data.examScore}&finalScore=${data.finalScore || 0}&passed=${data.passed || false}&progressPercent=${subjectStatus?.progressPercent || 0}&remainingTries=${(subjectStatus?.remainingTries || 3) - 1}`);
     } catch (error) {
-      alert('시험 제출 중 오류가 발생했습니다.');
+      alert(t('시험 제출 중 오류가 발생했습니다.'));
       console.error(error);
     } finally {
       setSubmitting(false);
@@ -225,7 +229,7 @@ export default function ExamPage() {
       <div className="min-h-screen flex items-center justify-center bg-bg-primary">
         <div className="flex items-center gap-2 text-lg text-text-secondary">
           <div className="w-5 h-5 border-2 border-text-tertiary/30 border-t-text-tertiary rounded-full animate-spin"></div>
-          시험을 준비 중입니다...
+          {t('시험을 준비 중입니다...')}
         </div>
       </div>
     );
@@ -234,7 +238,7 @@ export default function ExamPage() {
   if (!examData) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-bg-primary">
-        <div className="text-lg text-text-secondary">시험 데이터를 불러올 수 없습니다.</div>
+        <div className="text-lg text-text-secondary">{t('시험 데이터를 불러올 수 없습니다.')}</div>
       </div>
     );
   }
@@ -247,35 +251,35 @@ export default function ExamPage() {
           <div className="flex justify-between items-start mb-4">
             <div>
               <h1 className="text-[28px] font-bold text-text-primary mb-2">
-                {examData.subjectName || '과목'} 시험
+                {t(`${examData.subjectName || '과목'} 시험`)}
               </h1>
               <p className="text-sm text-text-secondary">
-                모든 문제에 답변한 후 제출해주세요
+                {t('모든 문제에 답변한 후 제출해주세요')}
               </p>
             </div>
             <div className="text-sm text-text-secondary px-4 py-2 bg-bg-primary rounded-full border border-border">
-              {examData.questions.length}문제
+              {t(`${examData.questions.length}문제`)}
             </div>
           </div>
           
           {/* 시험 정보 카드 */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-bg-primary border border-border rounded-lg">
             <div className="text-center">
-              <div className="text-xs text-text-tertiary mb-1">현재 진도율</div>
+              <div className="text-xs text-text-tertiary mb-1">{t('현재 진도율')}</div>
               <div className="text-lg font-bold text-text-primary">
                 {Math.round(subjectStatus?.progressPercent || 0)}%
               </div>
             </div>
             <div className="text-center">
-              <div className="text-xs text-text-tertiary mb-1">시험 차수</div>
+              <div className="text-xs text-text-tertiary mb-1">{t('시험 차수')}</div>
               <div className="text-lg font-bold text-text-primary">
-                {(subjectStatus?.examAttemptCount || 0) + 1}회차
+                {t(`${(subjectStatus?.examAttemptCount || 0) + 1}회차`)}
               </div>
             </div>
             <div className="text-center">
-              <div className="text-xs text-text-tertiary mb-1">남은 기회</div>
+              <div className="text-xs text-text-tertiary mb-1">{t('남은 기회')}</div>
               <div className="text-lg font-bold text-warning">
-                {subjectStatus?.remainingTries || 3}회
+                {t(`${subjectStatus?.remainingTries || 3}회`)}
               </div>
             </div>
           </div>
@@ -318,7 +322,7 @@ export default function ExamPage() {
             onClick={handleBackToDashboard}
             className="px-6 py-3 bg-bg-primary text-text-secondary border border-border rounded-md text-base font-medium cursor-pointer transition-all hover:bg-surface hover:text-text-primary hover:border-border-light"
           >
-            취소
+            {t('취소')}
           </button>
           
           <button
@@ -329,10 +333,10 @@ export default function ExamPage() {
             {submitting ? (
               <span className="inline-flex items-center gap-2">
                 <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                제출 중...
+                {t('제출 중...')}
               </span>
             ) : (
-              '시험 제출'
+              t('시험 제출')
             )}
           </button>
         </div>

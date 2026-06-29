@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { SignupData } from './page';
 import PrivacyPolicyModal from './PrivacyPolicyModal';
+import { useLocale } from '../../src/i18n/client';
+import { translateStudentAttribute, translateStudentText } from '../../src/i18n/studentTranslations';
 
 interface StepAccountProps {
   onComplete: (data: Partial<SignupData>) => void;
@@ -30,6 +32,9 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
   const [error, setError] = useState('');
   const [privacyAgreed, setPrivacyAgreed] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const { locale } = useLocale();
+  const t = (source: string) => translateStudentText(source, locale);
+  const ta = (source: string) => translateStudentAttribute(source, locale);
   const [passwordStrength, setPasswordStrength] = useState<PasswordStrength>({
     hasLowerCase: false,
     hasUpperCase: false,
@@ -153,12 +158,12 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-semibold text-text-primary uppercase tracking-wide">이름 *</label>
+        <label className="text-sm font-semibold text-text-primary uppercase tracking-wide">{t('이름 *')}</label>
         <input
           type="text"
           value={formData.name}
           onChange={(e) => handleInputChange('name', e.target.value)}
-          placeholder="이름을 입력하세요"
+          placeholder={ta('이름을 입력하세요')}
           className="w-full h-12 px-4 bg-bg-primary border-2 border-border rounded-lg text-base text-text-primary placeholder:text-text-tertiary transition-all focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20 disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-surface"
           disabled={loading}
           required
@@ -166,12 +171,12 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
       </div>
 
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-semibold text-text-primary uppercase tracking-wide">비밀번호 *</label>
+        <label className="text-sm font-semibold text-text-primary uppercase tracking-wide">{t('비밀번호 *')}</label>
         <input
           type="password"
           value={formData.password}
           onChange={(e) => handleInputChange('password', e.target.value)}
-          placeholder="비밀번호를 입력하세요"
+          placeholder={ta('비밀번호를 입력하세요')}
           className={`w-full h-12 px-4 bg-bg-primary border-2 rounded-lg text-base text-text-primary placeholder:text-text-tertiary transition-all focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20 disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-surface ${
             error && !isPasswordValid(formData.password) ? 'border-error ring-2 ring-error/20' : 'border-border'
           }`}
@@ -181,7 +186,7 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
         
         {formData.password && (
           <div className="mt-2 p-3 bg-surface rounded-lg border border-border">
-            <div className="text-xs font-semibold text-text-tertiary mb-2 uppercase tracking-wide">비밀번호 조건</div>
+            <div className="text-xs font-semibold text-text-tertiary mb-2 uppercase tracking-wide">{t('비밀번호 조건')}</div>
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2 text-xs">
                 <div className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] transition-all ${
@@ -190,7 +195,7 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
                   {passwordStrength.hasMinLength ? '✓' : '○'}
                 </div>
                 <span className={passwordStrength.hasMinLength ? 'text-success' : 'text-text-tertiary'}>
-                  최소 8자 이상
+                  {t('최소 8자 이상')}
                 </span>
               </div>
               <div className="flex items-center gap-2 text-xs">
@@ -200,7 +205,7 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
                   {passwordStrength.hasLowerCase ? '✓' : '○'}
                 </div>
                 <span className={passwordStrength.hasLowerCase ? 'text-success' : 'text-text-tertiary'}>
-                  소문자 포함
+                  {t('소문자 포함')}
                 </span>
               </div>
               <div className="flex items-center gap-2 text-xs">
@@ -210,7 +215,7 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
                   {passwordStrength.hasUpperCase ? '✓' : '○'}
                 </div>
                 <span className={passwordStrength.hasUpperCase ? 'text-success' : 'text-text-tertiary'}>
-                  대문자 포함
+                  {t('대문자 포함')}
                 </span>
               </div>
               <div className="flex items-center gap-2 text-xs">
@@ -220,7 +225,7 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
                   {passwordStrength.hasNumber ? '✓' : '○'}
                 </div>
                 <span className={passwordStrength.hasNumber ? 'text-success' : 'text-text-tertiary'}>
-                  숫자 포함
+                  {t('숫자 포함')}
                 </span>
               </div>
               <div className="flex items-center gap-2 text-xs">
@@ -230,7 +235,7 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
                   {passwordStrength.hasSpecialChar ? '✓' : '○'}
                 </div>
                 <span className={passwordStrength.hasSpecialChar ? 'text-success' : 'text-text-tertiary'}>
-                  특수문자 포함
+                  {t('특수문자 포함')}
                 </span>
               </div>
             </div>
@@ -239,12 +244,12 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
       </div>
 
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-semibold text-text-primary uppercase tracking-wide">비밀번호 확인 *</label>
+        <label className="text-sm font-semibold text-text-primary uppercase tracking-wide">{t('비밀번호 확인 *')}</label>
         <input
           type="password"
           value={formData.confirmPassword}
           onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-          placeholder="비밀번호를 다시 입력하세요"
+          placeholder={ta('비밀번호를 다시 입력하세요')}
           className={`w-full h-12 px-4 bg-bg-primary border-2 rounded-lg text-base text-text-primary placeholder:text-text-tertiary transition-all focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20 disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-surface ${
             error && formData.password !== formData.confirmPassword ? 'border-error ring-2 ring-error/20' : 'border-border'
           }`}
@@ -254,24 +259,24 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
       </div>
 
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-semibold text-text-primary uppercase tracking-wide">초대코드 (선택)</label>
+        <label className="text-sm font-semibold text-text-primary uppercase tracking-wide">{t('초대코드 (선택)')}</label>
         <input
           type="text"
           value={formData.inviteCode}
           onChange={(e) => handleInputChange('inviteCode', e.target.value.toUpperCase())}
-          placeholder="회사 초대코드를 입력하세요"
+          placeholder={ta('회사 초대코드를 입력하세요')}
           className="w-full h-12 px-4 bg-bg-primary border-2 border-border rounded-lg text-base text-text-primary placeholder:text-text-tertiary transition-all focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20 disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-surface"
           disabled={loading}
           maxLength={12}
         />
         <p className="text-xs text-text-tertiary mt-1">
-          초대코드가 있으면 해당 회사로 자동 배정됩니다
+          {t('초대코드가 있으면 해당 회사로 자동 배정됩니다')}
         </p>
       </div>
 
       {error && (
         <div className="p-3 md:p-4 bg-error-bg border border-error rounded-lg text-error text-sm font-semibold animate-[slideDown_0.3s_ease-out]">
-          {error}
+          {t(error)}
         </div>
       )}
 
@@ -286,15 +291,15 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
           disabled={loading}
         />
         <label htmlFor="privacyAgreement" className="text-sm text-text-secondary cursor-pointer flex-1">
-          <span className="text-text-primary font-semibold">[필수]</span>{' '}
+          <span className="text-text-primary font-semibold">{t('[필수]')}</span>{' '}
           <button
             type="button"
             onClick={() => setShowPrivacyModal(true)}
             className="text-primary underline hover:text-primary-600 transition-colors bg-transparent border-0 p-0 cursor-pointer font-medium"
           >
-            개인정보 처리방침
+            {t('개인정보 처리방침')}
           </button>
-          에 동의합니다.
+          {t('에 동의합니다.')}
         </label>
       </div>
 
@@ -305,7 +310,7 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
           className="w-full h-12 bg-bg-primary text-text-secondary border-2 border-border rounded-lg text-base font-semibold transition-all hover:bg-surface hover:text-text-primary hover:border-border-light disabled:opacity-60 disabled:cursor-not-allowed"
           disabled={loading}
         >
-          이전
+          {t('이전')}
         </button>
         
         <button
@@ -323,10 +328,10 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
           {loading ? (
             <span className="inline-flex items-center gap-2">
               <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-              회원가입 중...
+              {t('회원가입 중...')}
             </span>
           ) : (
-            '회원가입 완료'
+            t('회원가입 완료')
           )}
         </button>
       </div>

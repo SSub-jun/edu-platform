@@ -5,6 +5,8 @@ export const dynamic = 'force-dynamic';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthGuard } from '../hooks/useAuthGuard';
+import { useLocale } from '../../src/i18n/client';
+import { translateStudentAttribute, translateStudentText } from '../../src/i18n/studentTranslations';
 
 // 전화번호 마스킹 함수 (01012345678 → 010****5678)
 function maskPhone(phone: string): string {
@@ -48,6 +50,9 @@ interface QnaPost {
 export default function QnaPage() {
   const router = useRouter();
   const { isAuthenticated, logout } = useAuthGuard();
+  const { locale } = useLocale();
+  const t = (source: string) => translateStudentText(source, locale);
+  const ta = (source: string) => translateStudentAttribute(source, locale);
   const [posts, setPosts] = useState<QnaPost[]>([]);
   const [loading, setLoading] = useState(false);
   const [showQuestionForm, setShowQuestionForm] = useState(false);
@@ -127,7 +132,7 @@ export default function QnaPage() {
         fetchPosts();
       }
     } catch (error) {
-      alert('질문 등록에 실패했습니다.');
+      alert(t('질문 등록에 실패했습니다.'));
     }
   };
 
@@ -155,7 +160,7 @@ export default function QnaPage() {
         fetchPosts();
       }
     } catch (error) {
-      alert('답변 등록에 실패했습니다.');
+      alert(t('답변 등록에 실패했습니다.'));
     }
   };
 
@@ -174,7 +179,7 @@ export default function QnaPage() {
                 onClick={() => setShowQuestionForm(!showQuestionForm)}
               className="px-5 py-2.5 bg-info text-white border-0 rounded-md cursor-pointer font-medium transition-colors hover:bg-info/90"
               >
-                {showQuestionForm ? '취소' : '질문하기'}
+                {showQuestionForm ? t('취소') : t('질문하기')}
               </button>
             )}
         </div>
@@ -183,19 +188,19 @@ export default function QnaPage() {
         {showQuestionForm && userRole === 'student' && (
           <div className="bg-surface p-6 rounded-xl mb-6 border border-border">
             <h3 className="m-0 mb-5 text-text-primary text-lg font-semibold">
-              새 질문 작성
+              {t('새 질문 작성')}
             </h3>
             <form onSubmit={handleQuestionSubmit} className="flex flex-col gap-4">
               <input
                 type="text"
-                placeholder="질문 제목을 입력하세요"
+                placeholder={ta('질문 제목을 입력하세요')}
                 value={questionTitle}
                 onChange={(e) => setQuestionTitle(e.target.value)}
                 className="w-full px-4 py-3 bg-bg-primary border-2 border-border rounded-lg text-base text-text-primary placeholder:text-text-tertiary outline-none transition-all focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20"
                 required
               />
               <textarea
-                placeholder="질문 내용을 자세히 적어주세요"
+                placeholder={ta('질문 내용을 자세히 적어주세요')}
                 value={questionBody}
                 onChange={(e) => setQuestionBody(e.target.value)}
                 rows={5}
@@ -206,7 +211,7 @@ export default function QnaPage() {
                 type="submit"
                 className="px-6 py-3 bg-success text-white border-0 rounded-lg cursor-pointer text-base font-semibold transition-colors hover:bg-success/90 self-start"
               >
-                질문 등록
+                {t('질문 등록')}
               </button>
             </form>
           </div>
@@ -218,12 +223,12 @@ export default function QnaPage() {
             <div className="text-center py-10 bg-surface border border-border rounded-xl">
               <div className="flex items-center justify-center gap-2 text-text-secondary">
                 <div className="w-5 h-5 border-2 border-text-tertiary/30 border-t-text-tertiary rounded-full animate-spin"></div>
-              로딩 중...
+              {t('로딩 중...')}
               </div>
             </div>
           ) : posts.length === 0 ? (
             <div className="text-center py-10 bg-surface border border-border rounded-xl text-text-secondary">
-              아직 질문이 없습니다.
+              {t('아직 질문이 없습니다.')}
             </div>
           ) : (
             posts.map((post) => (
@@ -238,7 +243,7 @@ export default function QnaPage() {
                       {post.title}
                     </h3>
                     <div className="text-xs text-text-tertiary whitespace-nowrap">
-                      {maskPhone(post.user.username)} ({post.user.role === 'student' ? '학생' : '강사'}) | {new Date(post.createdAt).toLocaleString()}
+                      {maskPhone(post.user.username)} ({post.user.role === 'student' ? t('학생') : t('강사')}) | {new Date(post.createdAt).toLocaleString()}
                     </div>
                   </div>
                   <p className="m-0 leading-relaxed text-text-secondary">
@@ -252,7 +257,7 @@ export default function QnaPage() {
                     {post.replies.map((reply) => (
                       <div key={reply.id} className="mb-2.5">
                         <div className="text-xs text-text-tertiary mb-1">
-                          {maskPhone(reply.user.username)} ({reply.user.role === 'instructor' ? '강사' : '학생'}) | {new Date(reply.createdAt).toLocaleString()}
+                          {maskPhone(reply.user.username)} ({reply.user.role === 'instructor' ? t('강사') : t('학생')}) | {new Date(reply.createdAt).toLocaleString()}
                         </div>
                         <p className="m-0 text-text-secondary">
                           {reply.body}
@@ -269,7 +274,7 @@ export default function QnaPage() {
                       <form onSubmit={handleReplySubmit} className="flex gap-2.5">
                         <input
                           type="text"
-                          placeholder="답변을 입력하세요"
+                          placeholder={ta('답변을 입력하세요')}
                           value={replyBody}
                           onChange={(e) => setReplyBody(e.target.value)}
                           className="flex-1 px-3 py-2 bg-bg-primary border border-border rounded-md text-text-primary placeholder:text-text-tertiary outline-none transition-all focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20"
@@ -279,14 +284,14 @@ export default function QnaPage() {
                           type="submit"
                           className="px-4 py-2 bg-success text-white border-0 rounded-md cursor-pointer font-medium transition-colors hover:bg-success/90"
                         >
-                          답변
+                          {t('답변')}
                         </button>
                         <button
                           type="button"
                           onClick={() => setReplyingTo(null)}
                           className="px-4 py-2 bg-bg-primary text-text-secondary border border-border rounded-md cursor-pointer font-medium transition-all hover:bg-surface hover:text-text-primary hover:border-border-light"
                         >
-                          취소
+                          {t('취소')}
                         </button>
                       </form>
                     ) : (
@@ -294,7 +299,7 @@ export default function QnaPage() {
                         onClick={() => setReplyingTo(post.id)}
                         className="px-3 py-1.5 bg-info text-white border-0 rounded-md cursor-pointer text-xs font-medium transition-colors hover:bg-info/90"
                       >
-                        답변하기
+                        {t('답변하기')}
                       </button>
                     )}
                   </div>

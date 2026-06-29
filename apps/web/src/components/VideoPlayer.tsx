@@ -6,6 +6,7 @@ import 'video.js/dist/video-js.css';
 import type Player from 'video.js/dist/types/player';
 import styles from './VideoPlayer.module.css';
 import { useLocale, useT } from '../i18n/client';
+import { translateStudentText } from '../i18n/studentTranslations';
 
 interface VideoPlayerProps {
   src?: string;
@@ -54,6 +55,7 @@ export default function VideoPlayer({
 }: VideoPlayerProps) {
   const { locale } = useLocale();
   const t = useT(locale);
+  const ts = (source: string) => translateStudentText(source, locale);
   const videoRef = useRef<HTMLVideoElement>(null);
   const playerRef = useRef<Player | null>(null);
 
@@ -394,10 +396,10 @@ export default function VideoPlayer({
       }}>
         <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📹</div>
         <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '0.5rem', color: '#374151' }}>
-          등록된 영상이 없습니다
+          {ts('등록된 영상이 없습니다')}
         </h3>
         <p style={{ color: '#6b7280' }}>
-          강사가 영상을 업로드하면 여기에 표시됩니다.
+          {ts('강사가 영상을 업로드하면 여기에 표시됩니다.')}
         </p>
       </div>
     );

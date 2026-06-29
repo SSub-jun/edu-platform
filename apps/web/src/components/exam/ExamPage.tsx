@@ -7,6 +7,8 @@ import { Progress } from '../ui/progress';
 import { ExamStartButton } from './ExamStartButton';
 import { ExamQuestionCard } from './ExamQuestionCard';
 import { useSubmitExam, useRetakeExam } from '../../hooks/useExam';
+import { useLocale } from '../../i18n/client';
+import { translateStudentText } from '../../i18n/studentTranslations';
 
 interface ExamPageProps {
   lessonId: string;
@@ -45,6 +47,8 @@ export function ExamPage({
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [examResult, setExamResult] = useState<ExamResult | null>(null);
   const [showValidation, setShowValidation] = useState(false);
+  const { locale } = useLocale();
+  const t = (source: string) => translateStudentText(source, locale);
 
   const submitExamMutation = useSubmitExam();
   const retakeExamMutation = useRetakeExam();
@@ -124,24 +128,24 @@ export function ExamPage({
       <div className="max-w-2xl mx-auto space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle className="text-xl">{lessonTitle} - 시험</CardTitle>
+            <CardTitle className="text-xl">{t(`${lessonTitle} - 시험`)}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span>현재 진도</span>
+                <span>{t('현재 진도')}</span>
                 <span>{progressPercent.toFixed(1)}%</span>
               </div>
               <Progress value={progressPercent} className="h-2" />
             </div>
 
             <div className="bg-blue-50 p-4 rounded-lg">
-              <h3 className="font-semibold mb-2">시험 정보</h3>
+              <h3 className="font-semibold mb-2">{t('시험 정보')}</h3>
               <ul className="text-sm space-y-1 text-gray-700">
-                <li>• 문항 수: 3문항 (객관식)</li>
-                <li>• 시험 시간: 제한 없음</li>
-                <li>• 합격 기준: 70점 이상</li>
-                <li>• 응시 제한: 회차당 3회</li>
+                <li>{t('• 문항 수: 3문항 (객관식)')}</li>
+                <li>{t('• 시험 시간: 제한 없음')}</li>
+                <li>{t('• 합격 기준: 70점 이상')}</li>
+                <li>{t('• 응시 제한: 회차당 3회')}</li>
               </ul>
             </div>
 
@@ -159,7 +163,7 @@ export function ExamPage({
                 variant="outline"
                 className="w-full"
               >
-                {retakeExamMutation.isPending ? '재응시 준비중...' : '재응시하기'}
+                {retakeExamMutation.isPending ? t('재응시 준비중...') : t('재응시하기')}
               </Button>
             )}
           </CardContent>
@@ -176,9 +180,9 @@ export function ExamPage({
         <Card>
           <CardContent className="pt-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">{lessonTitle} - 시험 응시</h2>
+              <h2 className="text-xl font-semibold">{t(`${lessonTitle} - 시험 응시`)}</h2>
               <div className="text-sm text-gray-600">
-                {answeredCount} / {totalQuestions} 문항 완료
+                {t(`${answeredCount} / ${totalQuestions} 문항 완료`)}
               </div>
             </div>
             <Progress value={progressPercentage} className="h-2" />
@@ -208,7 +212,7 @@ export function ExamPage({
                 variant="outline"
                 disabled={submitExamMutation.isPending}
               >
-                시험 포기
+                {t('시험 포기')}
               </Button>
               
               <Button
@@ -219,17 +223,17 @@ export function ExamPage({
                 {submitExamMutation.isPending ? (
                   <div className="flex items-center space-x-2">
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>제출 중...</span>
+                    <span>{t('제출 중...')}</span>
                   </div>
                 ) : (
-                  `시험 제출 (${answeredCount}/${totalQuestions})`
+                  t(`시험 제출 (${answeredCount}/${totalQuestions})`)
                 )}
               </Button>
             </div>
             
             {showValidation && !isAllAnswered && (
               <p className="text-red-600 text-sm mt-2 text-center">
-                모든 문항에 답해주세요
+                {t('모든 문항에 답해주세요')}
               </p>
             )}
           </CardContent>
@@ -244,21 +248,21 @@ export function ExamPage({
       <div className="max-w-2xl mx-auto space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle className="text-xl text-center">시험 결과</CardTitle>
+            <CardTitle className="text-xl text-center">{t('시험 결과')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* 점수 표시 */}
             <div className="text-center space-y-4">
               <div className={`text-6xl font-bold ${examResult.passed ? 'text-green-600' : 'text-red-600'}`}>
-                {examResult.examScore.toFixed(0)}점
+                {t(`${examResult.examScore.toFixed(0)}점`)}
               </div>
               
               <div className={`text-lg font-semibold ${examResult.passed ? 'text-green-600' : 'text-red-600'}`}>
-                {examResult.passed ? '🎉 합격!' : '❌ 불합격'}
+                {examResult.passed ? t('🎉 합격!') : t('❌ 불합격')}
               </div>
               
               <div className="text-sm text-gray-600">
-                합격 기준: 70점 이상
+                {t('합격 기준: 70점 이상')}
               </div>
             </div>
 
@@ -266,13 +270,13 @@ export function ExamPage({
             <div className={`p-4 rounded-lg ${examResult.passed ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
               {examResult.passed ? (
                 <div>
-                  <p className="font-semibold">축하합니다! 시험에 합격했습니다.</p>
-                  <p className="text-sm mt-1">다음 레슨을 학습할 수 있습니다.</p>
+                  <p className="font-semibold">{t('축하합니다! 시험에 합격했습니다.')}</p>
+                  <p className="text-sm mt-1">{t('다음 레슨을 학습할 수 있습니다.')}</p>
                 </div>
               ) : (
                 <div>
-                  <p className="font-semibold">아쉽게도 불합격입니다.</p>
-                  <p className="text-sm mt-1">다시 학습 후 재응시해보세요.</p>
+                  <p className="font-semibold">{t('아쉽게도 불합격입니다.')}</p>
+                  <p className="text-sm mt-1">{t('다시 학습 후 재응시해보세요.')}</p>
                 </div>
               )}
             </div>
@@ -284,7 +288,7 @@ export function ExamPage({
                   onClick={() => window.location.href = '/curriculum'}
                   className="w-full bg-blue-600 hover:bg-blue-700"
                 >
-                  커리큘럼으로 돌아가기
+                  {t('커리큘럼으로 돌아가기')}
                 </Button>
               ) : (
                 <Button 
@@ -292,7 +296,7 @@ export function ExamPage({
                   className="w-full"
                   variant="outline"
                 >
-                  다시 시도하기
+                  {t('다시 시도하기')}
                 </Button>
               )}
             </div>
@@ -304,7 +308,6 @@ export function ExamPage({
 
   return null;
 }
-
 
 
 

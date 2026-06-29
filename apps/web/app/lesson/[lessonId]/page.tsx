@@ -9,11 +9,14 @@ import { useNextAvailable } from '../../../src/hooks/useNextAvailable';
 import VideoPlayer from '../../../src/components/VideoPlayer';
 import StatusBadge from '../../../src/components/ui/StatusBadge';
 import { getErrorMessage } from '../../../src/utils/errorMap';
-import { getStoredLocale } from '../../../src/i18n/client';
+import { getStoredLocale, useLocale } from '../../../src/i18n/client';
+import { translateStudentText } from '../../../src/i18n/studentTranslations';
 
 export default function LessonPage() {
   const params = useParams();
   const lessonId = params.lessonId as string;
+  const { locale } = useLocale();
+  const t = (source: string) => translateStudentText(source, locale);
   
   const { 
     data: lessonStatus, 
@@ -226,17 +229,17 @@ export default function LessonPage() {
     return (
       <div className="min-h-screen flex items-center justify-center p-6 bg-bg-primary">
         <div className="bg-surface border border-error rounded-xl p-8 max-w-md text-center">
-          <h3 className="text-xl font-bold text-error mb-3">{errorMessage.title}</h3>
-          <p className="text-base text-text-secondary mb-6">{errorMessage.description}</p>
+          <h3 className="text-xl font-bold text-error mb-3">{t(errorMessage.title)}</h3>
+          <p className="text-base text-text-secondary mb-6">{t(errorMessage.description)}</p>
           <div className="flex gap-3">
               <button 
               className="flex-1 px-5 py-3 bg-primary text-text-primary rounded-lg font-semibold transition-colors hover:bg-primary-600"
                 onClick={() => window.location.reload()}
               >
-                {errorMessage.actionLabel || '다시 시도'}
+                {errorMessage.actionLabel ? t(errorMessage.actionLabel) : t('다시 시도')}
               </button>
             <Link href="/curriculum" className="flex-1 px-5 py-3 bg-bg-primary text-text-secondary border border-border rounded-lg font-semibold text-center transition-all hover:bg-surface hover:text-text-primary">
-                커리큘럼으로
+                {t('커리큘럼으로')}
               </Link>
           </div>
         </div>
@@ -248,9 +251,9 @@ export default function LessonPage() {
     return (
       <div className="min-h-screen flex items-center justify-center p-6 bg-bg-primary">
         <div className="text-center bg-surface border border-border rounded-xl p-10">
-          <h3 className="text-xl font-bold text-text-primary mb-6">레슨을 찾을 수 없습니다</h3>
+          <h3 className="text-xl font-bold text-text-primary mb-6">{t('레슨을 찾을 수 없습니다')}</h3>
           <Link href="/curriculum" className="inline-block px-6 py-3 bg-primary text-text-primary rounded-lg font-semibold transition-colors hover:bg-primary-600">
-            커리큘럼으로 돌아가기
+            {t('커리큘럼으로 돌아가기')}
           </Link>
         </div>
       </div>
@@ -269,16 +272,16 @@ export default function LessonPage() {
         <div className="mb-6">
           <nav className="flex items-center gap-2 text-sm mb-4">
             <Link href="/curriculum" className="text-primary hover:text-primary-600 font-medium transition-colors">
-            커리큘럼
+            {t('커리큘럼')}
           </Link>
             <span className="text-text-tertiary">→</span>
             <span className="text-text-primary font-medium">
-            레슨 {lessonId}
+            {t(`레슨 ${lessonId}`)}
           </span>
         </nav>
 
           <div className="bg-surface border border-border rounded-xl p-5">
-            <h1 className="text-2xl font-bold text-text-primary mb-3">레슨 {lessonId}</h1>
+            <h1 className="text-2xl font-bold text-text-primary mb-3">{t(`레슨 ${lessonId}`)}</h1>
             <div className="flex items-center gap-4 mb-4">
             <StatusBadge 
               status={
@@ -288,7 +291,7 @@ export default function LessonPage() {
               } 
             />
               <span className="text-sm font-medium text-text-secondary">
-              진도율 {Math.round(displayProgressPercent)}%
+              {t(`진도율 ${Math.round(displayProgressPercent)}%`)}
             </span>
         </div>
 
@@ -308,7 +311,7 @@ export default function LessonPage() {
             <div className="bg-black rounded-xl overflow-hidden">
           <VideoPlayer
             src={signedVideoUrl}
-            title={`레슨 ${lessonId}`}
+            title={t(`레슨 ${lessonId}`)}
             subtitles={subtitleTracks}
             maxReachedSeconds={maxReachedSeconds || 0}
             videoDuration={0} // VideoPlayer가 로드 후 실제 duration을 onProgress로 전달
@@ -332,18 +335,18 @@ export default function LessonPage() {
           <div className="flex flex-col gap-4">
           {/* 레슨 진행 정보 */}
             <div className="bg-surface border border-border rounded-xl p-5">
-              <h3 className="text-lg font-bold text-text-primary mb-4">학습 진행 상황</h3>
+              <h3 className="text-lg font-bold text-text-primary mb-4">{t('학습 진행 상황')}</h3>
               <div className="flex flex-col gap-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-text-tertiary">현재 진도율</span>
+                  <span className="text-sm text-text-tertiary">{t('현재 진도율')}</span>
                   <span className="text-base font-bold text-text-primary">
                   {Math.round(displayProgressPercent)}%
                 </span>
               </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-text-tertiary">학습 상태</span>
+                  <span className="text-sm text-text-tertiary">{t('학습 상태')}</span>
                   <span className="text-base font-semibold text-text-primary">
-                  {displayProgressPercent >= 90 ? '완료' : '진행 중'}
+                  {displayProgressPercent >= 90 ? t('완료') : t('진행 중')}
                 </span>
               </div>
             </div>
@@ -352,11 +355,11 @@ export default function LessonPage() {
           {/* 다음 레슨 정보 */}
           {!nextLoading && nextAvailable?.lock && nextAvailable.blockedBy && (
               <div className="bg-surface border border-border rounded-xl p-5">
-                <h3 className="text-lg font-bold text-text-primary mb-4">다음 레슨 상태</h3>
+                <h3 className="text-lg font-bold text-text-primary mb-4">{t('다음 레슨 상태')}</h3>
                 <div className="bg-bg-primary border border-border rounded-lg p-4">
                   <p className="text-sm text-text-secondary">
-                    <strong className="text-text-primary">{nextAvailable.blockedBy.lessonTitle}</strong> 완료 후 
-                    다음 레슨이 해금됩니다.
+                    <strong className="text-text-primary">{nextAvailable.blockedBy.lessonTitle}</strong> {t('완료 후')}{' '}
+                    {t('다음 레슨이 해금됩니다.')}
                   </p>
               </div>
             </div>
@@ -365,7 +368,7 @@ export default function LessonPage() {
           {/* 진도 차단 사유 */}
           {blockers && blockers.length > 0 && (
               <div className="bg-surface border border-error rounded-xl p-5">
-                <h3 className="text-lg font-bold text-error mb-4">접근 제한</h3>
+                <h3 className="text-lg font-bold text-error mb-4">{t('접근 제한')}</h3>
                 <div className="flex flex-col gap-2">
                 {blockers.map((blocker, index) => (
                     <div key={index} className="flex items-start gap-2 p-3 bg-error-bg border border-error rounded-lg">
@@ -381,12 +384,12 @@ export default function LessonPage() {
 
           {/* 과목 시험 안내 */}
             <div className="bg-surface border border-border rounded-xl p-5">
-              <h3 className="text-lg font-bold text-text-primary mb-4">💡 시험 안내</h3>
+              <h3 className="text-lg font-bold text-text-primary mb-4">💡 {t('시험 안내')}</h3>
               <p className="text-sm text-text-secondary leading-relaxed">
-                과목의 <strong className="text-text-primary">모든 레슨</strong>을 90% 이상 완료하면<br/>
+                {t('과목의')} <strong className="text-text-primary">{t('모든 레슨')}</strong>{t('을 90% 이상 완료하면')}<br/>
                 <Link href="/curriculum" className="text-primary hover:text-primary-600 font-medium underline transition-colors">
-                  커리큘럼 페이지
-                </Link>에서 시험을 응시할 수 있습니다.
+                  {t('커리큘럼 페이지')}
+                </Link>{t('에서 시험을 응시할 수 있습니다.')}
               </p>
             </div>
           </div>

@@ -1,7 +1,11 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import { Lesson } from '../types/api';
 import StatusBadge, { BadgeStatus } from './ui/StatusBadge';
+import { useLocale } from '../i18n/client';
+import { translateStudentText } from '../i18n/studentTranslations';
 
 interface LessonCardProps {
   lesson: Lesson;
@@ -10,6 +14,8 @@ interface LessonCardProps {
 
 export default function LessonCard({ lesson, remainingDays }: LessonCardProps) {
   const { id, title, progressPercent, status, remainingTries } = lesson;
+  const { locale } = useLocale();
+  const t = (source: string) => translateStudentText(source, locale);
   
   // 상태에 따른 배지 상태 결정
   const getBadgeStatus = (): BadgeStatus => {
@@ -24,10 +30,15 @@ export default function LessonCard({ lesson, remainingDays }: LessonCardProps) {
   
   // 시험보기 버튼 활성화 여부
   const canTakeExam = status !== 'locked' && progressPercent >= 90 && remainingTries > 0;
+  const examDisabledReason = progressPercent < 90
+    ? '진도 90% 이상 필요'
+    : remainingTries === 0
+      ? '응시 기회 없음'
+      : '잠긴 레슨';
 
   const formatDuration = (durationMs: number) => {
     const minutes = Math.ceil(durationMs / (1000 * 60));
-    return `${minutes}분`;
+    return t(`${minutes}분`);
   };
 
   return (
@@ -61,15 +72,15 @@ export default function LessonCard({ lesson, remainingDays }: LessonCardProps) {
       {/* Info */}
       <div className="grid grid-cols-2 gap-4 mb-5 p-4 bg-bg-primary rounded-lg border border-border">
         <div className="flex flex-col gap-1">
-          <span className="text-[13px] text-text-tertiary font-normal">시험 응시 기회</span>
+          <span className="text-[13px] text-text-tertiary font-normal">{t('시험 응시 기회')}</span>
           <span className="text-sm font-semibold text-text-primary">
-            {status === 'passed' ? '완료' : `${remainingTries}회 남음`}
+            {status === 'passed' ? t('완료') : t(`${remainingTries}회 남음`)}
           </span>
         </div>
         <div className="flex flex-col gap-1">
-          <span className="text-[13px] text-text-tertiary font-normal">수강 기간</span>
+          <span className="text-[13px] text-text-tertiary font-normal">{t('수강 기간')}</span>
           <span className="text-sm font-semibold text-text-primary">
-            {remainingDays > 0 ? `${remainingDays}일 남음` : '만료'}
+            {remainingDays > 0 ? t(`${remainingDays}일 남음`) : t('만료')}
           </span>
         </div>
       </div>
@@ -86,7 +97,7 @@ export default function LessonCard({ lesson, remainingDays }: LessonCardProps) {
           aria-disabled={!canLearn}
           tabIndex={!canLearn ? -1 : 0}
         >
-          학습하기
+          {t('학습하기')}
         </Link>
         
         <Link 
@@ -98,24 +109,14 @@ export default function LessonCard({ lesson, remainingDays }: LessonCardProps) {
           }`}
           aria-disabled={!canTakeExam}
           tabIndex={!canTakeExam ? -1 : 0}
-          title={
-            !canTakeExam 
-              ? progressPercent < 90 
-                ? '진도 90% 이상 필요' 
-                : remainingTries === 0 
-                ? '응시 기회 없음' 
-                : '잠긴 레슨'
-              : undefined
-          }
+          title={!canTakeExam ? t(examDisabledReason) : undefined}
         >
-          시험보기
+          {t('시험보기')}
         </Link>
       </div>
     </div>
   );
 }
-
-
 
 
 
