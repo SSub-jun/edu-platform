@@ -7,7 +7,7 @@ import { translateStudentAttribute, translateStudentText } from '../i18n/student
 
 const EXCLUDED_PREFIXES = ['/admin', '/instructor', '/portal'];
 const TRANSLATED_ATTR_PREFIX = 'data-original-student-attr-';
-const originalTextNodes = new WeakMap<Text, string>();
+const originalTextNodes = new WeakMap<Text, { original: string; translated: string }>();
 
 function shouldTranslatePath(pathname: string) {
   return !EXCLUDED_PREFIXES.some((prefix) => pathname.startsWith(prefix));
@@ -22,12 +22,23 @@ function isSkippableNode(node: Node) {
 function translateTextNode(node: Text, locale: Locale) {
   if (isSkippableNode(node)) return;
 
-  const original = originalTextNodes.get(node) || node.nodeValue || '';
-  if (!originalTextNodes.has(node)) {
-    originalTextNodes.set(node, original);
+  const current = node.nodeValue || '';
+  let record = originalTextNodes.get(node);
+
+  if (!record) {
+    record = { original: current, translated: current };
+    originalTextNodes.set(node, record);
+  } else if (current !== record.original && current !== record.translated) {
+    record.original = current;
   }
 
-  node.nodeValue = locale === defaultLocale ? original : translateStudentText(original, locale);
+  const nextValue = locale === defaultLocale
+    ? record.original
+    : translateStudentText(record.original, locale);
+  record.translated = nextValue;
+  if (current !== nextValue) {
+    node.nodeValue = nextValue;
+  }
 }
 
 function translateElementAttribute(element: Element, attr: 'placeholder' | 'title' | 'aria-label', locale: Locale) {
@@ -40,10 +51,10 @@ function translateElementAttribute(element: Element, attr: 'placeholder' | 'titl
     element.setAttribute(originalAttr, original);
   }
 
-  element.setAttribute(
-    attr,
-    locale === defaultLocale ? original : translateStudentAttribute(original, locale),
-  );
+  const nextValue = locale === defaultLocale ? original : translateStudentAttribute(original, locale);
+  if (current !== nextValue) {
+    element.setAttribute(attr, nextValue);
+  }
 }
 
 function translateTree(root: ParentNode, locale: Locale) {
