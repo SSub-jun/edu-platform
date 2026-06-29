@@ -410,6 +410,207 @@ export const studentTextTranslations: Record<string, LocaleText> = {
     th: 'คุณจะสอบใหม่ได้หลังเรียนทุกบทเรียนอย่างน้อย 90%',
     bn: 'সব লেসনের অন্তত ৯০% সম্পন্ন করলে আবার পরীক্ষা দিতে পারবেন।',
   },
+  '내 정보': { en: 'My Information', th: 'ข้อมูลของฉัน', bn: 'আমার তথ্য' },
+  '계정 정보와 소속, 교육기간을 확인할 수 있습니다.': {
+    en: 'Check your account, company, and training period.',
+    th: 'ตรวจสอบบัญชี บริษัท และระยะเวลาเรียนของคุณ',
+    bn: 'আপনার অ্যাকাউন্ট, কোম্পানি ও শিক্ষার সময়কাল দেখুন।',
+  },
+  '로그아웃': { en: 'Log out', th: 'ออกจากระบบ', bn: 'লগ আউট' },
+  '내 정보를 불러오는 중입니다...': {
+    en: 'Loading your information...',
+    th: 'กำลังโหลดข้อมูลของคุณ...',
+    bn: 'আপনার তথ্য লোড হচ্ছে...',
+  },
+  '기본 정보': { en: 'Basic Information', th: 'ข้อมูลพื้นฐาน', bn: 'মৌলিক তথ্য' },
+  '이름': { en: 'Name', th: 'ชื่อ', bn: 'নাম' },
+  '아이디': { en: 'ID', th: 'ID', bn: 'আইডি' },
+  '역할': { en: 'Role', th: 'บทบาท', bn: 'ভূমিকা' },
+  '관리자': { en: 'Admin', th: 'ผู้ดูแลระบบ', bn: 'অ্যাডমিন' },
+  '소속 및 교육기간': { en: 'Company and Training Period', th: 'บริษัทและระยะเวลาเรียน', bn: 'কোম্পানি ও শিক্ষার সময়কাল' },
+  '소속 회사': { en: 'Company', th: 'บริษัท', bn: 'কোম্পানি' },
+  '회사 정보 없음': { en: 'No company information', th: 'ไม่มีข้อมูลบริษัท', bn: 'কোম্পানির তথ্য নেই' },
+  '미배정': { en: 'Not assigned', th: 'ยังไม่ได้กำหนด', bn: 'বরাদ্দ হয়নি' },
+  '진행 중인 교육': { en: 'Active training', th: 'การเรียนที่กำลังดำเนินอยู่', bn: 'চলমান শিক্ষা' },
+  '비활성 회사': { en: 'Inactive company', th: 'บริษัทไม่ใช้งาน', bn: 'নিষ্ক্রিয় কোম্পানি' },
+  '회사 배정 상태를 확인해주세요.': {
+    en: 'Please check your company assignment status.',
+    th: 'กรุณาตรวจสอบสถานะการกำหนดบริษัท',
+    bn: 'আপনার কোম্পানি বরাদ্দের অবস্থা 확인 করুন।',
+  },
+  '교육 시작일': { en: 'Training Start Date', th: 'วันเริ่มเรียน', bn: 'শিক্ষা শুরুর তারিখ' },
+  '교육 종료일': { en: 'Training End Date', th: 'วันสิ้นสุดการเรียน', bn: 'শিক্ষা শেষের তারিখ' },
+  '기타': { en: 'Other', th: 'อื่นๆ', bn: 'অন্যান্য' },
+  '강의실에서 학습 진도와 시험 결과를 확인하실 수 있습니다.': {
+    en: 'You can check your learning progress and exam results in the classroom.',
+    th: 'คุณสามารถตรวจสอบความคืบหน้าและผลสอบได้ในห้องเรียน',
+    bn: 'ক্লাসরুমে শেখার অগ্রগতি ও পরীক্ষার ফলাফল দেখতে পারবেন।',
+  },
+  '강의실로 이동': { en: 'Go to Classroom', th: 'ไปห้องเรียน', bn: 'ক্লাসরুমে যান' },
+  '교육소개 및 수강 안내': {
+    en: 'Training Introduction and Guide',
+    th: 'แนะนำการศึกษาและคู่มือการเรียน',
+    bn: 'শিক্ষা পরিচিতি ও নির্দেশিকা',
+  },
+  '교육기관 소개': { en: 'About the Institution', th: 'เกี่ยวกับสถาบัน', bn: 'প্রতিষ্ঠান পরিচিতি' },
+  '한국산업보건안전기술원 온라인 교육센터는 산업재해 예방과 안전문화 정착을 목표로,': {
+    en: 'The Korea Occupational Health and Safety Technology Institute Online Education Center aims to prevent industrial accidents and build a safety culture.',
+    th: 'ศูนย์การศึกษาออนไลน์ของสถาบันเทคโนโลยีอาชีวอนามัยและความปลอดภัยแห่งเกาหลีมุ่งป้องกันอุบัติเหตุจากการทำงานและสร้างวัฒนธรรมความปลอดภัย',
+    bn: 'কোরিয়া অকুপেশনাল হেলথ অ্যান্ড সেফটি টেকনোলজি ইনস্টিটিউট অনলাইন শিক্ষা কেন্দ্র শিল্প দুর্ঘটনা প্রতিরোধ ও নিরাপত্তা সংস্কৃতি গড়ে তুলতে কাজ করে।',
+  },
+  '사업장 현장에서 바로 활용 가능한 실무 중심의 안전보건 교육을 제공합니다.': {
+    en: 'It provides practical safety and health training that can be used directly at worksites.',
+    th: 'ให้การอบรมความปลอดภัยและอาชีวอนามัยเชิงปฏิบัติที่ใช้ได้จริงในสถานประกอบการ',
+    bn: 'এটি কর্মক্ষেত্রে সরাসরি ব্যবহারযোগ্য বাস্তবভিত্তিক নিরাপত্তা ও স্বাস্থ্য শিক্ষা প্রদান করে।',
+  },
+  '산업안전보건법령에서 요구하는 법정·위탁 교육 과정을 체계적으로 운영하고 있습니다.': {
+    en: 'It systematically operates legally required and commissioned training under occupational safety and health laws.',
+    th: 'ดำเนินหลักสูตรตามกฎหมายและหลักสูตรที่ได้รับมอบหมายตามกฎหมายความปลอดภัยและอาชีวอนามัยอย่างเป็นระบบ',
+    bn: 'এটি পেশাগত নিরাপত্তা ও স্বাস্থ্য আইনে প্রয়োজনীয় আইনগত ও委託 শিক্ষা পদ্ধতিগতভাবে পরিচালনা করে।',
+  },
+  '교육기간': { en: 'Training Period', th: 'ระยะเวลาเรียน', bn: 'শিক্ষার সময়কাল' },
+  '교육기간은 회사(고객사) 단위로 설정되며, 시작일 기준 6개월 동안 수강이 가능합니다.': {
+    en: 'The training period is set by company and is available for 6 months from the start date.',
+    th: 'ระยะเวลาเรียนกำหนดตามบริษัท และสามารถเรียนได้ 6 เดือนนับจากวันเริ่มต้น',
+    bn: 'শিক্ষার সময়কাল কোম্পানি অনুযায়ী নির্ধারিত হয় এবং শুরু তারিখ থেকে ৬ মাস শেখা যায়।',
+  },
+  '수강기간 내에는 자유롭게 로그인하여 학습 및 평가를 진행하실 수 있습니다.': {
+    en: 'During the period, you can log in freely to learn and complete assessments.',
+    th: 'ในช่วงเวลาเรียน คุณสามารถเข้าสู่ระบบเพื่อเรียนและทำแบบประเมินได้อย่างอิสระ',
+    bn: 'সময়কালের মধ্যে আপনি লগ ইন করে শেখা ও মূল্যায়ন সম্পন্ন করতে পারবেন।',
+  },
+  '수강기간이 종료되면 신규 수강 및 평가 응시는 제한될 수 있습니다.': {
+    en: 'After the period ends, new learning and assessments may be restricted.',
+    th: 'เมื่อสิ้นสุดระยะเวลาเรียน การเรียนใหม่และการสอบอาจถูกจำกัด',
+    bn: 'সময়কাল শেষ হলে নতুন শেখা ও মূল্যায়ন সীমিত হতে পারে।',
+  },
+  '교육방법': { en: 'Training Method', th: 'วิธีการเรียน', bn: 'শিক্ষা পদ্ধতি' },
+  '100% 온라인 동영상 기반 이러닝 교육으로 제공됩니다.': {
+    en: 'Training is provided as 100% online video-based e-learning.',
+    th: 'การเรียนเป็นอีเลิร์นนิงแบบวิดีโอออนไลน์ 100%',
+    bn: 'শিক্ষা ১০০% অনলাইন ভিডিওভিত্তিক ই-লার্নিং হিসেবে 제공 করা হয়।',
+  },
+  '각 과목은 여러 개의 강의(레슨)으로 구성되며, 레슨별 학습 진도율이 자동으로 기록됩니다.': {
+    en: 'Each subject consists of multiple lessons, and progress is recorded automatically for each lesson.',
+    th: 'แต่ละรายวิชาประกอบด้วยหลายบทเรียน และระบบจะบันทึกความคืบหน้าของแต่ละบทเรียนโดยอัตโนมัติ',
+    bn: 'প্রতিটি বিষয় একাধিক লেসন নিয়ে গঠিত এবং প্রতিটি লেসনের অগ্রগতি স্বয়ংক্রিয়ভাবে রেকর্ড হয়।',
+  },
+  '레슨 진도율은 동영상 시청 시간 기준으로 계산되며, 90% 이상 수강 시 ‘수강 완료’로 반영됩니다.': {
+    en: 'Lesson progress is calculated by video watch time, and 90% or more is marked as complete.',
+    th: 'ความคืบหน้าคำนวณจากเวลาชมวิดีโอ และเมื่อเรียน 90% ขึ้นไปจะถือว่าสำเร็จ',
+    bn: 'লেসনের অগ্রগতি ভিডিও দেখার সময় অনুযায়ী গণনা হয় এবং ৯০% বা বেশি হলে সম্পন্ন হিসেবে গণ্য হয়।',
+  },
+  '교육진행절차': { en: 'Training Process', th: 'ขั้นตอนการเรียน', bn: 'শিক্ষা প্রক্রিয়া' },
+  '회원가입 및 로그인': { en: 'Sign Up and Log In', th: 'สมัครและเข้าสู่ระบบ', bn: 'নিবন্ধন ও লগ ইন' },
+  '회사에서 안내받은 방식에 따라 회원가입 후 로그인합니다.': {
+    en: 'Sign up and log in according to the instructions from your company.',
+    th: 'สมัครและเข้าสู่ระบบตามคำแนะนำจากบริษัท',
+    bn: 'আপনার কোম্পানির নির্দেশনা অনুযায়ী নিবন্ধন করে লগ ইন করুন।',
+  },
+  '강의실 접속': { en: 'Enter the Classroom', th: 'เข้าสู่ห้องเรียน', bn: 'ক্লাসরুমে প্রবেশ' },
+  '상단 내비게이션의 「강의실」 메뉴에서 배정된 교육과정을 확인합니다.': {
+    en: 'Check your assigned training in the Classroom menu at the top.',
+    th: 'ตรวจสอบหลักสูตรที่ได้รับมอบหมายจากเมนูห้องเรียนด้านบน',
+    bn: 'উপরের ক্লাসরুম মেনুতে বরাদ্দকৃত শিক্ষা 과정 দেখুন।',
+  },
+  '동영상 학습': { en: 'Video Learning', th: 'เรียนผ่านวิดีโอ', bn: 'ভিডিও শিক্ষা' },
+  '각 레슨의 동영상을 시청하며, 시청 시간에 따라 진도율이 자동으로 저장됩니다.': {
+    en: 'Watch each lesson video. Progress is saved automatically based on watch time.',
+    th: 'ชมวิดีโอแต่ละบทเรียน ระบบจะบันทึกความคืบหน้าตามเวลาที่ชมโดยอัตโนมัติ',
+    bn: 'প্রতিটি লেসনের ভিডিও দেখুন। দেখার সময় অনুযায়ী অগ্রগতি স্বয়ংক্রিয়ভাবে সংরক্ষিত হয়।',
+  },
+  '학습평가(시험) 응시': { en: 'Take Assessment (Exam)', th: 'ทำแบบประเมิน (สอบ)', bn: 'মূল্যায়ন (পরীক্ষা) দিন' },
+  '해당 레슨 진도율이 90% 이상일 때 레슨 시험에 응시할 수 있습니다.': {
+    en: 'You can take the lesson exam when that lesson progress is at least 90%.',
+    th: 'สามารถสอบบทเรียนได้เมื่อความคืบหน้าบทเรียนนั้นอย่างน้อย 90%',
+    bn: 'সেই লেসনের অগ্রগতি অন্তত ৯০% হলে লেসন পরীক্ষা দিতে পারবেন।',
+  },
+  '진도율과 학습평가 점수를 반영한 최종 점수가 수료 기준을 충족하면 교육을 수료하게 됩니다.': {
+    en: 'Training is completed when the final score from progress and assessment meets the requirement.',
+    th: 'สำเร็จการเรียนเมื่อคะแนนรวมจากความคืบหน้าและแบบประเมินผ่านเกณฑ์',
+    bn: 'অগ্রগতি ও মূল্যায়নের চূড়ান্ত স্কোর মানদণ্ড পূরণ করলে শিক্ষা সম্পন্ন হয়।',
+  },
+  '각 강의(레슨) 단위로 수료 여부를 판단합니다.': {
+    en: 'Completion is determined for each lesson.',
+    th: 'การสำเร็จจะพิจารณาเป็นรายบทเรียน',
+    bn: 'প্রতিটি লেসন অনুযায়ী সম্পন্নতা নির্ধারিত হয়।',
+  },
+  '레슨 진도율이 90% 이상이어야 학습평가(시험)에 응시할 수 있습니다.': {
+    en: 'Lesson progress must be at least 90% to take the assessment.',
+    th: 'ต้องมีความคืบหน้าอย่างน้อย 90% จึงจะทำแบบประเมินได้',
+    bn: 'মূল্যায়ন দিতে লেসনের অগ্রগতি অন্তত ৯০% হতে হবে।',
+  },
+  '레슨 최종 점수는 진도 20점 + 학습평가 80점으로 계산되며, 총점 70점 이상일 경우 해당 레슨을 수료한 것으로 인정됩니다.': {
+    en: 'The final lesson score is progress 20 points plus assessment 80 points; 70 or more is completed.',
+    th: 'คะแนนสุดท้ายของบทเรียนคำนวณจากความคืบหน้า 20 คะแนน + แบบประเมิน 80 คะแนน และต้องได้ 70 คะแนนขึ้นไป',
+    bn: 'লেসনের চূড়ান্ত স্কোর অগ্রগতি ২০ + মূল্যায়ন ৮০; মোট ৭০ বা বেশি হলে সম্পন্ন গণ্য হয়।',
+  },
+  '과목은 해당 과목에 포함된 모든 레슨이 수료된 경우에만 수료로 처리됩니다.': {
+    en: 'A subject is completed only when all lessons in it are completed.',
+    th: 'รายวิชาจะสำเร็จเมื่อบทเรียนทั้งหมดในรายวิชานั้นสำเร็จแล้วเท่านั้น',
+    bn: 'বিষয়ের সব লেসন সম্পন্ন হলেই বিষয় সম্পন্ন হিসেবে গণ্য হয়।',
+  },
+  '교육생 유의사항': { en: 'Learner Notes', th: 'ข้อควรทราบสำหรับผู้เรียน', bn: 'শিক্ষার্থীর জন্য নির্দেশনা' },
+  '모든 교육은 개인 계정 기준으로 운영되며, 계정 공유 및 대리 수강은 엄격히 금지됩니다.': {
+    en: 'All training is based on individual accounts. Account sharing and proxy attendance are strictly prohibited.',
+    th: 'การเรียนทั้งหมดใช้บัญชีส่วนบุคคล ห้ามแชร์บัญชีหรือเรียนแทนผู้อื่นโดยเด็ดขาด',
+    bn: 'সব শিক্ষা ব্যক্তিগত অ্যাকাউন্টভিত্তিক। অ্যাকাউন্ট শেয়ার ও অন্যের হয়ে শেখা কঠোরভাবে নিষিদ্ধ।',
+  },
+  '수강기간 내에 진도 및 평가를 모두 완료하지 못한 경우, 미수료 처리될 수 있습니다.': {
+    en: 'If progress and assessments are not completed during the period, you may be marked incomplete.',
+    th: 'หากไม่เรียนและทำแบบประเมินให้ครบภายในระยะเวลา อาจถือว่ายังไม่สำเร็จ',
+    bn: 'সময়কালের মধ্যে অগ্রগতি ও মূল্যায়ন শেষ না করলে অসম্পন্ন হিসেবে গণ্য হতে পারে।',
+  },
+  '학습 중 오류 또는 문의 사항이 있을 경우, Q&A 메뉴 또는 회사 담당자를 통해 문의해 주세요.': {
+    en: 'For errors or questions during learning, use Q&A or contact your company representative.',
+    th: 'หากพบข้อผิดพลาดหรือมีคำถามระหว่างเรียน โปรดใช้เมนู Q&A หรือติดต่อผู้รับผิดชอบของบริษัท',
+    bn: 'শেখার সময় সমস্যা বা প্রশ্ন থাকলে Q&A মেনু ব্যবহার করুন বা কোম্পানির দায়িত্বপ্রাপ্ত ব্যক্তির সাথে যোগাযোগ করুন।',
+  },
+  '등록된 영상이 없습니다': { en: 'No video is registered', th: 'ยังไม่มีวิดีโอ', bn: 'কোনো ভিডিও নিবন্ধিত নেই' },
+  '강사가 영상을 업로드하면 여기에 표시됩니다.': {
+    en: 'The video will appear here after an instructor uploads it.',
+    th: 'เมื่อผู้สอนอัปโหลดวิดีโอแล้ว จะแสดงที่นี่',
+    bn: 'প্রশিক্ষক ভিডিও আপলোড করলে এখানে দেখা যাবে।',
+  },
+  '확인': { en: 'OK', th: 'ตกลง', bn: 'ঠিক আছে' },
+  '시행일: 2025년 1월 1일': {
+    en: 'Effective Date: January 1, 2025',
+    th: 'วันที่มีผล: 1 มกราคม 2025',
+    bn: 'কার্যকর তারিখ: ১ জানুয়ারি ২০২৫',
+  },
+  '한국산업안전보건기술원(주)(이하 "회사")는 개인정보보호법에 따라 이용자의 개인정보 보호 및 권익을 보호하고 개인정보와 관련한 이용자의 고충을 원활하게 처리할 수 있도록 다음과 같은 처리방침을 두고 있습니다.': {
+    en: 'Korea Occupational Safety and Health Technology Institute Co., Ltd. (“Company”) establishes this Privacy Policy to protect users’ personal information and rights under the Personal Information Protection Act.',
+    th: 'บริษัท Korea Occupational Safety and Health Technology Institute จำกัด (“บริษัท”) จัดทำนโยบายนี้เพื่อคุ้มครองข้อมูลส่วนบุคคลและสิทธิของผู้ใช้ตามกฎหมายคุ้มครองข้อมูลส่วนบุคคล',
+    bn: 'Korea Occupational Safety and Health Technology Institute Co., Ltd. (“কোম্পানি”) ব্যক্তিগত তথ্য সুরক্ষা আইন অনুযায়ী ব্যবহারকারীর ব্যক্তিগত তথ্য ও অধিকার রক্ষার জন্য এই নীতি প্রণয়ন করেছে।',
+  },
+  '제1조 (개인정보의 처리 목적)': { en: 'Article 1. Purpose of Processing Personal Information', th: 'ข้อ 1 วัตถุประสงค์การประมวลผลข้อมูลส่วนบุคคล', bn: 'ধারা ১. ব্যক্তিগত তথ্য প্রক্রিয়াকরণের উদ্দেশ্য' },
+  '제2조 (개인정보의 처리 및 보유 기간)': { en: 'Article 2. Processing and Retention Period', th: 'ข้อ 2 ระยะเวลาประมวลผลและเก็บรักษาข้อมูล', bn: 'ধারা ২. প্রক্রিয়াকরণ ও সংরক্ষণকাল' },
+  '제3조 (처리하는 개인정보의 항목)': { en: 'Article 3. Personal Information Items Processed', th: 'ข้อ 3 รายการข้อมูลส่วนบุคคลที่ประมวลผล', bn: 'ধারা ৩. প্রক্রিয়াকৃত ব্যক্তিগত তথ্য' },
+  '제4조 (개인정보의 제3자 제공)': { en: 'Article 4. Provision to Third Parties', th: 'ข้อ 4 การให้ข้อมูลแก่บุคคลที่สาม', bn: 'ধারা ৪. তৃতীয় পক্ষকে প্রদান' },
+  '제5조 (개인정보처리의 위탁)': { en: 'Article 5. Outsourcing of Processing', th: 'ข้อ 5 การ委託ประมวลผลข้อมูล', bn: 'ধারা ৫. প্রক্রিয়াকরণ আউটসোর্সিং' },
+  '제6조 (정보주체와 법정대리인의 권리·의무 및 행사방법)': { en: 'Article 6. Rights and How to Exercise Them', th: 'ข้อ 6 สิทธิและวิธีใช้สิทธิของเจ้าของข้อมูล', bn: 'ধারা ৬. অধিকার ও তা প্রয়োগের পদ্ধতি' },
+  '제7조 (개인정보의 파기)': { en: 'Article 7. Destruction of Personal Information', th: 'ข้อ 7 การทำลายข้อมูลส่วนบุคคล', bn: 'ধারা ৭. ব্যক্তিগত তথ্য ধ্বংস' },
+  '제8조 (개인정보의 안전성 확보조치)': { en: 'Article 8. Security Measures', th: 'ข้อ 8 มาตรการรักษาความปลอดภัย', bn: 'ধারা ৮. নিরাপত্তা ব্যবস্থা' },
+  '제9조 (개인정보 보호책임자)': { en: 'Article 9. Privacy Officer', th: 'ข้อ 9 เจ้าหน้าที่คุ้มครองข้อมูลส่วนบุคคล', bn: 'ধারা ৯. ব্যক্তিগত তথ্য সুরক্ষা কর্মকর্তা' },
+  '제10조 (개인정보 열람청구)': { en: 'Article 10. Request to Access Personal Information', th: 'ข้อ 10 การขอเข้าถึงข้อมูลส่วนบุคคล', bn: 'ধারা ১০. ব্যক্তিগত তথ্য দেখার অনুরোধ' },
+  '제11조 (권익침해 구제방법)': { en: 'Article 11. Remedies for Rights Infringement', th: 'ข้อ 11 วิธีเยียวยาเมื่อสิทธิถูกละเมิด', bn: 'ধারা ১১. অধিকার লঙ্ঘনের প্রতিকার' },
+  '제12조 (개인정보 처리방침 변경)': { en: 'Article 12. Changes to This Privacy Policy', th: 'ข้อ 12 การเปลี่ยนแปลงนโยบายความเป็นส่วนตัว', bn: 'ধারা ১২. গোপনীয়তা নীতির পরিবর্তন' },
+  '한국산업안전보건기술원(주)': {
+    en: 'Korea Occupational Safety and Health Technology Institute Co., Ltd.',
+    th: 'บริษัท Korea Occupational Safety and Health Technology Institute จำกัด',
+    bn: 'Korea Occupational Safety and Health Technology Institute Co., Ltd.',
+  },
+  '대표자: 정의석': { en: 'Representative: Jeong Ui-seok', th: 'ผู้แทน: Jeong Ui-seok', bn: 'প্রতিনিধি: Jeong Ui-seok' },
+  '주소: 경기 수원시 권선구 곡반정동 543-4 2층': {
+    en: 'Address: 2F, 543-4 Gokbanjeong-dong, Gwonseon-gu, Suwon-si, Gyeonggi-do',
+    th: 'ที่อยู่: ชั้น 2, 543-4 Gokbanjeong-dong, Gwonseon-gu, Suwon-si, Gyeonggi-do',
+    bn: 'ঠিকানা: ২য় তলা, ৫৪৩-৪ Gokbanjeong-dong, Gwonseon-gu, Suwon-si, Gyeonggi-do',
+  },
+  '사업자등록번호: 790-88-00834': {
+    en: 'Business Registration No.: 790-88-00834',
+    th: 'เลขทะเบียนธุรกิจ: 790-88-00834',
+    bn: 'ব্যবসা নিবন্ধন নম্বর: 790-88-00834',
+  },
   '새 질문 작성': { en: 'New Question', th: 'เขียนคำถามใหม่', bn: 'নতুন প্রশ্ন' },
   '질문하기': { en: 'Ask Question', th: 'ถามคำถาม', bn: 'প্রশ্ন করুন' },
   '질문 등록': { en: 'Submit Question', th: 'ส่งคำถาม', bn: 'প্রশ্ন জমা দিন' },
@@ -513,9 +714,19 @@ function translateDynamicStudentText(text: string, locale: Locale): string | nul
     return pick(locale, `${attempts[1]} times`, `${attempts[1]} ครั้ง`, `${attempts[1]} বার`);
   }
 
+  const attemptRound = text.match(/^(\d+)회차$/);
+  if (attemptRound) {
+    return pick(locale, `Attempt ${attemptRound[1]}`, `ครั้งที่ ${attemptRound[1]}`, `চেষ্টা ${attemptRound[1]}`);
+  }
+
   const questions = text.match(/^(\d+)문제$/);
   if (questions) {
     return pick(locale, `${questions[1]} questions`, `${questions[1]} ข้อ`, `${questions[1]}টি প্রশ্ন`);
+  }
+
+  const questionItems = text.match(/^(\d+)문항$/);
+  if (questionItems) {
+    return pick(locale, `${questionItems[1]} questions`, `${questionItems[1]} ข้อ`, `${questionItems[1]}টি প্রশ্ন`);
   }
 
   const progress = text.match(/^진도율 (\d+)%$/);
@@ -561,6 +772,21 @@ function translateDynamicStudentText(text: string, locale: Locale): string | nul
   const remainingAttempts = text.match(/^남은 시험 기회: (\d+)회$/);
   if (remainingAttempts) {
     return pick(locale, `Exam attempts left: ${remainingAttempts[1]}`, `โอกาสสอบที่เหลือ: ${remainingAttempts[1]} ครั้ง`, `বাকি পরীক্ষার সুযোগ: ${remainingAttempts[1]} বার`);
+  }
+
+  const unanswered = text.match(/^(\d+)개 문제가 답변되지 않았습니다\. 제출하시겠습니까\?$/);
+  if (unanswered) {
+    return pick(locale, `${unanswered[1]} questions are unanswered. Submit anyway?`, `ยังไม่ได้ตอบ ${unanswered[1]} ข้อ ต้องการส่งหรือไม่?`, `${unanswered[1]}টি প্রশ্নের উত্তর দেওয়া হয়নি। জমা দেবেন?`);
+  }
+
+  const watched = text.match(/^\((\d+)% 수강\)$/);
+  if (watched) {
+    return pick(locale, `(${watched[1]}% watched)`, `(เรียนแล้ว ${watched[1]}%)`, `(${watched[1]}% দেখা হয়েছে)`);
+  }
+
+  const examScore = text.match(/^\(시험 (\d+)점\)$/);
+  if (examScore) {
+    return pick(locale, `(Exam ${examScore[1]} pts)`, `(สอบ ${examScore[1]} คะแนน)`, `(পরীক্ষা ${examScore[1]} পয়েন্ট)`);
   }
 
   const nextAttempt = text.match(/^남은 (\d+)회의 기회로 재응시하세요$/);
