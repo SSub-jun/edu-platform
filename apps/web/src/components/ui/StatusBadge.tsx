@@ -1,4 +1,8 @@
+'use client';
+
 import React from 'react';
+import { useLocale } from '../../i18n/client';
+import { translateStudentText } from '../../i18n/studentTranslations';
 
 export type BadgeStatus = 'locked' | 'available' | 'passed' | 'in-progress';
 
@@ -28,15 +32,14 @@ const statusConfig = {
 
 export default function StatusBadge({ status, className = '' }: StatusBadgeProps) {
   const config = statusConfig[status];
+  const { locale } = useLocale();
   
   return (
     <span className={`inline-flex items-center rounded-full border px-3 py-1 text-[13px] leading-5 font-normal transition-colors ${config.className} ${className}`}>
-      {config.label}
+      {translateStudentText(config.label, locale)}
     </span>
   );
 }
-
-
 
 
 

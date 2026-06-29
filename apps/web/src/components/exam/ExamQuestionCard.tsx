@@ -4,6 +4,8 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 import { Label } from '../ui/label';
+import { useLocale } from '../../i18n/client';
+import { translateStudentText } from '../../i18n/studentTranslations';
 
 interface Question {
   id: string;
@@ -27,12 +29,14 @@ export function ExamQuestionCard({
   showValidation = false 
 }: ExamQuestionCardProps) {
   const hasAnswer = selectedIndex !== undefined;
+  const { locale } = useLocale();
+  const t = (source: string) => translateStudentText(source, locale);
   
   return (
     <Card className={`mb-6 ${showValidation && !hasAnswer ? 'border-error bg-error-bg' : ''}`}>
       <CardHeader>
         <CardTitle className="text-lg font-semibold text-text-primary">
-          문제 {questionNumber}
+          {t(`문제 ${questionNumber}`)}
         </CardTitle>
       </CardHeader>
       
@@ -69,14 +73,13 @@ export function ExamQuestionCard({
         
         {showValidation && !hasAnswer && (
           <p className="text-sm text-error mt-2">
-            ⚠️ 답을 선택해주세요
+            {t('⚠️ 답을 선택해주세요')}
           </p>
         )}
       </CardContent>
     </Card>
   );
 }
-
 
 
 

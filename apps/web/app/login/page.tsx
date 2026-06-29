@@ -86,7 +86,7 @@ export default function LoginPage() {
       } else {
         console.error(`[LOGIN_PAGE] Login failed:`, result.error);
         // 더 명확한 에러 메시지 표시
-        const errorMessage = result.error || '로그인에 실패했습니다.';
+        const errorMessage = result.error || t('login.error.generic');
         if (errorMessage.includes('Invalid') || errorMessage.includes('credentials') || errorMessage.includes('Unauthorized')) {
           setError(t('login.error.invalid'));
         } else {
@@ -148,12 +148,6 @@ export default function LoginPage() {
 
         {/* Right: Login Form */}
         <div className="w-full max-w-md mx-auto md:mx-0 bg-surface/85 border border-border rounded-xl p-8 md:p-10 shadow-2xl">
-          {/* Header */}
-          {/* <div className="text-center mb-10">
-            <h1 className="text-[28px] md:text-[32px] leading-9 font-bold text-text-primary mb-3">로그인</h1>
-            <p className="text-base text-text-secondary font-medium">교육 플랫폼에 오신 것을 환영합니다</p>
-          </div> */}
-
           {/* Error Message */}
         {error && (
             <div className="mb-6 p-4 bg-error-bg border border-error rounded-lg text-error text-sm font-semibold animate-[slideDown_0.3s_ease-out]">

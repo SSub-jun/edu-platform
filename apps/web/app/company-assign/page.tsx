@@ -3,8 +3,12 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { authClient } from '../../lib/auth';
+import { useLocale } from '../../src/i18n/client';
+import { translateStudentText } from '../../src/i18n/studentTranslations';
 
 export default function CompanyAssignPage() {
+  const { locale } = useLocale();
+  const t = (source: string) => translateStudentText(source, locale);
   const [inviteCode, setInviteCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -39,12 +43,12 @@ export default function CompanyAssignPage() {
     e.preventDefault();
     
     if (!inviteCode) {
-      setError('회사 코드를 입력해주세요.');
+      setError(t('회사 코드를 입력해주세요.'));
       return;
     }
 
     if (!/^[A-Z0-9]{6}$/.test(inviteCode)) {
-      setError('회사 코드는 6자리 영문과 숫자 조합이어야 합니다.');
+      setError(t('회사 코드는 6자리 영문과 숫자 조합이어야 합니다.'));
       return;
     }
 
@@ -82,29 +86,29 @@ export default function CompanyAssignPage() {
       if (isAxiosError(error) && error.response?.status === 409) {
         const data = error.response.data;
         if (data?.code === 'ALREADY_ASSIGNED') {
-          setError('이미 회사에 배정된 사용자입니다.');
+          setError(t('이미 회사에 배정된 사용자입니다.'));
           // 이미 배정된 경우 커리큘럼으로 이동
           setTimeout(() => router.push('/curriculum'), 2000);
         } else {
-          setError('중복된 요청입니다.');
+          setError(t('중복된 요청입니다.'));
         }
       } else if (isAxiosError(error) && error.response?.status === 422) {
         const data = error.response.data;
         switch (data?.code) {
           case 'INVALID_INVITE_CODE':
-            setError('유효하지 않은 회사 코드입니다. 다시 확인해주세요.');
+            setError(t('유효하지 않은 회사 코드입니다. 다시 확인해주세요.'));
             break;
           case 'COMPANY_INACTIVE':
-            setError('비활성화된 회사입니다. 관리자에게 문의해주세요.');
+            setError(t('비활성화된 회사입니다. 관리자에게 문의해주세요.'));
             break;
           default:
-            setError(data?.message || '입력한 회사 코드를 확인해주세요.');
+            setError(data?.message ? t(data.message) : t('입력한 회사 코드를 확인해주세요.'));
         }
       } else if (isAxiosError(error) && error.response?.status === 401) {
-        setError('로그인이 필요합니다.');
+        setError(t('로그인이 필요합니다.'));
         setTimeout(() => router.push('/login'), 2000);
       } else {
-        setError('회사 배정에 실패했습니다. 다시 시도해주세요.');
+        setError(t('회사 배정에 실패했습니다. 다시 시도해주세요.'));
       }
     } finally {
       setLoading(false);
@@ -140,8 +144,8 @@ export default function CompanyAssignPage() {
         <div className="w-full max-w-md bg-surface border border-border rounded-xl overflow-hidden">
           <div className="text-center px-10 py-10 pb-5 bg-surface border-b border-border">
             <div className="text-6xl mb-4 animate-bounce">🎉</div>
-            <h1 className="text-[32px] font-bold text-text-primary mb-3">배정 완료!</h1>
-            <p className="text-base text-text-secondary font-medium">회사에 성공적으로 배정되었습니다</p>
+            <h1 className="text-[32px] font-bold text-text-primary mb-3">{t('배정 완료!')}</h1>
+            <p className="text-base text-text-secondary font-medium">{t('회사에 성공적으로 배정되었습니다')}</p>
           </div>
 
           <div className="p-10">
@@ -149,11 +153,11 @@ export default function CompanyAssignPage() {
               <div className="text-5xl mb-4">✅</div>
               
               <h2 className="text-2xl font-bold text-text-primary mb-2 bg-gradient-to-r from-success to-primary bg-clip-text text-transparent">
-                환영합니다!
+                {t('환영합니다!')}
               </h2>
               
               <p className="text-base text-text-secondary mb-6">
-                이제 학습을 시작할 수 있습니다.
+                {t('이제 학습을 시작할 수 있습니다.')}
               </p>
 
               <div className="bg-gradient-to-br from-surface to-bg-primary border border-border rounded-xl p-6 mb-6">
@@ -167,14 +171,14 @@ export default function CompanyAssignPage() {
 
               <div className="flex items-center justify-center gap-2 text-sm text-text-tertiary mb-6">
                 <div className="w-4 h-4 border-2 border-text-tertiary/30 border-t-text-tertiary rounded-full animate-spin"></div>
-                <span>3초 후 자동으로 학습 페이지로 이동합니다...</span>
+                <span>{t('3초 후 자동으로 학습 페이지로 이동합니다...')}</span>
               </div>
 
               <button
                 onClick={() => router.push('/curriculum')}
                 className="w-full h-12 bg-primary text-text-primary rounded-lg text-base font-semibold transition-all hover:bg-primary-600 active:bg-primary-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600 focus-visible:outline-offset-2"
               >
-                바로 시작하기
+                {t('바로 시작하기')}
               </button>
             </div>
           </div>
@@ -188,20 +192,20 @@ export default function CompanyAssignPage() {
       <div className="w-full max-w-md bg-surface border border-border rounded-xl overflow-hidden">
         <div className="text-center px-10 py-10 pb-5 bg-surface border-b border-border">
           <div className="text-6xl mb-4">🏢</div>
-          <h1 className="text-[32px] font-bold text-text-primary mb-3">회사 배정</h1>
+          <h1 className="text-[32px] font-bold text-text-primary mb-3">{t('회사 배정')}</h1>
           <p className="text-base text-text-secondary font-medium mb-4">
-            회사 코드를 입력하여<br />
-            소속 회사를 등록해주세요
+            {t('회사 코드를 입력하여')}<br />
+            {t('소속 회사를 등록해주세요')}
           </p>
           <div className="bg-info-bg border border-info rounded-lg px-4 py-3 text-info text-sm font-medium">
-            💡 회사 코드는 관리자로부터 받으실 수 있습니다
+            💡 {t('회사 코드는 관리자로부터 받으실 수 있습니다')}
           </div>
         </div>
 
         <div className="p-10">
           <form onSubmit={handleSubmit} className="flex flex-col gap-6">
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-semibold text-text-primary uppercase tracking-wide text-center">회사 코드</label>
+              <label className="text-sm font-semibold text-text-primary uppercase tracking-wide text-center">{t('회사 코드')}</label>
               <input
                 type="text"
                 value={inviteCode}
@@ -215,7 +219,7 @@ export default function CompanyAssignPage() {
                 autoFocus
               />
               <p className="text-xs text-text-tertiary text-center mt-1">
-                6자리 영문과 숫자 조합
+                {t('6자리 영문과 숫자 조합')}
               </p>
               
               {error && (
@@ -234,10 +238,10 @@ export default function CompanyAssignPage() {
                 {loading ? (
                   <span className="inline-flex items-center gap-2">
                     <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                    배정 중...
+                    {t('배정 중...')}
                   </span>
                 ) : (
-                  '회사 배정하기'
+                  t('회사 배정하기')
                 )}
               </button>
 
@@ -247,7 +251,7 @@ export default function CompanyAssignPage() {
                 disabled={loading}
                 className="bg-transparent border-0 text-text-tertiary text-sm cursor-pointer underline py-2 transition-colors hover:text-text-secondary disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                나중에 배정하기 (로그아웃)
+                {t('나중에 배정하기 (로그아웃)')}
               </button>
             </div>
           </form>

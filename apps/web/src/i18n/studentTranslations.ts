@@ -906,6 +906,115 @@ export const studentTextTranslations: Record<string, LocaleText> = {
     th: 'เลขทะเบียนธุรกิจ: 790-88-00834',
     bn: 'ব্যবসা নিবন্ধন নম্বর: 790-88-00834',
   },
+  '회사는 다음의 목적을 위하여 개인정보를 처리합니다. 처리하고 있는 개인정보는 다음의 목적 이외의 용도로는 이용되지 않으며, 이용 목적이 변경되는 경우에는 개인정보보호법 제18조에 따라 별도의 동의를 받는 등 필요한 조치를 이행할 예정입니다.': {
+    en: 'The Company processes personal information for the following purposes and will not use it for other purposes without taking required measures such as obtaining separate consent.',
+    th: 'บริษัทประมวลผลข้อมูลส่วนบุคคลเพื่อวัตถุประสงค์ต่อไปนี้ และจะไม่ใช้เพื่อวัตถุประสงค์อื่น เว้นแต่จะดำเนินมาตรการที่จำเป็น เช่น ขอความยินยอมแยกต่างหาก',
+    bn: 'কোম্পানি নিচের উদ্দেশ্যে ব্যক্তিগত তথ্য প্রক্রিয়া করে এবং প্রয়োজনীয় ব্যবস্থা, যেমন পৃথক সম্মতি নেওয়া ছাড়া অন্য উদ্দেশ্যে ব্যবহার করবে না।',
+  },
+  '회원 가입 및 관리: 회원 가입의사 확인, 회원제 서비스 제공에 따른 본인 식별·인증, 회원자격 유지·관리, 서비스 부정이용 방지 등': {
+    en: 'Membership registration and management: confirming intent to sign up, identity verification, account maintenance, and preventing misuse.',
+    th: 'การสมัครและจัดการสมาชิก: ยืนยันความประสงค์สมัคร ระบุตัวตน ดูแลสถานะสมาชิก และป้องกันการใช้งานไม่ถูกต้อง',
+    bn: 'সদস্য নিবন্ধন ও ব্যবস্থাপনা: নিবন্ধনের ইচ্ছা যাচাই, পরিচয় যাচাই, সদস্যতা রক্ষণাবেক্ষণ এবং অপব্যবহার প্রতিরোধ।',
+  },
+  '교육 서비스 제공: 온라인 교육 콘텐츠 제공, 학습 진도 관리, 수료증 발급, 교육 이력 관리 등': {
+    en: 'Education service: providing online content, managing progress, issuing certificates, and managing training history.',
+    th: 'บริการการศึกษา: ให้เนื้อหาออนไลน์ จัดการความคืบหน้า ออกใบรับรอง และจัดการประวัติการเรียน',
+    bn: 'শিক্ষা সেবা: অনলাইন কনটেন্ট প্রদান, অগ্রগতি ব্যবস্থাপনা, সনদ প্রদান এবং শিক্ষা ইতিহাস ব্যবস্থাপনা।',
+  },
+  '고충처리: 민원인의 신원 확인, 민원사항 확인, 사실조사를 위한 연락·통지, 처리결과 통보 등': {
+    en: 'Complaint handling: verifying identity, reviewing complaints, contacting for fact-finding, and notifying results.',
+    th: 'การจัดการข้อร้องเรียน: ยืนยันตัวตน ตรวจสอบเรื่องร้องเรียน ติดต่อเพื่อสอบข้อเท็จจริง และแจ้งผล',
+    bn: 'অভিযোগ 처리: পরিচয় যাচাই, অভিযোগ পরীক্ষা, তথ্য যাচাইয়ের জন্য যোগাযোগ এবং ফলাফল জানানো।',
+  },
+  '회사는 법령에 따른 개인정보 보유·이용기간 또는 정보주체로부터 개인정보를 수집 시에 동의 받은 개인정보 보유·이용기간 내에서 개인정보를 처리·보유합니다.': {
+    en: 'The Company processes and retains personal information within the period required by law or consented to at collection.',
+    th: 'บริษัทประมวลผลและเก็บรักษาข้อมูลส่วนบุคคลภายในระยะเวลาตามกฎหมายหรือที่ได้รับความยินยอมเมื่อเก็บข้อมูล',
+    bn: 'কোম্পানি আইন অনুযায়ী বা সংগ্রহের সময় সম্মত সময়সীমার মধ্যে ব্যক্তিগত তথ্য প্রক্রিয়া ও সংরক্ষণ করে।',
+  },
+  '회원 가입 및 관리: 회원 탈퇴 시까지 (단, 관계 법령 위반에 따른 수사·조사 등이 진행 중인 경우에는 해당 수사·조사 종료 시까지)': {
+    en: 'Membership registration and management: until withdrawal, or until any investigation under applicable law is completed.',
+    th: 'การสมัครและจัดการสมาชิก: จนกว่าจะถอนสมาชิก หรือจนกว่าการสืบสวน/ตรวจสอบตามกฎหมายที่เกี่ยวข้องจะสิ้นสุด',
+    bn: 'সদস্য নিবন্ধন ও ব্যবস্থাপনা: সদস্যতা প্রত্যাহার পর্যন্ত, অথবা প্রযোজ্য আইনের তদন্ত শেষ হওয়া পর্যন্ত।',
+  },
+  '교육 서비스 제공: 교육 수료일로부터 5년 (산업안전보건법에 따른 교육 이력 보관)': {
+    en: 'Education service: 5 years from completion date for training history retention under occupational safety and health law.',
+    th: 'บริการการศึกษา: 5 ปีนับจากวันที่สำเร็จการอบรม เพื่อเก็บประวัติการเรียนตามกฎหมายความปลอดภัยและอาชีวอนามัย',
+    bn: 'শিক্ষা সেবা: পেশাগত নিরাপত্তা ও স্বাস্থ্য আইনের অধীনে শিক্ষা ইতিহাস সংরক্ষণের জন্য সম্পন্ন তারিখ থেকে ৫ বছর।',
+  },
+  '회사는 다음의 개인정보 항목을 처리하고 있습니다.': {
+    en: 'The Company processes the following personal information.',
+    th: 'บริษัทประมวลผลข้อมูลส่วนบุคคลดังต่อไปนี้',
+    bn: 'কোম্পানি নিচের ব্যক্তিগত তথ্য প্রক্রিয়া করে।',
+  },
+  '필수항목: 휴대전화번호, 이름, 비밀번호': {
+    en: 'Required: mobile phone number, name, password',
+    th: 'ข้อมูลจำเป็น: หมายเลขโทรศัพท์มือถือ ชื่อ รหัสผ่าน',
+    bn: 'আবশ্যক: মোবাইল নম্বর, নাম, পাসওয়ার্ড',
+  },
+  '선택항목: 소속 회사명': {
+    en: 'Optional: company name',
+    th: 'ข้อมูลเพิ่มเติม: ชื่อบริษัท',
+    bn: 'ঐচ্ছিক: কোম্পানির নাম',
+  },
+  '자동 수집 항목: 서비스 이용 기록, 접속 로그, 접속 IP 정보, 학습 진도 정보': {
+    en: 'Automatically collected: service usage records, access logs, IP information, and learning progress.',
+    th: 'ข้อมูลที่เก็บอัตโนมัติ: ประวัติการใช้งาน บันทึกการเข้าถึง ข้อมูล IP และความคืบหน้าการเรียน',
+    bn: 'স্বয়ংক্রিয়ভাবে সংগৃহীত: সেবা ব্যবহারের রেকর্ড, অ্যাক্সেস লগ, IP তথ্য এবং শেখার অগ্রগতি।',
+  },
+  '개인정보 열람요구': { en: 'Request access to personal information', th: 'ขอเข้าถึงข้อมูลส่วนบุคคล', bn: 'ব্যক্তিগত তথ্য দেখার অনুরোধ' },
+  '오류 등이 있을 경우 정정 요구': { en: 'Request correction of errors', th: 'ขอแก้ไขเมื่อมีข้อผิดพลาด', bn: 'ভুল থাকলে সংশোধনের অনুরোধ' },
+  '삭제요구': { en: 'Request deletion', th: 'ขอลบข้อมูล', bn: 'মুছে ফেলার অনুরোধ' },
+  '처리정지 요구': { en: 'Request suspension of processing', th: 'ขอระงับการประมวลผล', bn: 'প্রক্রিয়াকরণ বন্ধের অনুরোধ' },
+  '전자적 파일 형태의 정보는 복구 및 재생이 불가능한 방법으로 영구 삭제': {
+    en: 'Electronic files are permanently deleted in a way that cannot be restored.',
+    th: 'ไฟล์อิเล็กทรอนิกส์จะถูกลบถาวรโดยไม่สามารถกู้คืนได้',
+    bn: 'ইলেকট্রনিক ফাইল পুনরুদ্ধার অযোগ্য পদ্ধতিতে স্থায়ীভাবে মুছে ফেলা হয়।',
+  },
+  '종이에 출력된 개인정보는 분쇄기로 분쇄하거나 소각하여 파기': {
+    en: 'Printed personal information is shredded or incinerated.',
+    th: 'ข้อมูลส่วนบุคคลที่พิมพ์บนกระดาษจะถูกทำลายด้วยเครื่องย่อยหรือเผาทำลาย',
+    bn: 'কাগজে মুদ্রিত ব্যক্তিগত তথ্য কুচি কুচি বা দাহ করে ধ্বংস করা হয়।',
+  },
+  '관리적 조치: 내부관리계획 수립·시행, 정기적 직원 교육': {
+    en: 'Administrative measures: internal management plans and regular employee training.',
+    th: 'มาตรการบริหาร: จัดทำและดำเนินแผนบริหารภายใน และอบรมพนักงานเป็นประจำ',
+    bn: 'প্রশাসনিক ব্যবস্থা: অভ্যন্তরীণ ব্যবস্থাপনা পরিকল্পনা ও নিয়মিত কর্মী প্রশিক্ষণ।',
+  },
+  '기술적 조치: 개인정보처리시스템 등의 접근권한 관리, 접근통제시스템 설치, 개인정보의 암호화, 보안프로그램 설치': {
+    en: 'Technical measures: access control, system protection, encryption, and security programs.',
+    th: 'มาตรการทางเทคนิค: จัดการสิทธิ์เข้าถึง ระบบควบคุมการเข้าถึง การเข้ารหัส และโปรแกรมรักษาความปลอดภัย',
+    bn: 'প্রযুক্তিগত ব্যবস্থা: অ্যাক্সেস নিয়ন্ত্রণ, সিস্টেম সুরক্ষা, এনক্রিপশন এবং নিরাপত্তা প্রোগ্রাম।',
+  },
+  '물리적 조치: 전산실, 자료보관실 등의 접근통제': {
+    en: 'Physical measures: access control for server rooms and document storage areas.',
+    th: 'มาตรการทางกายภาพ: ควบคุมการเข้าถึงห้องระบบและพื้นที่เก็บเอกสาร',
+    bn: 'ভৌত ব্যবস্থা: সার্ভার রুম ও নথি সংরক্ষণ স্থানে অ্যাক্সেস নিয়ন্ত্রণ।',
+  },
+  '연락처: 본 서비스 내 문의하기를 통해 연락': {
+    en: 'Contact: use the inquiry feature in this service',
+    th: 'ติดต่อ: ผ่านเมนูสอบถามภายในบริการนี้',
+    bn: 'যোগাযোগ: এই সেবার 문의 기능 ব্যবহার করুন',
+  },
+  '개인정보분쟁조정위원회: (국번없이) 1833-6972 (www.kopico.go.kr)': {
+    en: 'Personal Information Dispute Mediation Committee: 1833-6972 (www.kopico.go.kr)',
+    th: 'คณะกรรมการไกล่เกลี่ยข้อพิพาทข้อมูลส่วนบุคคล: 1833-6972 (www.kopico.go.kr)',
+    bn: 'ব্যক্তিগত তথ্য বিরোধ মধ্যস্থতা কমিটি: 1833-6972 (www.kopico.go.kr)',
+  },
+  '개인정보침해신고센터: (국번없이) 118 (privacy.kisa.or.kr)': {
+    en: 'Privacy Infringement Report Center: 118 (privacy.kisa.or.kr)',
+    th: 'ศูนย์รายงานการละเมิดข้อมูลส่วนบุคคล: 118 (privacy.kisa.or.kr)',
+    bn: 'গোপনীয়তা লঙ্ঘন রিপোর্ট কেন্দ্র: 118 (privacy.kisa.or.kr)',
+  },
+  '대검찰청: (국번없이) 1301 (www.spo.go.kr)': {
+    en: 'Supreme Prosecutors’ Office: 1301 (www.spo.go.kr)',
+    th: 'สำนักงานอัยการสูงสุด: 1301 (www.spo.go.kr)',
+    bn: 'সুপ্রিম প্রসিকিউটরস অফিস: 1301 (www.spo.go.kr)',
+  },
+  '경찰청: (국번없이) 182 (ecrm.cyber.go.kr)': {
+    en: 'National Police Agency: 182 (ecrm.cyber.go.kr)',
+    th: 'สำนักงานตำรวจแห่งชาติ: 182 (ecrm.cyber.go.kr)',
+    bn: 'জাতীয় পুলিশ সংস্থা: 182 (ecrm.cyber.go.kr)',
+  },
   '새 질문 작성': { en: 'New Question', th: 'เขียนคำถามใหม่', bn: 'নতুন প্রশ্ন' },
   '질문하기': { en: 'Ask Question', th: 'ถามคำถาม', bn: 'প্রশ্ন করুন' },
   '질문 등록': { en: 'Submit Question', th: 'ส่งคำถาม', bn: 'প্রশ্ন জমা দিন' },
@@ -924,6 +1033,310 @@ export const studentTextTranslations: Record<string, LocaleText> = {
     th: 'ส่งคำตอบไม่สำเร็จ',
     bn: 'উত্তর জমা দেওয়া যায়নি।',
   },
+  '다시 시도': { en: 'Try Again', th: 'ลองอีกครั้ง', bn: 'আবার চেষ্টা করুন' },
+  '다시 수강하기 요청에 실패했습니다.': {
+    en: 'Failed to request retake.',
+    th: 'ขอเรียนใหม่ไม่สำเร็จ',
+    bn: 'পুনরায় শেখার অনুরোধ ব্যর্থ হয়েছে।',
+  },
+  '3문항의 객관식 문제가 출제됩니다. 진도 20점 + 학습평가 80점으로 총점을 계산하며, 총점 70점 이상이면 이 강의를 수료할 수 있습니다.': {
+    en: 'There are 3 multiple-choice questions. The total score is progress 20 points plus assessment 80 points, and 70 or more completes this lesson.',
+    th: 'มีข้อสอบปรนัย 3 ข้อ คะแนนรวมคำนวณจากความคืบหน้า 20 คะแนน + แบบประเมิน 80 คะแนน และต้องได้ 70 คะแนนขึ้นไปจึงสำเร็จบทเรียนนี้',
+    bn: '৩টি বহুনির্বাচনী প্রশ্ন থাকবে। মোট স্কোর অগ্রগতি ২০ পয়েন্ট + মূল্যায়ন ৮০ পয়েন্ট, এবং ৭০ বা বেশি হলে এই লেসন সম্পন্ন হবে।',
+  },
+  '레슨 진도:': { en: 'Lesson progress:', th: 'ความคืบหน้าบทเรียน:', bn: 'লেসন অগ্রগতি:' },
+  '남은 응시 기회:': { en: 'Attempts left:', th: 'โอกาสสอบที่เหลือ:', bn: 'বাকি সুযোগ:' },
+  '최대 6회까지 응시 가능합니다': {
+    en: 'Up to 6 attempts are allowed',
+    th: 'สอบได้สูงสุด 6 ครั้ง',
+    bn: 'সর্বোচ্চ ৬ বার চেষ্টা করা যাবে',
+  },
+  '수료 기준: 진도율 90% 이상 + 총점 70점 이상': {
+    en: 'Completion: 90%+ progress and 70+ total score',
+    th: 'เกณฑ์สำเร็จ: ความคืบหน้า 90% ขึ้นไป + คะแนนรวม 70 คะแนนขึ้นไป',
+    bn: 'সম্পন্নের শর্ত: অগ্রগতি ৯০%+ এবং মোট স্কোর ৭০+',
+  },
+  '수료 완료 (총점 70점 이상)': {
+    en: 'Completed (total score 70+)',
+    th: 'สำเร็จแล้ว (คะแนนรวม 70 ขึ้นไป)',
+    bn: 'সম্পন্ন (মোট স্কোর ৭০+)',
+  },
+  '수료 기준 미달 (총점 70점 미만)': {
+    en: 'Below completion requirement (under 70 total)',
+    th: 'ไม่ผ่านเกณฑ์สำเร็จ (คะแนนรวมต่ำกว่า 70)',
+    bn: 'সম্পন্নের শর্ত পূরণ হয়নি (মোট স্কোর ৭০-এর কম)',
+  },
+  '진도율 (20%)': { en: 'Progress (20%)', th: 'ความคืบหน้า (20%)', bn: 'অগ্রগতি (২০%)' },
+  '시험 점수 (80%)': { en: 'Exam Score (80%)', th: 'คะแนนสอบ (80%)', bn: 'পরীক্ষার স্কোর (৮০%)' },
+  '진도 20점 + 평가 80점, 총점 70점 이상': {
+    en: 'Progress 20 + assessment 80, total 70 or more',
+    th: 'ความคืบหน้า 20 + แบบประเมิน 80, คะแนนรวม 70 ขึ้นไป',
+    bn: 'অগ্রগতি ২০ + মূল্যায়ন ৮০, মোট ৭০ বা বেশি',
+  },
+  '총점 70점 이상': { en: 'Total score 70+', th: 'คะแนนรวม 70 ขึ้นไป', bn: 'মোট স্কোর ৭০+' },
+  '총점 70점 미만': { en: 'Total score below 70', th: 'คะแนนรวมต่ำกว่า 70', bn: 'মোট স্কোর ৭০-এর কম' },
+  '회사': { en: 'Company', th: 'บริษัท', bn: 'কোম্পানি' },
+  '시험 응시 기회': { en: 'Exam Attempts', th: 'โอกาสสอบ', bn: 'পরীক্ষার সুযোগ' },
+  '학습하기': { en: 'Learn', th: 'เรียน', bn: 'শিখুন' },
+  '시험보기': { en: 'Take Exam', th: 'ทำแบบทดสอบ', bn: 'পরীক্ষা দিন' },
+  '만료': { en: 'Expired', th: 'หมดอายุ', bn: 'মেয়াদ শেষ' },
+  '진도 90% 이상 필요': {
+    en: '90%+ progress required',
+    th: 'ต้องมีความคืบหน้า 90% ขึ้นไป',
+    bn: '৯০%+ অগ্রগতি প্রয়োজন',
+  },
+  '응시 기회 없음': { en: 'No attempts left', th: 'ไม่มีโอกาสสอบเหลือ', bn: 'কোনো সুযোগ বাকি নেই' },
+  '잠긴 레슨': { en: 'Locked lesson', th: 'บทเรียนถูกล็อก', bn: 'লেসন লক করা' },
+  '잠금': { en: 'Locked', th: 'ล็อก', bn: 'লক' },
+  '시작 가능': { en: 'Available', th: 'เริ่มได้', bn: 'শুরু করা যাবে' },
+  '답을 선택해주세요': { en: 'Please select an answer', th: 'กรุณาเลือกคำตอบ', bn: 'উত্তর নির্বাচন করুন' },
+  '합격 완료': { en: 'Passed', th: 'ผ่านแล้ว', bn: 'পাস হয়েছে' },
+  '시험 시작하기': { en: 'Start Exam', th: 'เริ่มทำแบบทดสอบ', bn: 'পরীক্ষা শুরু করুন' },
+  '이미 합격한 시험입니다': {
+    en: 'You have already passed this exam',
+    th: 'คุณผ่านแบบทดสอบนี้แล้ว',
+    bn: 'আপনি ইতিমধ্যে এই পরীক্ষায় পাস করেছেন',
+  },
+  '진도가 90% 이상이어야 시험을 볼 수 있습니다': {
+    en: 'You need at least 90% progress to take the exam',
+    th: 'ต้องมีความคืบหน้าอย่างน้อย 90% จึงจะสอบได้',
+    bn: 'পরীক্ষা দিতে অন্তত ৯০% অগ্রগতি দরকার',
+  },
+  '시험을 시작합니다': { en: 'Start the exam', th: 'เริ่มทำแบบทดสอบ', bn: 'পরীক্ষা শুরু করুন' },
+  '시험 준비중...': { en: 'Preparing exam...', th: 'กำลังเตรียมสอบ...', bn: 'পরীক্ষা প্রস্তুত হচ্ছে...' },
+  '현재 진도': { en: 'Current Progress', th: 'ความคืบหน้าปัจจุบัน', bn: 'বর্তমান অগ্রগতি' },
+  '시험 정보': { en: 'Exam Information', th: 'ข้อมูลการสอบ', bn: 'পরীক্ষার তথ্য' },
+  '• 문항 수: 3문항 (객관식)': {
+    en: '• Questions: 3 multiple-choice questions',
+    th: '• จำนวนข้อ: 3 ข้อปรนัย',
+    bn: '• প্রশ্ন: ৩টি বহুনির্বাচনী প্রশ্ন',
+  },
+  '• 시험 시간: 제한 없음': {
+    en: '• Time limit: None',
+    th: '• เวลา: ไม่จำกัด',
+    bn: '• সময়সীমা: নেই',
+  },
+  '• 합격 기준: 70점 이상': {
+    en: '• Passing score: 70 or higher',
+    th: '• เกณฑ์ผ่าน: 70 คะแนนขึ้นไป',
+    bn: '• পাসের মান: ৭০ বা বেশি',
+  },
+  '• 응시 제한: 회차당 3회': {
+    en: '• Attempts: 3 per round',
+    th: '• จำกัดการสอบ: รอบละ 3 ครั้ง',
+    bn: '• চেষ্টা সীমা: প্রতি রাউন্ডে ৩ বার',
+  },
+  '재응시 준비중...': { en: 'Preparing retake...', th: 'กำลังเตรียมสอบใหม่...', bn: 'পুনরায় পরীক্ষা প্রস্তুত হচ্ছে...' },
+  '시험 응시': { en: 'Taking Exam', th: 'กำลังทำแบบทดสอบ', bn: 'পরীক্ষা চলছে' },
+  '시험 포기': { en: 'Give Up Exam', th: 'ยกเลิกการสอบ', bn: 'পরীক্ষা ছেড়ে দিন' },
+  '모든 문항에 답해주세요': {
+    en: 'Please answer every question',
+    th: 'กรุณาตอบทุกข้อ',
+    bn: 'সব প্রশ্নের উত্তর দিন',
+  },
+  '시험 결과': { en: 'Exam Result', th: 'ผลสอบ', bn: 'পরীক্ষার ফলাফল' },
+  '합격 기준: 70점 이상': {
+    en: 'Passing score: 70 or higher',
+    th: 'เกณฑ์ผ่าน: 70 คะแนนขึ้นไป',
+    bn: 'পাসের মান: ৭০ বা বেশি',
+  },
+  '축하합니다! 시험에 합격했습니다.': {
+    en: 'Congratulations! You passed the exam.',
+    th: 'ยินดีด้วย! คุณสอบผ่านแล้ว',
+    bn: 'অভিনন্দন! আপনি পরীক্ষায় পাস করেছেন।',
+  },
+  '다음 레슨을 학습할 수 있습니다.': {
+    en: 'You can study the next lesson.',
+    th: 'คุณสามารถเรียนบทเรียนถัดไปได้',
+    bn: 'আপনি পরবর্তী লেসন শিখতে পারবেন।',
+  },
+  '아쉽게도 불합격입니다.': {
+    en: 'Unfortunately, you did not pass.',
+    th: 'น่าเสียดาย คุณยังไม่ผ่าน',
+    bn: 'দুঃখিত, আপনি পাস করেননি।',
+  },
+  '다시 학습 후 재응시해보세요.': {
+    en: 'Review the lesson and try again.',
+    th: 'ทบทวนบทเรียนแล้วลองสอบอีกครั้ง',
+    bn: 'লেসন আবার দেখে পুনরায় পরীক্ষা দিন।',
+  },
+  '다시 시도하기': { en: 'Try Again', th: 'ลองอีกครั้ง', bn: 'আবার চেষ্টা করুন' },
+  '접근 권한이 없습니다': { en: 'No Access', th: 'ไม่มีสิทธิ์เข้าถึง', bn: 'প্রবেশাধিকার নেই' },
+  '이 과목은 회사 커리큘럼에 포함되지 않았습니다.': {
+    en: 'This subject is not included in your company curriculum.',
+    th: 'รายวิชานี้ไม่ได้อยู่ในหลักสูตรของบริษัทคุณ',
+    bn: 'এই বিষয়টি আপনার কোম্পানির কারিকুলামে নেই।',
+  },
+  '커리큘럼 확인': { en: 'Check Curriculum', th: 'ตรวจสอบหลักสูตร', bn: 'কারিকুলাম দেখুন' },
+  '비활성 레슨입니다': { en: 'Inactive Lesson', th: 'บทเรียนไม่เปิดใช้งาน', bn: 'নিষ্ক্রিয় লেসন' },
+  '이 레슨은 현재 회사에서 활성화되지 않았습니다.': {
+    en: 'This lesson is not active for your company.',
+    th: 'บทเรียนนี้ยังไม่เปิดใช้งานสำหรับบริษัทของคุณ',
+    bn: 'এই লেসনটি আপনার কোম্পানির জন্য সক্রিয় নয়।',
+  },
+  '관리자 문의': { en: 'Contact Admin', th: 'ติดต่อผู้ดูแลระบบ', bn: 'অ্যাডমিনের সাথে যোগাযোগ করুন' },
+  '진도가 부족합니다': { en: 'Progress Not Enough', th: 'ความคืบหน้ายังไม่พอ', bn: 'অগ্রগতি যথেষ্ট নয়' },
+  '시험을 보려면 레슨 진도가 90% 이상이어야 합니다.': {
+    en: 'Lesson progress must be at least 90% to take the exam.',
+    th: 'ต้องมีความคืบหน้าบทเรียนอย่างน้อย 90% จึงจะสอบได้',
+    bn: 'পরীক্ষা দিতে লেসনের অগ্রগতি অন্তত ৯০% হতে হবে।',
+  },
+  '학습 계속하기': { en: 'Continue Learning', th: 'เรียนต่อ', bn: 'শেখা চালিয়ে যান' },
+  '응시 횟수 초과': { en: 'Attempt Limit Reached', th: 'เกินจำนวนครั้งสอบ', bn: 'চেষ্টার সীমা শেষ' },
+  '이번 회차의 시험 응시 횟수를 모두 사용했습니다.': {
+    en: 'You have used all exam attempts for this round.',
+    th: 'คุณใช้โอกาสสอบของรอบนี้ครบแล้ว',
+    bn: 'এই রাউন্ডের সব পরীক্ষার সুযোগ ব্যবহার হয়েছে।',
+  },
+  '다음 레슨으로': { en: 'Next Lesson', th: 'บทเรียนถัดไป', bn: 'পরবর্তী লেসন' },
+  '답안이 올바르지 않습니다': { en: 'Invalid Answers', th: 'คำตอบไม่ถูกต้อง', bn: 'উত্তর সঠিক নয়' },
+  '진행 중인 시험이 있습니다': { en: 'Exam In Progress', th: 'มีแบบทดสอบที่กำลังทำอยู่', bn: 'একটি পরীক্ষা চলছে' },
+  '이전 시험을 완료하고 다시 시도해주세요.': {
+    en: 'Complete the previous exam and try again.',
+    th: 'กรุณาทำแบบทดสอบก่อนหน้าให้เสร็จแล้วลองอีกครั้ง',
+    bn: 'আগের পরীক্ষা শেষ করে আবার চেষ্টা করুন।',
+  },
+  '시험 계속하기': { en: 'Continue Exam', th: 'ทำแบบทดสอบต่อ', bn: 'পরীক্ষা চালিয়ে যান' },
+  '수강 기간이 아닙니다': { en: 'Outside Training Period', th: 'อยู่นอกช่วงเวลาเรียน', bn: 'শিক্ষার সময়কাল নয়' },
+  '현재 회사의 수강 기간에 해당하지 않습니다.': {
+    en: 'This is outside your company training period.',
+    th: 'ขณะนี้ไม่อยู่ในช่วงเวลาเรียนของบริษัท',
+    bn: 'এটি আপনার কোম্পানির শিক্ষার সময়কালের বাইরে।',
+  },
+  '문제은행 부족': { en: 'Not Enough Questions', th: 'คลังข้อสอบไม่พอ', bn: 'প্রশ্নব্যাংক যথেষ্ট নয়' },
+  '시험 출제를 위한 문제가 부족합니다.': {
+    en: 'There are not enough questions to create the exam.',
+    th: 'มีข้อสอบไม่พอสำหรับสร้างแบบทดสอบ',
+    bn: 'পরীক্ষা তৈরি করার মতো পর্যাপ্ত প্রশ্ন নেই।',
+  },
+  '중복 제출': { en: 'Duplicate Submission', th: 'ส่งซ้ำ', bn: 'ডুপ্লিকেট জমা' },
+  '이미 제출된 시험입니다.': {
+    en: 'This exam has already been submitted.',
+    th: 'แบบทดสอบนี้ถูกส่งแล้ว',
+    bn: 'এই পরীক্ষা ইতিমধ্যে জমা হয়েছে।',
+  },
+  '결과 확인': { en: 'Check Result', th: 'ดูผลลัพธ์', bn: 'ফলাফল দেখুন' },
+  '요청하신 레슨이 존재하지 않습니다.': {
+    en: 'The requested lesson does not exist.',
+    th: 'ไม่มีบทเรียนที่ร้องขอ',
+    bn: 'অনুরোধ করা লেসনটি নেই।',
+  },
+  '시험 기록을 찾을 수 없습니다': {
+    en: 'Exam record not found',
+    th: 'ไม่พบประวัติการสอบ',
+    bn: 'পরীক্ষার রেকর্ড পাওয়া যায়নি',
+  },
+  '해당 시험 기록이 존재하지 않습니다.': {
+    en: 'That exam record does not exist.',
+    th: 'ไม่มีประวัติการสอบดังกล่าว',
+    bn: 'ওই পরীক্ষার রেকর্ড নেই।',
+  },
+  '새로 시작하기': { en: 'Start New', th: 'เริ่มใหม่', bn: 'নতুন করে শুরু করুন' },
+  '이 기능을 사용하려면 로그인해주세요.': {
+    en: 'Please log in to use this feature.',
+    th: 'กรุณาเข้าสู่ระบบเพื่อใช้ฟีเจอร์นี้',
+    bn: 'এই ফিচার ব্যবহার করতে লগ ইন করুন।',
+  },
+  '세션이 만료되었습니다': { en: 'Session Expired', th: 'เซสชันหมดอายุ', bn: 'সেশন শেষ হয়েছে' },
+  '다시 로그인해주세요.': {
+    en: 'Please log in again.',
+    th: 'กรุณาเข้าสู่ระบบอีกครั้ง',
+    bn: 'আবার লগ ইন করুন।',
+  },
+  '잘못된 요청': { en: 'Bad Request', th: 'คำขอไม่ถูกต้อง', bn: 'ভুল অনুরোধ' },
+  '요청 내용을 확인해주세요.': {
+    en: 'Please check your request.',
+    th: 'กรุณาตรวจสอบคำขอ',
+    bn: 'আপনার অনুরোধ পরীক্ষা করুন।',
+  },
+  '인증이 필요합니다': { en: 'Authentication Required', th: 'ต้องยืนยันตัวตน', bn: 'প্রমাণীকরণ প্রয়োজন' },
+  '로그인 후 이용해주세요.': {
+    en: 'Please log in first.',
+    th: 'กรุณาเข้าสู่ระบบก่อน',
+    bn: 'আগে লগ ইন করুন।',
+  },
+  '이 기능에 대한 권한이 없습니다.': {
+    en: 'You do not have permission for this feature.',
+    th: 'คุณไม่มีสิทธิ์ใช้ฟีเจอร์นี้',
+    bn: 'এই ফিচারের জন্য আপনার অনুমতি নেই।',
+  },
+  '페이지를 찾을 수 없습니다': { en: 'Page Not Found', th: 'ไม่พบหน้า', bn: 'পেজ পাওয়া যায়নি' },
+  '요청하신 페이지가 존재하지 않습니다.': {
+    en: 'The requested page does not exist.',
+    th: 'ไม่มีหน้าที่ร้องขอ',
+    bn: 'অনুরোধ করা পেজটি নেই।',
+  },
+  '홈으로': { en: 'Home', th: 'หน้าแรก', bn: 'হোম' },
+  '서버 오류': { en: 'Server Error', th: 'ข้อผิดพลาดเซิร์ฟเวอร์', bn: 'সার্ভার ত্রুটি' },
+  '일시적인 오류가 발생했습니다.': {
+    en: 'A temporary error occurred.',
+    th: 'เกิดข้อผิดพลาดชั่วคราว',
+    bn: 'একটি সাময়িক ত্রুটি হয়েছে।',
+  },
+  '서비스 이용 불가': { en: 'Service Unavailable', th: 'ไม่สามารถใช้บริการได้', bn: 'সেবা উপলভ্য নয়' },
+  '서버가 일시적으로 사용할 수 없습니다.': {
+    en: 'The server is temporarily unavailable.',
+    th: 'เซิร์ฟเวอร์ไม่พร้อมใช้งานชั่วคราว',
+    bn: 'সার্ভার সাময়িকভাবে উপলভ্য নয়।',
+  },
+  '잠시 후 다시 시도': { en: 'Try Again Later', th: 'ลองใหม่ภายหลัง', bn: 'পরে আবার চেষ্টা করুন' },
+  '오류가 발생했습니다': { en: 'An Error Occurred', th: 'เกิดข้อผิดพลาด', bn: 'একটি ত্রুটি ঘটেছে' },
+  '네트워크 연결을 확인해주세요.': {
+    en: 'Please check your network connection.',
+    th: 'กรุณาตรวจสอบการเชื่อมต่อเครือข่าย',
+    bn: 'আপনার নেটওয়ার্ক সংযোগ পরীক্ষা করুন।',
+  },
+  '회사는 정보주체의 개인정보를 제1조(개인정보의 처리 목적)에서 명시한 범위 내에서만 처리하며, 정보주체의 동의, 법률의 특별한 규정 등 개인정보보호법 제17조 및 제18조에 해당하는 경우에만 개인정보를 제3자에게 제공합니다.': {
+    en: 'The company processes personal information only within the scope stated in Article 1 and provides it to third parties only with consent or when allowed by law.',
+    th: 'บริษัทจะประมวลผลข้อมูลส่วนบุคคลเฉพาะภายในขอบเขตที่ระบุในข้อ 1 และจะให้ข้อมูลแก่บุคคลที่สามเฉพาะเมื่อได้รับความยินยอมหรือมีกฎหมายรองรับ',
+    bn: 'কোম্পানি ধারা ১-এ উল্লেখিত 범위의 মধ্যে ব্যক্তিগত তথ্য 처리 করে এবং সম্মতি বা আইনগত ভিত্তি থাকলেই তৃতীয় পক্ষকে 제공 করে।',
+  },
+  '회사는 원활한 개인정보 업무처리를 위하여 개인정보 처리업무를 위탁할 수 있으며, 위탁하는 경우 위탁받는 자와 위탁업무 내용을 홈페이지에 공개합니다.': {
+    en: 'The company may outsource personal information processing and will disclose the recipient and outsourced work on the website.',
+    th: 'บริษัทอาจมอบหมายงานประมวลผลข้อมูลส่วนบุคคล และจะเปิดเผยผู้รับมอบหมายและรายละเอียดงานบนเว็บไซต์',
+    bn: 'ব্যক্তিগত তথ্য 처리 업무 কোম্পানি আউটসোর্স করতে পারে এবং গ্রহীতা ও 업무 내용 ওয়েবসাইটে প্রকাশ করবে।',
+  },
+  '정보주체는 회사에 대해 언제든지 다음 각 호의 개인정보 보호 관련 권리를 행사할 수 있습니다.': {
+    en: 'Data subjects may exercise the following personal information rights at any time.',
+    th: 'เจ้าของข้อมูลสามารถใช้สิทธิ์เกี่ยวกับข้อมูลส่วนบุคคลต่อบริษัทได้ตลอดเวลา',
+    bn: 'তথ্য主体 যে কোনো সময় নিম্নলিখিত ব্যক্তিগত তথ্য অধিকার ব্যবহার করতে পারেন।',
+  },
+  '회사는 개인정보 보유기간의 경과, 처리목적 달성 등 개인정보가 불필요하게 되었을 때에는 지체없이 해당 개인정보를 파기합니다.': {
+    en: 'When personal information is no longer needed, such as when the retention period ends or the purpose is achieved, the company destroys it without delay.',
+    th: 'เมื่อข้อมูลส่วนบุคคลไม่จำเป็นแล้ว เช่น ครบกำหนดเก็บรักษาหรือบรรลุวัตถุประสงค์ บริษัทจะทำลายข้อมูลโดยไม่ล่าช้า',
+    bn: 'ধারণ সময় শেষ বা উদ্দেশ্য পূরণ হয়ে তথ্য অপ্রয়োজনীয় হলে কোম্পানি বিলম্ব না করে তা ধ্বংস করে।',
+  },
+  '회사는 개인정보의 안전성 확보를 위해 다음과 같은 조치를 취하고 있습니다.': {
+    en: 'The company takes the following measures to secure personal information.',
+    th: 'บริษัทดำเนินมาตรการต่อไปนี้เพื่อรักษาความปลอดภัยของข้อมูลส่วนบุคคล',
+    bn: 'ব্যক্তিগত তথ্যের নিরাপত্তার জন্য কোম্পানি নিম্নলিখিত ব্যবস্থা গ্রহণ করে।',
+  },
+  '회사는 개인정보 처리에 관한 업무를 총괄해서 책임지고, 개인정보 처리와 관련한 정보주체의 불만처리 및 피해구제 등을 위하여 아래와 같이 개인정보 보호책임자를 지정하고 있습니다.': {
+    en: 'The company designates a personal information protection officer responsible for personal information processing, complaints, and remedies.',
+    th: 'บริษัทแต่งตั้งผู้รับผิดชอบคุ้มครองข้อมูลส่วนบุคคลเพื่อดูแลงานประมวลผลข้อมูล การร้องเรียน และการเยียวยา',
+    bn: 'ব্যক্তিগত তথ্য 처리, অভিযোগ এবং 피해 구제를 위해 কোম্পানি একজন ব্যক্তিগত তথ্য সুরক্ষা দায়িত্বপ্রাপ্ত ব্যক্তি 지정 করে।',
+  },
+  '개인정보 보호책임자': { en: 'Personal Information Protection Officer', th: 'ผู้รับผิดชอบคุ้มครองข้อมูลส่วนบุคคล', bn: 'ব্যক্তিগত তথ্য সুরক্ষা কর্মকর্তা' },
+  '성명: 정의석': { en: 'Name: Jeong Ui-seok', th: 'ชื่อ: Jeong Ui-seok', bn: 'নাম: Jeong Ui-seok' },
+  '직책: 대표이사': { en: 'Position: CEO', th: 'ตำแหน่ง: CEO', bn: 'পদ: CEO' },
+  '정보주체는 개인정보보호법 제35조에 따른 개인정보의 열람 청구를 회사에 할 수 있습니다.': {
+    en: 'Data subjects may request access to personal information under Article 35 of the Personal Information Protection Act.',
+    th: 'เจ้าของข้อมูลสามารถขอเข้าถึงข้อมูลส่วนบุคคลตามมาตรา 35 ของกฎหมายคุ้มครองข้อมูลส่วนบุคคลได้',
+    bn: 'তথ্য主体 ব্যক্তিগত তথ্য 보호법ের ৩৫ ধারা অনুযায়ী তথ্য閲覧 অনুরোধ করতে পারেন।',
+  },
+  '정보주체는 아래의 기관에 대해 개인정보 침해에 대한 피해구제, 상담 등을 문의하실 수 있습니다.': {
+    en: 'For remedies or counseling on privacy infringement, data subjects may contact the organizations below.',
+    th: 'หากต้องการขอคำปรึกษาหรือความช่วยเหลือเกี่ยวกับการละเมิดข้อมูลส่วนบุคคล สามารถติดต่อหน่วยงานด้านล่าง',
+    bn: 'গোপনীয়তা 침해 관련 সহায়তা বা 상담ের জন্য নিচের সংস্থাগুলিতে যোগাযোগ করা যায়।',
+  },
+  '이 개인정보 처리방침은 2025년 1월 1일부터 적용됩니다. 이전의 개인정보 처리방침은 본 방침으로 대체됩니다.': {
+    en: 'This privacy policy applies from January 1, 2025. Previous policies are replaced by this policy.',
+    th: 'นโยบายนี้มีผลตั้งแต่วันที่ 1 มกราคม 2025 และแทนนโยบายก่อนหน้า',
+    bn: 'এই গোপনীয়তা নীতি ২০২৫ সালের ১ জানুয়ারি থেকে প্রযোজ্য। আগের নীতিগুলি এর দ্বারা প্রতিস্থাপিত।',
+  },
+  '🎉 합격!': { en: '🎉 Passed!', th: '🎉 ผ่าน!', bn: '🎉 পাস!' },
+  '❌ 불합격': { en: '❌ Not passed', th: '❌ ไม่ผ่าน', bn: '❌ পাস হয়নি' },
+  '⚠️ 답을 선택해주세요': { en: '⚠️ Please select an answer', th: '⚠️ กรุณาเลือกคำตอบ', bn: '⚠️ উত্তর নির্বাচন করুন' },
 };
 
 export const studentAttributeTranslations: Record<string, LocaleText> = {
@@ -1036,14 +1449,54 @@ function translateDynamicStudentText(text: string, locale: Locale): string | nul
     return pick(locale, `${questions[1]} questions`, `${questions[1]} ข้อ`, `${questions[1]}টি প্রশ্ন`);
   }
 
+  const minutes = text.match(/^(\d+)분$/);
+  if (minutes) {
+    return pick(locale, `${minutes[1]} min`, `${minutes[1]} นาที`, `${minutes[1]} মিনিট`);
+  }
+
+  const triesLeft = text.match(/^(\d+)회 남음$/);
+  if (triesLeft) {
+    return pick(locale, `${triesLeft[1]} attempts left`, `เหลือ ${triesLeft[1]} ครั้ง`, `${triesLeft[1]} বার বাকি`);
+  }
+
+  const daysLeft = text.match(/^(\d+)일 남음$/);
+  if (daysLeft) {
+    return pick(locale, `${daysLeft[1]} days left`, `เหลือ ${daysLeft[1]} วัน`, `${daysLeft[1]} দিন বাকি`);
+  }
+
   const questionItems = text.match(/^(\d+)문항$/);
   if (questionItems) {
     return pick(locale, `${questionItems[1]} questions`, `${questionItems[1]} ข้อ`, `${questionItems[1]}টি প্রশ্ন`);
   }
 
+  const questionNumber = text.match(/^문제 (\d+)$/);
+  if (questionNumber) {
+    return pick(locale, `Question ${questionNumber[1]}`, `ข้อ ${questionNumber[1]}`, `প্রশ্ন ${questionNumber[1]}`);
+  }
+
+  const questionNumberTotal = text.match(/^문제 (\d+) \/ (\d+)$/);
+  if (questionNumberTotal) {
+    return pick(locale, `Question ${questionNumberTotal[1]} / ${questionNumberTotal[2]}`, `ข้อ ${questionNumberTotal[1]} / ${questionNumberTotal[2]}`, `প্রশ্ন ${questionNumberTotal[1]} / ${questionNumberTotal[2]}`);
+  }
+
   const progress = text.match(/^진도율 (\d+)%$/);
   if (progress) {
     return pick(locale, `Progress ${progress[1]}%`, `ความคืบหน้า ${progress[1]}%`, `অগ্রগতি ${progress[1]}%`);
+  }
+
+  const progressNeed = text.match(/^진도 ([\d.]+)% \(90% 필요\)$/);
+  if (progressNeed) {
+    return pick(locale, `Progress ${progressNeed[1]}% (90% required)`, `ความคืบหน้า ${progressNeed[1]}% (ต้อง 90%)`, `অগ্রগতি ${progressNeed[1]}% (৯০% প্রয়োজন)`);
+  }
+
+  const lessonProgress = text.match(/^레슨 진도: (\d+)%$/);
+  if (lessonProgress) {
+    return pick(locale, `Lesson progress: ${lessonProgress[1]}%`, `ความคืบหน้าบทเรียน: ${lessonProgress[1]}%`, `লেসন অগ্রগতি: ${lessonProgress[1]}%`);
+  }
+
+  const lessonAttempts = text.match(/^남은 응시 기회: (\d+)회 \(최대 6회까지 응시 가능합니다\)$/);
+  if (lessonAttempts) {
+    return pick(locale, `Attempts left: ${lessonAttempts[1]} (up to 6 attempts)`, `โอกาสสอบที่เหลือ: ${lessonAttempts[1]} ครั้ง (สูงสุด 6 ครั้ง)`, `বাকি সুযোগ: ${lessonAttempts[1]} বার (সর্বোচ্চ ৬ বার)`);
   }
 
   const lesson = text.match(/^레슨 (.+)$/);
@@ -1056,6 +1509,16 @@ function translateDynamicStudentText(text: string, locale: Locale): string | nul
     return pick(locale, `${examTitle[1]} Exam`, `แบบทดสอบ ${examTitle[1]}`, `${examTitle[1]} পরীক্ষা`);
   }
 
+  const legacyExamTitle = text.match(/^(.+) - 시험$/);
+  if (legacyExamTitle) {
+    return pick(locale, `${legacyExamTitle[1]} - Exam`, `${legacyExamTitle[1]} - แบบทดสอบ`, `${legacyExamTitle[1]} - পরীক্ষা`);
+  }
+
+  const legacyTakingTitle = text.match(/^(.+) - 시험 응시$/);
+  if (legacyTakingTitle) {
+    return pick(locale, `${legacyTakingTitle[1]} - Taking Exam`, `${legacyTakingTitle[1]} - กำลังทำแบบทดสอบ`, `${legacyTakingTitle[1]} - পরীক্ষা চলছে`);
+  }
+
   const examTry = text.match(/^시험 보기 \((\d+)\/3회 남음\)$/);
   if (examTry) {
     return pick(locale, `Take Exam (${examTry[1]}/3 left)`, `ทำแบบทดสอบ (เหลือ ${examTry[1]}/3)`, `পরীক্ষা দিন (${examTry[1]}/৩ বাকি)`);
@@ -1066,9 +1529,19 @@ function translateDynamicStudentText(text: string, locale: Locale): string | nul
     return pick(locale, `${questionProgress[1]} / ${questionProgress[2]} questions`, `${questionProgress[1]} / ${questionProgress[2]} ข้อ`, `${questionProgress[1]} / ${questionProgress[2]} প্রশ্ন`);
   }
 
+  const spacedAnswered = text.match(/^(\d+) \/ (\d+) 문항 완료$/);
+  if (spacedAnswered) {
+    return pick(locale, `${spacedAnswered[1]} / ${spacedAnswered[2]} answered`, `ตอบแล้ว ${spacedAnswered[1]} / ${spacedAnswered[2]} ข้อ`, `${spacedAnswered[1]} / ${spacedAnswered[2]} উত্তর দেওয়া হয়েছে`);
+  }
+
   const answered = text.match(/^(\d+)\/(\d+) 문항 완료$/);
   if (answered) {
     return pick(locale, `${answered[1]}/${answered[2]} answered`, `ตอบแล้ว ${answered[1]}/${answered[2]} ข้อ`, `${answered[1]}/${answered[2]} উত্তর দেওয়া হয়েছে`);
+  }
+
+  const submitProgress = text.match(/^시험 제출 \((\d+)\/(\d+)\)$/);
+  if (submitProgress) {
+    return pick(locale, `Submit Exam (${submitProgress[1]}/${submitProgress[2]})`, `ส่งแบบทดสอบ (${submitProgress[1]}/${submitProgress[2]})`, `পরীক্ষা জমা দিন (${submitProgress[1]}/${submitProgress[2]})`);
   }
 
   const resendSeconds = text.match(/^인증번호 재전송 \((\d+)초\)$/);

@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { useLocale } from '../../src/i18n/client';
+import { translateStudentAttribute, translateStudentText } from '../../src/i18n/studentTranslations';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
@@ -19,6 +21,9 @@ async function readErrorMessage(res: Response, fallback: string) {
 
 export default function ResetPasswordPage() {
   const router = useRouter();
+  const { locale } = useLocale();
+  const t = (source: string) => translateStudentText(source, locale);
+  const ta = (source: string) => translateStudentAttribute(source, locale);
 
   // 단계 상태
   const [step, setStep] = useState<Step>('phone');
@@ -239,23 +244,23 @@ export default function ResetPasswordPage() {
           <>
             <div className="text-center mb-8">
               <h1 className="text-[24px] font-bold text-text-primary mb-2">
-                비밀번호 찾기
+                {t('비밀번호 찾기')}
               </h1>
               <p className="text-sm text-text-secondary">
-                가입 시 등록한 휴대폰 번호를 입력해주세요.
+                {t('가입 시 등록한 휴대폰 번호를 입력해주세요.')}
               </p>
             </div>
 
             {phoneError && (
               <div className="mb-4 p-3 bg-error-bg border border-error rounded-lg text-error text-sm font-semibold">
-                {phoneError}
+                {t(phoneError)}
               </div>
             )}
 
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-semibold text-text-primary">
-                  휴대폰 번호
+                  {t('휴대폰 번호')}
                 </label>
                 <input
                   type="tel"
@@ -281,10 +286,10 @@ export default function ResetPasswordPage() {
                 {phoneSending ? (
                   <span className="inline-flex items-center gap-2">
                     <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    전송 중...
+                    {t('전송 중...')}
                   </span>
                 ) : (
-                  '인증번호 받기'
+                  t('인증번호 받기')
                 )}
               </button>
             </div>
@@ -295,7 +300,7 @@ export default function ResetPasswordPage() {
                 onClick={() => router.push('/login')}
                 className="text-sm text-text-secondary hover:text-primary-600 transition-colors"
               >
-                로그인으로 돌아가기
+                {t('로그인으로 돌아가기')}
               </button>
             </div>
           </>
@@ -306,17 +311,17 @@ export default function ResetPasswordPage() {
           <>
             <div className="text-center mb-8">
               <h1 className="text-[24px] font-bold text-text-primary mb-2">
-                인증번호 입력
+                {t('인증번호 입력')}
               </h1>
               <p className="text-sm text-text-secondary">
                 <span className="font-semibold text-text-primary">{phone}</span>
-                으로 전송된 6자리 인증번호를 입력해주세요.
+                {t('으로 전송된 6자리 인증번호를 입력해주세요')}
               </p>
             </div>
 
             {otpError && (
               <div className="mb-4 p-3 bg-error-bg border border-error rounded-lg text-error text-sm font-semibold">
-                {otpError}
+                {t(otpError)}
               </div>
             )}
 
@@ -350,10 +355,10 @@ export default function ResetPasswordPage() {
               {otpVerifying ? (
                 <span className="inline-flex items-center gap-2">
                   <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  확인 중...
+                  {t('확인 중...')}
                 </span>
               ) : (
-                '인증 확인'
+                t('인증 확인')
               )}
             </button>
 
@@ -365,8 +370,8 @@ export default function ResetPasswordPage() {
                 className="text-sm text-text-secondary hover:text-primary-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {resendCooldown > 0
-                  ? `인증번호 재전송 (${resendCooldown}초)`
-                  : '인증번호 재전송'}
+                  ? t(`인증번호 재전송 (${resendCooldown}초)`)
+                  : t('인증번호 재전송')}
               </button>
             </div>
           </>
@@ -377,23 +382,23 @@ export default function ResetPasswordPage() {
           <>
             <div className="text-center mb-8">
               <h1 className="text-[24px] font-bold text-text-primary mb-2">
-                새 비밀번호 설정
+                {t('새 비밀번호 설정')}
               </h1>
               <p className="text-sm text-text-secondary">
-                새로운 비밀번호를 입력해주세요.
+                {t('새로운 비밀번호를 입력해주세요.')}
               </p>
             </div>
 
             {passwordError && (
               <div className="mb-4 p-3 bg-error-bg border border-error rounded-lg text-error text-sm font-semibold">
-                {passwordError}
+                {t(passwordError)}
               </div>
             )}
 
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-semibold text-text-primary">
-                  새 비밀번호
+                  {t('새 비밀번호')}
                 </label>
                 <input
                   type="password"
@@ -402,7 +407,7 @@ export default function ResetPasswordPage() {
                     setNewPassword(e.target.value);
                     setPasswordError('');
                   }}
-                  placeholder="8자 이상, 대/소문자/숫자/특수문자 포함"
+                  placeholder={ta('8자 이상, 대/소문자/숫자/특수문자 포함')}
                   className="w-full h-12 px-4 bg-bg-primary border-2 border-border rounded-lg text-base text-text-primary placeholder:text-text-tertiary transition-all focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20"
                   disabled={resetting}
                 />
@@ -410,7 +415,7 @@ export default function ResetPasswordPage() {
 
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-semibold text-text-primary">
-                  비밀번호 확인
+                  {t('비밀번호 확인')}
                 </label>
                 <input
                   type="password"
@@ -419,7 +424,7 @@ export default function ResetPasswordPage() {
                     setConfirmPassword(e.target.value);
                     setPasswordError('');
                   }}
-                  placeholder="비밀번호를 다시 입력해주세요"
+                  placeholder={ta('비밀번호를 다시 입력해주세요')}
                   className="w-full h-12 px-4 bg-bg-primary border-2 border-border rounded-lg text-base text-text-primary placeholder:text-text-tertiary transition-all focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20"
                   disabled={resetting}
                   onKeyDown={(e) => e.key === 'Enter' && handleResetPassword()}
@@ -427,12 +432,12 @@ export default function ResetPasswordPage() {
               </div>
 
               <div className="text-xs text-text-tertiary space-y-1">
-                <p>비밀번호 규칙:</p>
+                <p>{t('비밀번호 규칙:')}</p>
                 <ul className="list-disc list-inside space-y-0.5">
-                  <li>최소 8자 이상</li>
-                  <li>대문자, 소문자 각 1개 이상</li>
-                  <li>숫자 1개 이상</li>
-                  <li>특수문자 1개 이상</li>
+                  <li>{t('최소 8자 이상')}</li>
+                  <li>{t('대문자, 소문자 각 1개 이상')}</li>
+                  <li>{t('숫자 1개 이상')}</li>
+                  <li>{t('특수문자 1개 이상')}</li>
                 </ul>
               </div>
 
@@ -445,10 +450,10 @@ export default function ResetPasswordPage() {
                 {resetting ? (
                   <span className="inline-flex items-center gap-2">
                     <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    변경 중...
+                    {t('변경 중...')}
                   </span>
                 ) : (
-                  '비밀번호 변경'
+                  t('비밀번호 변경')
                 )}
               </button>
             </div>
@@ -461,10 +466,10 @@ export default function ResetPasswordPage() {
             <div className="text-center mb-8">
               <div className="text-5xl mb-4">✅</div>
               <h1 className="text-[24px] font-bold text-text-primary mb-2">
-                비밀번호 변경 완료
+                {t('비밀번호 변경 완료')}
               </h1>
               <p className="text-sm text-text-secondary">
-                새 비밀번호로 로그인해주세요.
+                {t('새 비밀번호로 로그인해주세요.')}
               </p>
             </div>
 
@@ -473,7 +478,7 @@ export default function ResetPasswordPage() {
               onClick={() => router.push('/login')}
               className="w-full h-12 bg-primary-600 text-white rounded-lg text-base font-semibold transition-all hover:bg-primary active:bg-primary-700"
             >
-              로그인하러 가기
+              {t('로그인하러 가기')}
             </button>
           </>
         )}

@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import StepPhone from './StepPhone';
 import StepAccount from './StepAccount';
 import StepDone from './StepDone';
+import { useLocale } from '../../src/i18n/client';
+import { translateStudentText } from '../../src/i18n/studentTranslations';
 
 export type SignupStep = 'phone' | 'account' | 'done';
 
@@ -20,6 +22,8 @@ export default function SignupPage() {
   const [currentStep, setCurrentStep] = useState<SignupStep>('phone');
   const [signupData, setSignupData] = useState<Partial<SignupData>>({});
   const router = useRouter();
+  const { locale } = useLocale();
+  const t = (source: string) => translateStudentText(source, locale);
 
   const handleStepComplete = (stepData: Partial<SignupData>) => {
     setSignupData(prev => ({ ...prev, ...stepData }));
@@ -65,8 +69,8 @@ export default function SignupPage() {
       <div className="w-full max-w-[520px] bg-surface border border-border rounded-xl overflow-hidden">
         {/* Header */}
         <div className="text-center px-10 py-10 pb-5 bg-surface border-b border-border">
-          <h1 className="text-[32px] font-bold text-text-primary mb-3">회원가입</h1>
-          <p className="text-base text-text-secondary font-medium">교육 플랫폼에서 학습을 시작하세요</p>
+          <h1 className="text-[32px] font-bold text-text-primary mb-3">{t('회원가입')}</h1>
+          <p className="text-base text-text-secondary font-medium">{t('교육 플랫폼에서 학습을 시작하세요')}</p>
           
           {/* Step Indicator */}
           <div className="flex justify-center items-center gap-3 mt-5">
@@ -133,13 +137,13 @@ export default function SignupPage() {
         
         {/* Login Section */}
         <div className="px-10 py-5 text-center bg-bg-primary border-t border-border rounded-b-xl">
-          <p className="text-sm text-text-secondary font-medium mb-3">이미 계정이 있으신가요?</p>
+          <p className="text-sm text-text-secondary font-medium mb-3">{t('이미 계정이 있으신가요?')}</p>
           <button
             type="button"
             onClick={() => router.push('/login')}
             className="bg-transparent border-2 border-primary text-primary px-6 py-2.5 rounded-md text-sm font-semibold transition-all hover:bg-primary hover:text-white hover:-translate-y-0.5"
           >
-            로그인
+            {t('로그인')}
           </button>
         </div>
       </div>

@@ -7,6 +7,8 @@ import { useRouter } from 'next/navigation';
 import { useAuthGuard } from '../hooks/useAuthGuard';
 import { authClient } from '../../lib/auth';
 import { getErrorMessage } from '../../src/utils/errorMap';
+import { useLocale } from '../../src/i18n/client';
+import { translateStudentText } from '../../src/i18n/studentTranslations';
 
 interface Lesson {
   id: string;
@@ -41,10 +43,13 @@ interface CurriculumItem {
 export default function CurriculumPage() {
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading, logout } = useAuthGuard();
+  const { locale } = useLocale();
   const [curriculumData, setCurriculumData] = useState<CurriculumItem[]>([]);
   const [companyPeriod, setCompanyPeriod] = useState<{ startDate: string; endDate: string; remainingDays: number } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<any>(null);
+  const t = (source: string) => translateStudentText(source, locale);
+  const dateLocale = locale === 'ko' ? 'ko-KR' : locale === 'th' ? 'th-TH' : locale === 'bn' ? 'bn-BD' : 'en-US';
 
   const loadCurriculum = async () => {
     try {
@@ -91,7 +96,7 @@ export default function CurriculumPage() {
 
   const handleStartExam = async (subject: Subject) => {
     if (!subject.canTakeExam) {
-      alert('시험 응시 조건을 만족하지 않습니다.');
+      alert(t('시험 응시 조건을 만족하지 않습니다.'));
       return;
     }
 
@@ -100,11 +105,11 @@ export default function CurriculumPage() {
 
   const handleRestart = async (subject: Subject) => {
     if (!subject.canRestart) {
-      alert('다시 수강하기 조건을 만족하지 않습니다.');
+      alert(t('다시 수강하기 조건을 만족하지 않습니다.'));
       return;
     }
 
-    if (!confirm('모든 강의 진도가 0%로 초기화됩니다. 계속하시겠습니까?')) {
+    if (!confirm(t('모든 강의 진도가 0%로 초기화됩니다. 계속하시겠습니까?'))) {
       return;
     }
 
@@ -120,14 +125,14 @@ export default function CurriculumPage() {
       });
 
       if (!response.ok) {
-        throw new Error('다시 수강하기 요청에 실패했습니다.');
+        throw new Error(t('다시 수강하기 요청에 실패했습니다.'));
       }
 
-      alert('다시 수강하기가 완료되었습니다. 모든 강의를 처음부터 다시 수강해주세요.');
+      alert(t('다시 수강하기가 완료되었습니다. 모든 강의를 처음부터 다시 수강해주세요.'));
       loadCurriculum(); // 새로고침
     } catch (err) {
       console.error('Restart failed:', err);
-      alert('다시 수강하기 요청 중 오류가 발생했습니다.');
+      alert(t('다시 수강하기 요청 중 오류가 발생했습니다.'));
     }
   };
 
@@ -168,7 +173,7 @@ export default function CurriculumPage() {
     return (
       <div className="min-h-screen bg-bg-primary px-6 py-8">
         <div className="flex justify-center items-center min-h-[400px]">
-          <div className="text-text-secondary">인증 확인 중...</div>
+          <div className="text-text-secondary">{t('인증 확인 중...')}</div>
         </div>
       </div>
     );
@@ -183,7 +188,7 @@ export default function CurriculumPage() {
     return (
       <div className="min-h-screen bg-bg-primary px-6 py-8">
         <div className="flex justify-center items-center min-h-[400px]">
-          <div className="text-text-secondary">로딩 중...</div>
+          <div className="text-text-secondary">{t('로딩 중...')}</div>
         </div>
       </div>
     );
@@ -195,16 +200,16 @@ export default function CurriculumPage() {
       <div className="min-h-screen bg-bg-primary px-6 py-8">
         <div className="flex justify-center items-center min-h-[400px]">
           <div className="bg-surface border border-error rounded-xl p-10 text-center max-w-md w-full">
-            <h3 className="text-xl font-bold text-error mb-3">{errorMessage.title}</h3>
+            <h3 className="text-xl font-bold text-error mb-3">{t(errorMessage.title)}</h3>
             <p className="text-base text-text-secondary mb-6 leading-relaxed">
-              {errorMessage.description}
+              {t(errorMessage.description)}
             </p>
             {errorMessage.actionLabel && (
               <button 
                 className="bg-error text-white px-6 py-3 rounded-md text-sm font-semibold hover:bg-error/90 transition-colors"
                 onClick={() => window.location.reload()}
               >
-                {errorMessage.actionLabel}
+                {t(errorMessage.actionLabel)}
               </button>
             )}
           </div>
@@ -218,9 +223,9 @@ export default function CurriculumPage() {
       <div className="min-h-screen bg-bg-primary px-6 py-8">
         <div className="flex justify-center items-center min-h-[400px]">
           <div className="bg-surface border border-border rounded-xl p-10 text-center max-w-md w-full">
-            <h3 className="text-xl font-bold text-text-primary mb-3">등록된 과목이 없습니다</h3>
+            <h3 className="text-xl font-bold text-text-primary mb-3">{t('등록된 과목이 없습니다')}</h3>
             <p className="text-base text-text-secondary leading-relaxed">
-              관리자에게 커리큘럼 등록을 요청해주세요.
+              {t('관리자에게 커리큘럼 등록을 요청해주세요.')}
             </p>
           </div>
         </div>
@@ -234,22 +239,22 @@ export default function CurriculumPage() {
         {/* 수강 기간 정보 */}
         {companyPeriod && (
           <div className="bg-surface border border-border rounded-xl p-6 mb-8">
-            <h2 className="text-xl font-bold text-text-primary mb-4">📅 수강 기간</h2>
+            <h2 className="text-xl font-bold text-text-primary mb-4">📅 {t('수강 기간')}</h2>
             <div className="flex flex-col md:flex-row md:items-center gap-4">
               <div className="flex items-center gap-2 text-text-secondary">
-                <span className="font-semibold">시작일:</span>
-                <span>{companyPeriod.startDate ? new Date(companyPeriod.startDate).toLocaleDateString('ko-KR') : '-'}</span>
+                <span className="font-semibold">{t('시작일:')}</span>
+                <span>{companyPeriod.startDate ? new Date(companyPeriod.startDate).toLocaleDateString(dateLocale) : '-'}</span>
               </div>
               <div className="hidden md:block text-text-tertiary">~</div>
               <div className="flex items-center gap-2 text-text-secondary">
-                <span className="font-semibold">종료일:</span>
-                <span>{companyPeriod.endDate ? new Date(companyPeriod.endDate).toLocaleDateString('ko-KR') : '-'}</span>
+                <span className="font-semibold">{t('종료일:')}</span>
+                <span>{companyPeriod.endDate ? new Date(companyPeriod.endDate).toLocaleDateString(dateLocale) : '-'}</span>
           </div>
               <div className="ml-auto flex items-center gap-2">
                 <span className={`text-lg font-bold ${companyPeriod.remainingDays > 30 ? 'text-success' : companyPeriod.remainingDays > 7 ? 'text-warning' : 'text-error'}`}>
                   D-{companyPeriod.remainingDays}
                 </span>
-                <span className="text-sm text-text-tertiary">남음</span>
+                <span className="text-sm text-text-tertiary">{t('남음')}</span>
           </div>
         </div>
       </div>
@@ -288,11 +293,11 @@ export default function CurriculumPage() {
                   <div className="ml-3">
                     {isPassed ? (
                       <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-success text-white whitespace-nowrap">
-                        ✓ 수료
+                        ✓ {t('수료')}
                     </span>
                     ) : (
                       <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-warning text-white whitespace-nowrap">
-                        미수료
+                        {t('미수료')}
                               </span>
                             )}
                   </div>
@@ -301,7 +306,7 @@ export default function CurriculumPage() {
                 {/* 진도율 정보 */}
                 <div className="mb-4">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm text-text-secondary">전체 진도율</span>
+                    <span className="text-sm text-text-secondary">{t('전체 진도율')}</span>
                     <span className="text-sm font-bold text-text-primary">{Math.round(avgProgress)}%</span>
                   </div>
                   <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
@@ -316,7 +321,7 @@ export default function CurriculumPage() {
 
                 {/* 레슨 수 정보 */}
                 <div className="text-sm text-text-tertiary mb-4">
-                  총 {lessons.length}개 강의
+                  {t(`총 ${lessons.length}개 강의`)}
                         </div>
 
                 {/* 액션 버튼들 */}
@@ -327,7 +332,7 @@ export default function CurriculumPage() {
                       onClick={() => handleViewLessons(subject.id)}
                       className="w-full px-4 py-2.5 bg-primary text-white rounded-md text-sm font-semibold hover:bg-primary-600 transition-colors"
                     >
-                      강의 다시보기
+                      {t('강의 다시보기')}
                     </button>
                   )}
 
@@ -338,13 +343,13 @@ export default function CurriculumPage() {
                         onClick={() => handleStartExam(subject)}
                         className="w-full px-4 py-2.5 bg-info text-white rounded-md text-sm font-semibold hover:bg-info/90 transition-colors"
                       >
-                        ✅ 시험 보기 ({remainingTries}/3회 남음)
+                        ✅ {t(`시험 보기 (${remainingTries}/3회 남음)`)}
                       </button>
                       <button
                         onClick={() => handleViewLessons(subject.id)}
                         className="w-full px-4 py-2.5 bg-surface border border-border text-text-primary rounded-md text-sm font-semibold hover:bg-bg-elevated transition-colors"
                       >
-                        강의 보기
+                        {t('강의 보기')}
                       </button>
                     </>
                   )}
@@ -356,16 +361,16 @@ export default function CurriculumPage() {
                         onClick={() => handleRestart(subject)}
                         className="w-full px-4 py-2.5 bg-warning text-white rounded-md text-sm font-semibold hover:bg-warning/90 transition-colors"
                       >
-                        🔄 다시 수강하기
+                        🔄 {t('다시 수강하기')}
                       </button>
                       <button
                         onClick={() => handleViewLessons(subject.id)}
                         className="w-full px-4 py-2.5 bg-surface border border-border text-text-primary rounded-md text-sm font-semibold hover:bg-bg-elevated transition-colors"
                       >
-                        강의 보기
+                        {t('강의 보기')}
                       </button>
                       <div className="text-xs text-error text-center mt-1">
-                        ⚠️ 3회 시험 기회를 모두 사용했습니다
+                        ⚠️ {t('3회 시험 기회를 모두 사용했습니다')}
                       </div>
                     </>
                   )}
@@ -377,10 +382,10 @@ export default function CurriculumPage() {
                         onClick={() => handleViewLessons(subject.id)}
                         className="w-full px-4 py-2.5 bg-primary text-white rounded-md text-sm font-semibold hover:bg-primary-600 transition-colors"
                       >
-                        강의 수강하기
+                        {t('강의 수강하기')}
                       </button>
                       <div className="text-xs text-text-tertiary text-center mt-1">
-                        모든 강의 90% 이상 수강 시 시험 가능
+                        {t('모든 강의 90% 이상 수강 시 시험 가능')}
               </div>
                     </>
                   )}
@@ -389,8 +394,8 @@ export default function CurriculumPage() {
                 {/* 최종 점수 표시 (수료한 경우) */}
                 {isPassed && subject.finalScore !== undefined && (
                   <div className="mt-3 pt-3 border-t border-border text-center">
-                    <span className="text-xs text-text-tertiary">최종 점수: </span>
-                    <span className="text-sm font-bold text-success">{Math.round(subject.finalScore)}점</span>
+                    <span className="text-xs text-text-tertiary">{t('최종 점수:')} </span>
+                    <span className="text-sm font-bold text-success">{t(`${Math.round(subject.finalScore)}점`)}</span>
                 </div>
               )}
             </div>

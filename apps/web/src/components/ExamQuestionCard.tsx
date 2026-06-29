@@ -1,6 +1,10 @@
+'use client';
+
 import React from 'react';
 import { ExamQuestion, ExamAnswer } from '../types/api';
 import styles from './ExamQuestionCard.module.css';
+import { useLocale } from '../i18n/client';
+import { translateStudentText } from '../i18n/studentTranslations';
 
 interface ExamQuestionCardProps {
   question: ExamQuestion;
@@ -19,6 +23,9 @@ export default function ExamQuestionCard({
   onAnswerSelect,
   disabled = false,
 }: ExamQuestionCardProps) {
+  const { locale } = useLocale();
+  const t = (source: string) => translateStudentText(source, locale);
+
   const handleChoiceSelect = (choiceIndex: number) => {
     if (disabled) return;
     
@@ -32,7 +39,7 @@ export default function ExamQuestionCard({
     <div className={styles.card}>
       <div className={styles.header}>
         <div className={styles.questionNumber}>
-          문제 {questionIndex + 1} / {totalQuestions}
+          {t(`문제 ${questionIndex + 1} / ${totalQuestions}`)}
         </div>
         <div className={styles.progressDots}>
           {Array.from({ length: totalQuestions }).map((_, index) => (
@@ -84,4 +91,3 @@ export default function ExamQuestionCard({
     </div>
   );
 }
-

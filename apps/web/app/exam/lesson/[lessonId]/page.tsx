@@ -8,6 +8,8 @@ import { useStartExam, useSubmitExam } from '../../../../src/hooks/useExam';
 import ExamQuestionCard from '../../../../src/components/ExamQuestionCard';
 import { getErrorMessage, actionHandlers } from '../../../../src/utils/errorMap';
 import { ExamAnswer, StartExamResponse } from '../../../../src/types/api';
+import { useLocale } from '../../../../src/i18n/client';
+import { translateStudentText } from '../../../../src/i18n/studentTranslations';
 
 type ExamStep = 'preparation' | 'questions' | 'submitting';
 
@@ -15,6 +17,8 @@ export default function ExamPage() {
   const params = useParams();
   const router = useRouter();
   const lessonId = params.lessonId as string;
+  const { locale } = useLocale();
+  const t = (source: string) => translateStudentText(source, locale);
   
   const [examStep, setExamStep] = useState<ExamStep>('preparation');
   const [examData, setExamData] = useState<StartExamResponse['data'] | null>(null);
@@ -31,7 +35,7 @@ export default function ExamPage() {
     if (examStep === 'questions') {
       const handleBeforeUnload = (e: BeforeUnloadEvent) => {
         e.preventDefault();
-        e.returnValue = '시험을 종료하시겠습니까? 진행 상황이 저장되지 않습니다.';
+        e.returnValue = translateStudentText('시험을 종료하시겠습니까? 진행 상황이 저장되지 않습니다.', locale);
       };
 
       const handlePopState = () => {
@@ -46,7 +50,7 @@ export default function ExamPage() {
         window.removeEventListener('popstate', handlePopState);
       };
     }
-  }, [examStep]);
+  }, [examStep, locale]);
 
   const handleStartExam = async () => {
     try {
@@ -55,7 +59,7 @@ export default function ExamPage() {
       setExamStep('questions');
     } catch (error) {
       const errorMessage = getErrorMessage(error);
-      alert(`${errorMessage.title}: ${errorMessage.description}`);
+      alert(`${t(errorMessage.title)}: ${t(errorMessage.description)}`);
       
       if (errorMessage.actionType && actionHandlers[errorMessage.actionType]) {
         actionHandlers[errorMessage.actionType]();
@@ -85,11 +89,11 @@ export default function ExamPage() {
     const answersArray = Array.from(answers.values());
     
     if (answersArray.length !== examData.questions.length) {
-      alert('모든 문항에 답을 선택해주세요.');
+      alert(t('모든 문항에 답을 선택해주세요.'));
       return;
     }
 
-    if (!confirm('시험을 제출하시겠습니까? 제출 후에는 수정할 수 없습니다.')) {
+    if (!confirm(t('시험을 제출하시겠습니까? 제출 후에는 수정할 수 없습니다.'))) {
       return;
     }
 
@@ -105,7 +109,7 @@ export default function ExamPage() {
     } catch (error) {
       setExamStep('questions');
       const errorMessage = getErrorMessage(error);
-      alert(`${errorMessage.title}: ${errorMessage.description}`);
+      alert(`${t(errorMessage.title)}: ${t(errorMessage.description)}`);
     }
   };
 
@@ -118,7 +122,7 @@ export default function ExamPage() {
       <div className="min-h-screen flex items-center justify-center p-6 bg-bg-primary">
         <div className="flex items-center gap-2 text-lg text-text-secondary">
           <div className="w-5 h-5 border-2 border-text-tertiary/30 border-t-text-tertiary rounded-full animate-spin"></div>
-          로딩 중...
+          {t('로딩 중...')}
         </div>
       </div>
     );
@@ -128,15 +132,15 @@ export default function ExamPage() {
     return (
       <div className="min-h-screen flex items-center justify-center p-6 bg-bg-primary">
         <div className="text-center bg-surface border border-border rounded-xl p-10 max-w-md">
-          <h3 className="text-xl font-bold text-text-primary mb-4">시험을 시작할 수 없습니다</h3>
+          <h3 className="text-xl font-bold text-text-primary mb-4">{t('시험을 시작할 수 없습니다')}</h3>
           <p className="text-base text-text-secondary mb-6">
             {!lessonStatus?.unlocked 
-              ? '이 레슨에 접근할 권한이 없습니다.' 
-              : '레슨 진도가 90% 이상이어야 시험을 볼 수 있습니다.'
+              ? t('이 레슨에 접근할 권한이 없습니다.')
+              : t('레슨 진도가 90% 이상이어야 시험을 볼 수 있습니다.')
             }
           </p>
           <Link href={`/lesson/${lessonId}`} className="inline-block px-6 py-3 bg-primary text-text-primary rounded-lg font-semibold transition-colors hover:bg-primary-600">
-            레슨으로 돌아가기
+            {t('레슨으로 돌아가기')}
           </Link>
         </div>
       </div>
@@ -148,29 +152,29 @@ export default function ExamPage() {
       <div className="min-h-screen py-10 px-5 bg-bg-primary">
         <div className="max-w-2xl mx-auto bg-surface border border-border rounded-xl p-8 md:p-10">
           <div className="text-center mb-8">
-            <h1 className="text-[28px] font-bold text-text-primary mb-3">레슨 {lessonId} 시험</h1>
+            <h1 className="text-[28px] font-bold text-text-primary mb-3">{t(`레슨 ${lessonId} 시험`)}</h1>
             <p className="text-base text-text-secondary">
-              3문항의 객관식 문제가 출제됩니다. 진도 20점 + 학습평가 80점으로 총점을 계산하며, 총점 70점 이상이면 이 강의를 수료할 수 있습니다.
+              {t('3문항의 객관식 문제가 출제됩니다. 진도 20점 + 학습평가 80점으로 총점을 계산하며, 총점 70점 이상이면 이 강의를 수료할 수 있습니다.')}
             </p>
           </div>
 
           <div className="bg-bg-primary border border-border rounded-xl p-6 mb-8">
-            <h3 className="text-lg font-bold text-text-primary mb-4">시험 조건 확인</h3>
+            <h3 className="text-lg font-bold text-text-primary mb-4">{t('시험 조건 확인')}</h3>
             <div className="flex flex-col gap-3">
               <div className="flex items-center gap-3 text-text-secondary">
                 <span className="text-2xl">✅</span>
-                <span className="text-base">레슨 진도: {Math.round(lessonStatus.progressPercent)}%</span>
+                <span className="text-base">{t(`레슨 진도: ${Math.round(lessonStatus.progressPercent)}%`)}</span>
               </div>
               <div className="flex items-center gap-3 text-text-secondary">
                 <span className="text-2xl">✅</span>
                 <span className="text-base">
-                  남은 응시 기회: {lessonStatus.remainingTries}회 (최대 6회까지 응시 가능합니다)
+                  {t(`남은 응시 기회: ${lessonStatus.remainingTries}회 (최대 6회까지 응시 가능합니다)`)}
                 </span>
               </div>
               <div className="flex items-center gap-3 text-text-secondary">
                 <span className="text-2xl">✅</span>
                 <span className="text-base">
-                  수료 기준: 진도율 90% 이상 + 총점 70점 이상
+                  {t('수료 기준: 진도율 90% 이상 + 총점 70점 이상')}
                 </span>
               </div>
             </div>
@@ -178,7 +182,7 @@ export default function ExamPage() {
 
           <div className="flex flex-col md:flex-row gap-3">
             <Link href={`/lesson/${lessonId}`} className="flex-1 px-6 py-3 bg-bg-primary text-text-secondary border-2 border-border rounded-lg font-semibold text-center transition-all hover:bg-surface hover:text-text-primary hover:border-border-light">
-              레슨으로 돌아가기
+              {t('레슨으로 돌아가기')}
             </Link>
             <button 
               className="flex-1 px-6 py-3 bg-primary text-text-primary rounded-lg font-semibold transition-all hover:bg-primary-600 active:bg-primary-700 disabled:opacity-60 disabled:cursor-not-allowed"
@@ -188,10 +192,10 @@ export default function ExamPage() {
               {startExamMutation.isPending ? (
                 <span className="inline-flex items-center gap-2">
                   <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                  시험 준비 중...
+                  {t('시험 준비 중...')}
                 </span>
               ) : (
-              lessonStatus.remainingTries === 0 ? '응시 기회 소진' : '시험 시작'
+              lessonStatus.remainingTries === 0 ? t('응시 기회 소진') : t('시험 시작')
               )}
             </button>
           </div>
@@ -207,9 +211,9 @@ export default function ExamPage() {
           {/* 진행 상황 */}
           <div className="bg-surface border border-border rounded-xl p-5 mb-6">
             <div className="flex justify-between items-center mb-3">
-              <h2 className="text-xl font-bold text-text-primary">레슨 {lessonId} 시험</h2>
+              <h2 className="text-xl font-bold text-text-primary">{t(`레슨 ${lessonId} 시험`)}</h2>
               <div className="text-sm text-text-secondary font-medium">
-              {currentQuestionIndex + 1} / {examData.questions.length} 문항
+              {t(`${currentQuestionIndex + 1} / ${examData.questions.length} 문항`)}
             </div>
           </div>
             <div className="w-full h-2 bg-bg-primary rounded-full overflow-hidden border border-border">
@@ -236,11 +240,11 @@ export default function ExamPage() {
             onClick={handlePrevQuestion}
             disabled={currentQuestionIndex === 0}
           >
-            이전 문제
+            {t('이전 문제')}
           </button>
 
             <div className="text-sm font-medium text-text-secondary">
-            {answers.size}/{examData.questions.length} 문항 완료
+            {t(`${answers.size}/${examData.questions.length} 문항 완료`)}
           </div>
 
           {currentQuestionIndex === examData.questions.length - 1 ? (
@@ -253,14 +257,14 @@ export default function ExamPage() {
               onClick={handleSubmitExam}
               disabled={!isAllAnswered}
             >
-              제출하기
+              {t('제출하기')}
             </button>
           ) : (
             <button 
                 className="px-5 py-2.5 bg-primary text-text-primary rounded-md font-semibold transition-all hover:bg-primary-600"
               onClick={handleNextQuestion}
             >
-              다음 문제
+              {t('다음 문제')}
             </button>
           )}
         </div>
@@ -269,20 +273,20 @@ export default function ExamPage() {
         {showExitConfirm && (
             <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
               <div className="bg-surface border border-border rounded-xl p-8 max-w-md w-full">
-                <h3 className="text-xl font-bold text-text-primary mb-3">시험을 종료하시겠습니까?</h3>
-                <p className="text-base text-text-secondary mb-6">진행 상황이 저장되지 않습니다.</p>
+                <h3 className="text-xl font-bold text-text-primary mb-3">{t('시험을 종료하시겠습니까?')}</h3>
+                <p className="text-base text-text-secondary mb-6">{t('진행 상황이 저장되지 않습니다.')}</p>
                 <div className="flex gap-3">
                 <button 
                     className="flex-1 px-5 py-3 bg-bg-primary text-text-secondary border border-border rounded-lg font-semibold transition-all hover:bg-surface hover:text-text-primary hover:border-border-light"
                   onClick={() => setShowExitConfirm(false)}
                 >
-                  계속 진행
+                  {t('계속 진행')}
                 </button>
                 <button 
                     className="flex-1 px-5 py-3 bg-error text-white rounded-lg font-semibold transition-colors hover:bg-error/90"
                   onClick={() => router.push(`/lesson/${lessonId}`)}
                 >
-                  종료
+                  {t('종료')}
                 </button>
               </div>
             </div>
@@ -298,7 +302,7 @@ export default function ExamPage() {
       <div className="min-h-screen flex items-center justify-center p-6 bg-bg-primary">
         <div className="flex flex-col items-center gap-4 text-center">
           <div className="w-12 h-12 border-4 border-text-tertiary/30 border-t-primary rounded-full animate-spin"></div>
-          <p className="text-lg text-text-secondary font-medium">시험을 제출하고 있습니다...</p>
+          <p className="text-lg text-text-secondary font-medium">{t('시험을 제출하고 있습니다...')}</p>
         </div>
       </div>
     );

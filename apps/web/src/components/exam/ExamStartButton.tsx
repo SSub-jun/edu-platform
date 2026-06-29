@@ -3,6 +3,8 @@
 import React from 'react';
 import { Button } from '../ui/button';
 import { useStartExam } from '../../hooks/useExam';
+import { useLocale } from '../../i18n/client';
+import { translateStudentText } from '../../i18n/studentTranslations';
 
 interface ExamStartButtonProps {
   lessonId: string;
@@ -20,6 +22,8 @@ export function ExamStartButton({
   disabled 
 }: ExamStartButtonProps) {
   const startExamMutation = useStartExam();
+  const { locale } = useLocale();
+  const t = (source: string) => translateStudentText(source, locale);
 
   const canStartExam = progressPercent >= 90 && !hasPassedExam;
 
@@ -34,15 +38,15 @@ export function ExamStartButton({
   };
 
   const getButtonText = () => {
-    if (hasPassedExam) return '합격 완료';
-    if (progressPercent < 90) return `진도 ${progressPercent.toFixed(1)}% (90% 필요)`;
-    return '시험 시작하기';
+    if (hasPassedExam) return t('합격 완료');
+    if (progressPercent < 90) return t(`진도 ${progressPercent.toFixed(1)}% (90% 필요)`);
+    return t('시험 시작하기');
   };
 
   const getTooltipText = () => {
-    if (hasPassedExam) return '이미 합격한 시험입니다';
-    if (progressPercent < 90) return '진도가 90% 이상이어야 시험을 볼 수 있습니다';
-    return '시험을 시작합니다';
+    if (hasPassedExam) return t('이미 합격한 시험입니다');
+    if (progressPercent < 90) return t('진도가 90% 이상이어야 시험을 볼 수 있습니다');
+    return t('시험을 시작합니다');
   };
 
   return (
@@ -56,7 +60,7 @@ export function ExamStartButton({
         {startExamMutation.isPending ? (
           <div className="flex items-center space-x-2">
             <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            <span>시험 준비중...</span>
+            <span>{t('시험 준비중...')}</span>
           </div>
         ) : (
           getButtonText()
@@ -71,7 +75,6 @@ export function ExamStartButton({
     </div>
   );
 }
-
 
 
 

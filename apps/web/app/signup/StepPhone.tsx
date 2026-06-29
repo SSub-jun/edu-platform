@@ -3,6 +3,8 @@
 import { useState, useRef } from 'react';
 import axios from 'axios';
 import { SignupData } from './page';
+import { useLocale } from '../../src/i18n/client';
+import { translateStudentText } from '../../src/i18n/studentTranslations';
 
 interface StepPhoneProps {
   onComplete: (data: Partial<SignupData>) => void;
@@ -16,6 +18,8 @@ export default function StepPhone({ onComplete, initialData }: StepPhoneProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [resendCountdown, setResendCountdown] = useState(0);
+  const { locale } = useLocale();
+  const t = (source: string) => translateStudentText(source, locale);
   
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -199,7 +203,7 @@ export default function StepPhone({ onComplete, initialData }: StepPhoneProps) {
     return (
       <form onSubmit={handlePhoneSubmit} className="flex flex-col gap-6">
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-semibold text-text-primary uppercase tracking-wide">휴대폰 번호</label>
+          <label className="text-sm font-semibold text-text-primary uppercase tracking-wide">{t('휴대폰 번호')}</label>
           <input
             type="tel"
             value={phone}
@@ -213,7 +217,7 @@ export default function StepPhone({ onComplete, initialData }: StepPhoneProps) {
           />
           {error && (
             <div className="mt-2 p-3 md:p-4 bg-error-bg border border-error rounded-lg text-error text-sm font-semibold animate-[slideDown_0.3s_ease-out]">
-              {error}
+              {t(error)}
             </div>
           )}
         </div>
@@ -226,10 +230,10 @@ export default function StepPhone({ onComplete, initialData }: StepPhoneProps) {
           {loading ? (
             <span className="inline-flex items-center gap-2">
               <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-              인증번호 전송 중...
+              {t('인증번호 전송 중...')}
             </span>
           ) : (
-            '인증번호 받기'
+            t('인증번호 받기')
           )}
         </button>
       </form>
@@ -239,9 +243,9 @@ export default function StepPhone({ onComplete, initialData }: StepPhoneProps) {
   return (
     <form onSubmit={handleOtpSubmit} className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-semibold text-text-primary uppercase tracking-wide">인증번호 입력</label>
+        <label className="text-sm font-semibold text-text-primary uppercase tracking-wide">{t('인증번호 입력')}</label>
         <p className="text-sm text-text-secondary my-2">
-          {phone}으로 전송된 6자리 인증번호를 입력해주세요
+          {phone}{t('으로 전송된 6자리 인증번호를 입력해주세요')}
         </p>
         
         <div className="flex gap-3 justify-center">
@@ -265,23 +269,23 @@ export default function StepPhone({ onComplete, initialData }: StepPhoneProps) {
 
         {error && (
           <div className="mt-2 p-3 md:p-4 bg-error-bg border border-error rounded-lg text-error text-sm font-semibold animate-[slideDown_0.3s_ease-out]">
-            {error}
+            {t(error)}
           </div>
         )}
 
         <div className="text-center mt-4 text-sm text-text-tertiary">
           {resendCountdown > 0 ? (
-            <span>인증번호 재전송 가능시간: {resendCountdown}초</span>
+            <span>{t(`인증번호 재전송 가능시간: ${resendCountdown}초`)}</span>
           ) : (
             <span>
-              인증번호를 받지 못하셨나요?{' '}
+              {t('인증번호를 받지 못하셨나요?')}{' '}
               <button
                 type="button"
                 onClick={handleResend}
                 disabled={loading}
                 className="bg-transparent border-0 text-primary font-semibold cursor-pointer underline transition-colors hover:text-primary-600 disabled:text-text-tertiary disabled:cursor-not-allowed disabled:no-underline"
               >
-                재전송
+                {t('재전송')}
               </button>
             </span>
           )}
@@ -295,7 +299,7 @@ export default function StepPhone({ onComplete, initialData }: StepPhoneProps) {
           className="w-full h-12 bg-bg-primary text-text-secondary border-2 border-border rounded-lg text-base font-semibold transition-all hover:bg-surface hover:text-text-primary hover:border-border-light disabled:opacity-60 disabled:cursor-not-allowed"
           disabled={loading}
         >
-          번호 변경
+          {t('번호 변경')}
         </button>
         
         <button
@@ -306,18 +310,16 @@ export default function StepPhone({ onComplete, initialData }: StepPhoneProps) {
           {loading ? (
             <span className="inline-flex items-center gap-2">
               <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-              인증 중...
+              {t('인증 중...')}
             </span>
           ) : (
-            '인증 확인'
+            t('인증 확인')
           )}
         </button>
       </div>
     </form>
   );
 }
-
-
 
 
 
