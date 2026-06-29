@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { authClient } from '../../../../lib/auth';
+import { localeLabels, supportedLocales, type Locale } from '../../../../src/i18n/config';
 
 interface SubjectDetail {
   id: string;
@@ -40,11 +41,31 @@ interface Question {
   explanation?: string;
   difficulty?: number;
   tags?: string;
+  translations?: QuestionTranslations;
   isActive: boolean;
   createdAt: string;
 }
 
 type TabType = 'basic' | 'lessons' | 'questions';
+type TranslatableLocale = Exclude<Locale, 'ko'>;
+type QuestionTranslations = Partial<Record<TranslatableLocale, {
+  content?: string;
+  explanation?: string;
+  choices?: string[];
+}>>;
+
+const translationLocales: TranslatableLocale[] = supportedLocales.filter(
+  (locale): locale is TranslatableLocale => locale !== 'ko',
+);
+
+function createEmptyQuestionTranslations(): QuestionTranslations {
+  return Object.fromEntries(
+    translationLocales.map((locale) => [
+      locale,
+      { content: '', explanation: '', choices: ['', '', '', ''] },
+    ]),
+  ) as QuestionTranslations;
+}
 
 export default function SubjectManagePage() {
   const router = useRouter();
@@ -105,6 +126,7 @@ export default function SubjectManagePage() {
     explanation: '',
     difficulty: 3,
     tags: '',
+    translations: createEmptyQuestionTranslations(),
   });
 
   const loadSubject = async () => {
@@ -239,6 +261,7 @@ export default function SubjectManagePage() {
         explanation: '',
         difficulty: 3,
         tags: '',
+        translations: createEmptyQuestionTranslations(),
       });
       loadQuestions();
     } catch (err: any) {
@@ -262,6 +285,7 @@ export default function SubjectManagePage() {
         explanation: '',
         difficulty: 3,
         tags: '',
+        translations: createEmptyQuestionTranslations(),
       });
       loadQuestions();
     } catch (err: any) {
@@ -319,6 +343,10 @@ export default function SubjectManagePage() {
         explanation: question.explanation || '',
         difficulty: question.difficulty || 3,
         tags: question.tags || '',
+        translations: {
+          ...createEmptyQuestionTranslations(),
+          ...(question.translations || {}),
+        },
       });
     } else {
       setEditingQuestion(null);
@@ -329,6 +357,7 @@ export default function SubjectManagePage() {
         explanation: '',
         difficulty: 3,
         tags: '',
+        translations: createEmptyQuestionTranslations(),
       });
     }
     setShowQuestionModal(true);
@@ -1170,6 +1199,112 @@ export default function SubjectManagePage() {
                   }}
                 />
               </div>
+              <div style={{
+                border: '1px solid #e9ecef',
+                borderRadius: '8px',
+                padding: '16px',
+                backgroundColor: '#f8f9fa'
+              }}>
+                <div style={{ fontWeight: 700, marginBottom: '6px', color: '#333' }}>
+                  언어별 번역
+                </div>
+                <div style={{ fontSize: '12px', color: '#666', marginBottom: '14px' }}>
+                  비워두면 시험 화면에서 한국어 원문이 표시됩니다.
+                </div>
+                <div style={{ display: 'grid', gap: '18px' }}>
+                  {translationLocales.map((locale) => {
+                    const translation = questionForm.translations[locale] || {
+                      content: '',
+                      explanation: '',
+                      choices: ['', '', '', ''],
+                    };
+
+                    return (
+                      <div
+                        key={locale}
+                        style={{
+                          padding: '14px',
+                          border: '1px solid #e0e0e0',
+                          borderRadius: '6px',
+                          backgroundColor: 'white'
+                        }}
+                      >
+                        <div style={{ fontWeight: 700, marginBottom: '10px', color: '#333' }}>
+                          {localeLabels[locale]}
+                        </div>
+                        <textarea
+                          value={translation.content || ''}
+                          onChange={(e) => setQuestionForm({
+                            ...questionForm,
+                            translations: {
+                              ...questionForm.translations,
+                              [locale]: { ...translation, content: e.target.value },
+                            },
+                          })}
+                          rows={2}
+                          placeholder={`${localeLabels[locale]} 문제 내용`}
+                          style={{
+                            width: '100%',
+                            padding: '10px',
+                            border: '1px solid #ddd',
+                            borderRadius: '4px',
+                            fontSize: '14px',
+                            resize: 'vertical',
+                            marginBottom: '10px'
+                          }}
+                        />
+                        {(translation.choices || ['', '', '', '']).map((choice, idx) => (
+                          <input
+                            key={`${locale}-choice-${idx}`}
+                            type="text"
+                            value={choice || ''}
+                            onChange={(e) => {
+                              const nextChoices = [...(translation.choices || ['', '', '', ''])];
+                              nextChoices[idx] = e.target.value;
+                              setQuestionForm({
+                                ...questionForm,
+                                translations: {
+                                  ...questionForm.translations,
+                                  [locale]: { ...translation, choices: nextChoices },
+                                },
+                              });
+                            }}
+                            placeholder={`${localeLabels[locale]} 선택지 ${idx + 1}`}
+                            style={{
+                              width: '100%',
+                              padding: '8px',
+                              border: '1px solid #ddd',
+                              borderRadius: '4px',
+                              fontSize: '14px',
+                              marginBottom: '8px'
+                            }}
+                          />
+                        ))}
+                        <textarea
+                          value={translation.explanation || ''}
+                          onChange={(e) => setQuestionForm({
+                            ...questionForm,
+                            translations: {
+                              ...questionForm.translations,
+                              [locale]: { ...translation, explanation: e.target.value },
+                            },
+                          })}
+                          rows={2}
+                          placeholder={`${localeLabels[locale]} 해설`}
+                          style={{
+                            width: '100%',
+                            padding: '10px',
+                            border: '1px solid #ddd',
+                            borderRadius: '4px',
+                            fontSize: '14px',
+                            resize: 'vertical'
+                          }}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
                   <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600 }}>난이도 (1-5)</label>
@@ -1217,6 +1352,7 @@ export default function SubjectManagePage() {
                       explanation: '',
                       difficulty: 3,
                       tags: '',
+                      translations: createEmptyQuestionTranslations(),
                     });
                   }}
                   style={{

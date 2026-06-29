@@ -10,7 +10,11 @@ import {
   CreateLessonPartDto,
   UpdateLessonPartDto,
 } from './dto/lesson.dto';
-import { CreateQuestionDto, UpdateQuestionDto } from './dto/question.dto';
+import {
+  CreateQuestionDto,
+  UpdateQuestionDto,
+  QuestionTranslationInput,
+} from './dto/question.dto';
 import { CreateSubjectDto, UpdateSubjectDto } from './dto/subject.dto';
 
 @Injectable()
@@ -347,7 +351,11 @@ export class AdminLessonService {
     }
 
     // Choice 생성을 위한 데이터 준비
-    const choicesData = dto.choices.map((text) => ({ text }));
+    const choicesData = dto.choices.map((text, index) => ({
+      text,
+      order: index,
+      isAnswer: index === dto.correctAnswer,
+    }));
 
     const question = await this.prisma.question.create({
       data: {
@@ -365,30 +373,19 @@ export class AdminLessonService {
       },
     });
 
-    return question;
+    await this.saveQuestionTranslations(question.id, dto.translations);
+
+    return this.formatQuestion(question);
   }
 
   async getQuestionsBySubject(subjectId: string) {
     const questions = await this.prisma.question.findMany({
       where: { subjectId },
-      include: {
-        choices: true,
-      },
+      include: this.questionInclude(),
       orderBy: { createdAt: 'desc' },
     });
 
-    // 프론트엔드 형식으로 변환
-    return questions.map((q) => ({
-      id: q.id,
-      content: q.stem,
-      choices: q.choices.map((c) => c.text),
-      correctAnswer: q.answerIndex,
-      explanation: q.explanation,
-      difficulty: 3, // 기본값
-      tags: '', // 기본값
-      isActive: q.isActive,
-      createdAt: q.createdAt,
-    }));
+    return questions.map((q) => this.formatQuestion(q));
   }
 
   async getQuestionById(questionId: string) {
@@ -396,34 +393,21 @@ export class AdminLessonService {
       where: { id: questionId },
       include: {
         subject: true,
-        choices: true,
-      },
+        ...this.questionInclude(),
+      } as any,
     });
 
     if (!question) {
       throw new NotFoundException(`Question with ID ${questionId} not found`);
     }
 
-    // 프론트엔드 형식으로 변환
-    return {
-      id: question.id,
-      content: question.stem,
-      choices: question.choices.map((c) => c.text),
-      correctAnswer: question.answerIndex,
-      explanation: question.explanation,
-      difficulty: 3,
-      tags: '',
-      isActive: question.isActive,
-      createdAt: question.createdAt,
-    };
+    return this.formatQuestion(question);
   }
 
   async updateQuestion(questionId: string, dto: UpdateQuestionDto) {
     const question = await this.prisma.question.findUnique({
       where: { id: questionId },
-      include: {
-        choices: true,
-      },
+      include: this.questionInclude(),
     });
 
     if (!question) {
@@ -459,27 +443,25 @@ export class AdminLessonService {
         isActive: dto.isActive,
         ...(dto.choices && {
           choices: {
-            create: dto.choices.map((text) => ({ text })),
+            create: dto.choices.map((text, index) => ({
+              text,
+              order: index,
+              isAnswer: index === finalCorrectAnswer,
+            })),
           },
         }),
       },
-      include: {
-        choices: true,
-      },
+      include: this.questionInclude(),
     });
 
-    // 프론트엔드 형식으로 변환
-    return {
-      id: updated.id,
-      content: updated.stem,
-      choices: updated.choices.map((c) => c.text),
-      correctAnswer: updated.answerIndex,
-      explanation: updated.explanation,
-      difficulty: 3,
-      tags: '',
-      isActive: updated.isActive,
-      createdAt: updated.createdAt,
-    };
+    await this.saveQuestionTranslations(questionId, dto.translations);
+
+    const withTranslations = await this.prisma.question.findUnique({
+      where: { id: questionId },
+      include: this.questionInclude(),
+    });
+
+    return this.formatQuestion(withTranslations || updated);
   }
 
   async deleteQuestion(questionId: string) {
@@ -502,9 +484,7 @@ export class AdminLessonService {
   async duplicateQuestion(questionId: string) {
     const question = await this.prisma.question.findUnique({
       where: { id: questionId },
-      include: {
-        choices: true,
-      },
+      include: this.questionInclude(),
     });
 
     if (!question) {
@@ -519,25 +499,154 @@ export class AdminLessonService {
         explanation: question.explanation,
         isActive: true,
         choices: {
-          create: question.choices.map((c) => ({ text: c.text })),
+          create: question.choices.map((c) => ({
+            text: c.text,
+            order: c.order,
+            isAnswer: c.isAnswer,
+          })),
         },
       },
-      include: {
-        choices: true,
-      },
+      include: this.questionInclude(),
     });
 
-    // 프론트엔드 형식으로 변환
+    await this.saveQuestionTranslations(
+      duplicated.id,
+      this.formatQuestion(question).translations,
+    );
+
+    return this.formatQuestion(duplicated);
+  }
+
+  private questionInclude() {
     return {
-      id: duplicated.id,
-      content: duplicated.stem,
-      choices: duplicated.choices.map((c) => c.text),
-      correctAnswer: duplicated.answerIndex,
-      explanation: duplicated.explanation,
+      choices: {
+        orderBy: { order: 'asc' as const },
+        include: {
+          translations: true,
+        },
+      },
+      translations: true,
+    };
+  }
+
+  private formatQuestion(question: any) {
+    const choices = [...(question.choices || [])].sort(
+      (a, b) => (a.order ?? 0) - (b.order ?? 0),
+    );
+    const translations: QuestionTranslationInput = {};
+
+    for (const translation of question.translations || []) {
+      translations[translation.locale] = {
+        content: translation.stem,
+        explanation: translation.explanation ?? undefined,
+        choices: choices.map((choice) => {
+          const choiceTranslation = choice.translations?.find(
+            (item: any) => item.locale === translation.locale,
+          );
+          return choiceTranslation?.text || '';
+        }),
+      };
+    }
+
+    return {
+      id: question.id,
+      content: question.stem,
+      stem: question.stem,
+      choices: choices.map((c) => c.text),
+      choiceDetails: choices.map((c) => ({
+        id: c.id,
+        text: c.text,
+        isAnswer: c.isAnswer,
+        order: c.order,
+      })),
+      choiceTexts: choices.map((c) => c.text),
+      correctAnswer: question.answerIndex,
+      answerIndex: question.answerIndex,
+      explanation: question.explanation,
+      translations,
       difficulty: 3,
       tags: '',
-      isActive: duplicated.isActive,
-      createdAt: duplicated.createdAt,
+      isActive: question.isActive,
+      createdAt: question.createdAt,
     };
+  }
+
+  private async saveQuestionTranslations(
+    questionId: string,
+    translations?: QuestionTranslationInput,
+  ) {
+    if (!translations) return;
+
+    const choices = await this.prisma.choice.findMany({
+      where: { questionId },
+      orderBy: { order: 'asc' },
+    });
+
+    for (const [locale, translation] of Object.entries(translations)) {
+      const content = translation.content?.trim();
+      const explanation = translation.explanation?.trim();
+      const translatedChoices = translation.choices || [];
+      const hasChoiceTranslation = translatedChoices.some((choice) => choice?.trim());
+
+      if (!content && !explanation && !hasChoiceTranslation) {
+        await this.prisma.questionTranslation.deleteMany({
+          where: { questionId, locale },
+        });
+        await this.prisma.choiceTranslation.deleteMany({
+          where: {
+            locale,
+            choiceId: { in: choices.map((choice) => choice.id) },
+          },
+        });
+        continue;
+      }
+
+      if (content) {
+        await this.prisma.questionTranslation.upsert({
+          where: {
+            questionId_locale: {
+              questionId,
+              locale,
+            },
+          },
+          create: {
+            questionId,
+            locale,
+            stem: content,
+            explanation: explanation || null,
+          },
+          update: {
+            stem: content,
+            explanation: explanation || null,
+          },
+        });
+      }
+
+      await Promise.all(
+        choices.map((choice, index) => {
+          const text = translatedChoices[index]?.trim();
+          if (!text) {
+            return this.prisma.choiceTranslation.deleteMany({
+              where: { choiceId: choice.id, locale },
+            });
+          }
+
+          return this.prisma.choiceTranslation.upsert({
+            where: {
+              choiceId_locale: {
+                choiceId: choice.id,
+                locale,
+              },
+            },
+            create: {
+              choiceId: choice.id,
+              locale,
+              text,
+            },
+            update: { text },
+          });
+        }),
+      );
+    }
   }
 }

@@ -7,6 +7,8 @@ import { useRouter } from 'next/navigation';
 import { authClient } from '../../lib/auth';
 import BrandTrustMini from '../../src/components/BrandTrustMini';
 import Image from 'next/image';
+import { localeLabels, supportedLocales, type Locale } from '../../src/i18n/config';
+import { useLocale, useT } from '../../src/i18n/client';
 
 export default function LoginPage() {
   const [username, setUsername] = useState(''); // ID 또는 휴대폰 번호
@@ -14,6 +16,8 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
+  const { locale, setLocale } = useLocale();
+  const t = useT(locale);
 
   // 이미 로그인된 경우 리다이렉트
   useEffect(() => {
@@ -23,7 +27,7 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!username || !password) {
-      setError('ID/휴대폰 번호와 비밀번호를 입력해주세요.');
+      setError(t('login.error.required'));
       return;
     }
 
@@ -83,7 +87,7 @@ export default function LoginPage() {
         // 더 명확한 에러 메시지 표시
         const errorMessage = result.error || '로그인에 실패했습니다.';
         if (errorMessage.includes('Invalid') || errorMessage.includes('credentials') || errorMessage.includes('Unauthorized')) {
-          setError('아이디 또는 비밀번호가 올바르지 않습니다.');
+          setError(t('login.error.invalid'));
         } else {
           setError(errorMessage);
         }
@@ -92,11 +96,11 @@ export default function LoginPage() {
       console.error('[LOGIN_PAGE] Login error:', error);
       // 네트워크 오류와 인증 오류 구분
       if (error.response?.status === 401) {
-        setError('아이디 또는 비밀번호가 올바르지 않습니다.');
+        setError(t('login.error.invalid'));
       } else if (error.message?.includes('Network')) {
-        setError('서버에 연결할 수 없습니다. 네트워크 연결을 확인해주세요.');
+        setError(t('login.error.network'));
       } else {
-        setError('로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+        setError(t('login.error.generic'));
       }
     } finally {
       setLoading(false);
@@ -129,10 +133,15 @@ export default function LoginPage() {
         {/* Left: 타이틀 섹션 (Desktop only) */}
         <div className="hidden md:flex md:flex-col md:justify-center md:gap-4 md:px-8">
           <h1 className="text-[35px] md:text-[43px] leading-tight font-bold text-white drop-shadow-lg">
-            함께하는 안전,<br />든든한 동반자가 되겠습니다.
+            {t('login.hero.title').split('\n').map((line, index) => (
+              <span key={line}>
+                {line}
+                {index === 0 && <br />}
+              </span>
+            ))}
           </h1>
           <p className="text-[20px] md:text-[24px] leading-relaxed font-semibold text-white/90 drop-shadow-md">
-            고객이 신뢰하는 한국산업보건안전기술원입니다.
+            {t('login.hero.subtitle')}
           </p>
         </div>
 
@@ -155,13 +164,31 @@ export default function LoginPage() {
           <form onSubmit={handleLogin} className="flex flex-col gap-6">
             <div className="flex flex-col gap-2">
               <label className="text-sm font-semibold text-text-primary">
-                휴대폰 번호
+                {t('login.language.label')}
+              </label>
+              <select
+                value={locale}
+                onChange={(e) => setLocale(e.target.value as Locale)}
+                className="w-full h-12 px-4 bg-bg-primary border-2 border-border rounded-lg text-base text-text-primary transition-all focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20 disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-surface"
+                disabled={loading}
+              >
+                {supportedLocales.map((option) => (
+                  <option key={option} value={option}>
+                    {localeLabels[option]}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-semibold text-text-primary">
+                {t('login.phone.label')}
             </label>
             <input
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="학생: 01012345678 / 관리자·강사: admin001"
+              placeholder={t('login.phone.placeholder')}
                 className="w-full h-12 px-4 bg-bg-primary border-2 border-border rounded-lg text-base text-text-primary placeholder:text-text-tertiary transition-all focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20 disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-surface"
               disabled={loading}
             />
@@ -169,13 +196,13 @@ export default function LoginPage() {
           
             <div className="flex flex-col gap-2">
               <label className="text-sm font-semibold text-text-primary">
-              비밀번호
+              {t('login.password.label')}
             </label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="비밀번호를 입력하세요"
+              placeholder={t('login.password.placeholder')}
                 className="w-full h-12 px-4 bg-bg-primary border-2 border-border rounded-lg text-base text-text-primary placeholder:text-text-tertiary transition-all focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20 disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-surface"
               disabled={loading}
             />
@@ -185,7 +212,7 @@ export default function LoginPage() {
                 onClick={() => router.push('/reset-password')}
                 className="text-xs text-text-tertiary hover:text-primary-600 transition-colors"
               >
-                비밀번호 찾기
+                {t('login.forgotPassword')}
               </button>
             </div>
           </div>
@@ -198,24 +225,24 @@ export default function LoginPage() {
             {loading ? (
                 <span className="inline-flex items-center gap-2">
                   <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                로그인 중...
+                {t('login.submitting')}
                 </span>
             ) : (
-              '로그인'
+              t('login.submit')
             )}
           </button>
         </form>
 
           {/* Signup Section */}
           <div className="mt-6 p-5 text-center bg-bg-primary rounded-lg border border-border">
-            <p className="text-sm text-text-secondary font-medium mb-3">계정이 없으신가요?</p>
+            <p className="text-sm text-text-secondary font-medium mb-3">{t('login.signup.prompt')}</p>
           <button
             type="button"
             onClick={() => router.push('/signup')}
               className="w-full h-10 bg-success text-white rounded-md text-sm font-semibold transition-all hover:bg-success/90 active:bg-success/80 disabled:opacity-60 disabled:cursor-not-allowed"
             disabled={loading}
           >
-            학생 회원가입
+            {t('login.signup.button')}
           </button>
         </div>
 

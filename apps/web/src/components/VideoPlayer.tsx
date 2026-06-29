@@ -5,10 +5,18 @@ import videojs from 'video.js';
 import 'video.js/dist/video-js.css';
 import type Player from 'video.js/dist/types/player';
 import styles from './VideoPlayer.module.css';
+import { useLocale, useT } from '../i18n/client';
 
 interface VideoPlayerProps {
   src?: string;
   title: string;
+  subtitles?: Array<{
+    id: string;
+    locale: string;
+    label: string;
+    signedUrl: string;
+    isDefault?: boolean;
+  }>;
   maxReachedSeconds?: number;
   videoDuration?: number;
   onProgress?: (data: {
@@ -39,10 +47,13 @@ const INITIAL_LOAD_RETRY_DELAY_MS = 900;
  */
 export default function VideoPlayer({
   src,
+  subtitles = [],
   maxReachedSeconds = 0,
   onProgress,
   autoPlay = false,
 }: VideoPlayerProps) {
+  const { locale } = useLocale();
+  const t = useT(locale);
   const videoRef = useRef<HTMLVideoElement>(null);
   const playerRef = useRef<Player | null>(null);
 
@@ -399,6 +410,16 @@ export default function VideoPlayer({
         className="video-js vjs-big-play-centered"
         playsInline
       >
+        {subtitles.map((subtitle) => (
+          <track
+            key={subtitle.id}
+            kind="subtitles"
+            src={subtitle.signedUrl}
+            srcLang={subtitle.locale}
+            label={subtitle.label}
+            default={subtitle.isDefault}
+          />
+        ))}
         <p className="vjs-no-js">
           To view this video please enable JavaScript, and consider upgrading to a
           web browser that supports HTML5 video
@@ -409,26 +430,26 @@ export default function VideoPlayer({
           <div className={styles.loadingPanel}>
             {loadState === 'error' ? (
               <>
-                <h3 className={styles.loadingTitle}>영상을 불러오지 못했습니다</h3>
+                <h3 className={styles.loadingTitle}>{t('video.error.title')}</h3>
                 <p className={styles.loadingText}>
-                  네트워크 상태를 확인한 뒤 다시 시도해주세요.
+                  {t('video.error.description')}
                 </p>
                 <button
                   type="button"
                   className={styles.retryButton}
                   onClick={retryVideoLoad}
                 >
-                  다시 불러오기
+                  {t('video.error.retry')}
                 </button>
               </>
             ) : (
               <>
                 <div className={styles.spinner} aria-hidden="true" />
                 <h3 className={styles.loadingTitle}>
-                  {loadState === 'retrying' ? '영상을 다시 준비 중입니다' : '영상 준비 중입니다'}
+                  {loadState === 'retrying' ? t('video.retrying') : t('video.loading')}
                 </h3>
                 <p className={styles.loadingText}>
-                  준비가 끝나면 재생 버튼이 활성화됩니다.
+                  {t('video.readyNotice')}
                 </p>
               </>
             )}
