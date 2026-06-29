@@ -105,6 +105,16 @@ export const studentTextTranslations: Record<string, LocaleText> = {
     bn: 'থেকে পরীক্ষা দিতে পারবেন।',
   },
   '회사 배정': { en: 'Company Assignment', th: 'กำหนดบริษัท', bn: 'কোম্পানি বরাদ্দ' },
+  '회사 코드를 입력해주세요.': {
+    en: 'Please enter the company code.',
+    th: 'กรุณากรอกรหัสบริษัท',
+    bn: 'কোম্পানি কোড লিখুন।',
+  },
+  '회사 코드는 6자리 영문과 숫자 조합이어야 합니다.': {
+    en: 'The company code must be a 6-character combination of letters and numbers.',
+    th: 'รหัสบริษัทต้องเป็นตัวอักษรและตัวเลข 6 ตัว',
+    bn: 'কোম্পানি কোড ৬ অক্ষর ও সংখ্যার সমন্বয় হতে হবে।',
+  },
   '회사 코드': { en: 'Company Code', th: 'รหัสบริษัท', bn: 'কোম্পানি কোড' },
   '회사 코드를 입력하여': {
     en: 'Enter your company code',
@@ -132,6 +142,41 @@ export const studentTextTranslations: Record<string, LocaleText> = {
     en: 'Assign later (log out)',
     th: 'กำหนดภายหลัง (ออกจากระบบ)',
     bn: 'পরে বরাদ্দ করুন (লগ আউট)',
+  },
+  '이미 회사에 배정된 사용자입니다.': {
+    en: 'You are already assigned to a company.',
+    th: 'คุณได้รับการกำหนดบริษัทแล้ว',
+    bn: 'আপনাকে ইতিমধ্যে একটি কোম্পানিতে বরাদ্দ করা হয়েছে।',
+  },
+  '중복된 요청입니다.': {
+    en: 'This is a duplicate request.',
+    th: 'เป็นคำขอซ้ำ',
+    bn: 'এটি একটি পুনরাবৃত্ত অনুরোধ।',
+  },
+  '유효하지 않은 회사 코드입니다. 다시 확인해주세요.': {
+    en: 'Invalid company code. Please check again.',
+    th: 'รหัสบริษัทไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง',
+    bn: 'কোম্পানি কোড সঠিক নয়। আবার পরীক্ষা করুন।',
+  },
+  '비활성화된 회사입니다. 관리자에게 문의해주세요.': {
+    en: 'This company is inactive. Please contact an administrator.',
+    th: 'บริษัทนี้ถูกปิดใช้งาน กรุณาติดต่อผู้ดูแลระบบ',
+    bn: 'এই কোম্পানি নিষ্ক্রিয়। অ্যাডমিনের সাথে যোগাযোগ করুন।',
+  },
+  '입력한 회사 코드를 확인해주세요.': {
+    en: 'Please check the company code you entered.',
+    th: 'กรุณาตรวจสอบรหัสบริษัทที่กรอก',
+    bn: 'আপনার লেখা কোম্পানি কোড পরীক্ষা করুন।',
+  },
+  '로그인이 필요합니다.': {
+    en: 'Login is required.',
+    th: 'จำเป็นต้องเข้าสู่ระบบ',
+    bn: 'লগ ইন প্রয়োজন।',
+  },
+  '회사 배정에 실패했습니다. 다시 시도해주세요.': {
+    en: 'Company assignment failed. Please try again.',
+    th: 'กำหนดบริษัทไม่สำเร็จ กรุณาลองอีกครั้ง',
+    bn: 'কোম্পানি বরাদ্দ ব্যর্থ হয়েছে। আবার চেষ্টা করুন।',
   },
   '배정 완료!': { en: 'Assignment Complete!', th: 'กำหนดเรียบร้อย!', bn: 'বরাদ্দ সম্পন্ন!' },
   '회사에 성공적으로 배정되었습니다': {
@@ -164,6 +209,16 @@ export const studentTextTranslations: Record<string, LocaleText> = {
   },
   '로그인': { en: 'Log in', th: 'เข้าสู่ระบบ', bn: 'লগ ইন' },
   '휴대폰 번호': { en: 'Phone Number', th: 'หมายเลขโทรศัพท์', bn: 'মোবাইল নম্বর' },
+  '올바른 휴대폰 번호를 입력해주세요 (01012345678)': {
+    en: 'Please enter a valid phone number (01012345678).',
+    th: 'กรุณากรอกหมายเลขโทรศัพท์ที่ถูกต้อง (01012345678)',
+    bn: 'সঠিক মোবাইল নম্বর লিখুন (01012345678)।',
+  },
+  '올바른 휴대폰 번호를 입력해주세요.': {
+    en: 'Please enter a valid phone number.',
+    th: 'กรุณากรอกหมายเลขโทรศัพท์ที่ถูกต้อง',
+    bn: 'সঠিক মোবাইল নম্বর লিখুন।',
+  },
   '인증번호 받기': { en: 'Get Verification Code', th: 'รับรหัสยืนยัน', bn: 'যাচাইকরণ কোড নিন' },
   '인증번호 전송 중...': {
     en: 'Sending code...',
@@ -185,6 +240,96 @@ export const studentTextTranslations: Record<string, LocaleText> = {
   '번호 변경': { en: 'Change Number', th: 'เปลี่ยนหมายเลข', bn: 'নম্বর পরিবর্তন' },
   '인증 중...': { en: 'Verifying...', th: 'กำลังยืนยัน...', bn: 'যাচাই হচ্ছে...' },
   '인증 확인': { en: 'Verify', th: 'ยืนยัน', bn: 'যাচাই করুন' },
+  '이미 가입된 전화번호입니다. 로그인해주세요.': {
+    en: 'This phone number is already registered. Please log in.',
+    th: 'หมายเลขนี้สมัครไว้แล้ว กรุณาเข้าสู่ระบบ',
+    bn: 'এই মোবাইল নম্বরটি ইতিমধ্যে নিবন্ধিত। লগ ইন করুন।',
+  },
+  '이미 가입된 전화번호입니다.': {
+    en: 'This phone number is already registered.',
+    th: 'หมายเลขนี้สมัครไว้แล้ว',
+    bn: 'এই মোবাইল নম্বরটি ইতিমধ্যে নিবন্ধিত।',
+  },
+  '잠시 후 다시 시도해주세요': {
+    en: 'Please try again later.',
+    th: 'กรุณาลองอีกครั้งภายหลัง',
+    bn: 'অনুগ্রহ করে পরে আবার চেষ্টা করুন।',
+  },
+  '인증번호 전송에 실패했습니다. 다시 시도해주세요.': {
+    en: 'Failed to send the verification code. Please try again.',
+    th: 'ส่งรหัสยืนยันไม่สำเร็จ กรุณาลองอีกครั้ง',
+    bn: 'যাচাইকরণ কোড পাঠানো যায়নি। আবার চেষ্টা করুন।',
+  },
+  '6자리 인증번호를 모두 입력해주세요': {
+    en: 'Please enter all 6 digits of the verification code.',
+    th: 'กรุณากรอกรหัสยืนยัน 6 หลักให้ครบ',
+    bn: '৬ সংখ্যার যাচাইকরণ কোড সম্পূর্ণ লিখুন।',
+  },
+  '6자리 인증번호를 모두 입력해주세요.': {
+    en: 'Please enter all 6 digits of the verification code.',
+    th: 'กรุณากรอกรหัสยืนยัน 6 หลักให้ครบ',
+    bn: '৬ সংখ্যার যাচাইকরণ কোড সম্পূর্ণ লিখুন।',
+  },
+  '인증번호가 만료되었습니다. 새로운 인증번호를 요청해주세요.': {
+    en: 'The code has expired. Please request a new one.',
+    th: 'รหัสหมดอายุแล้ว กรุณาขอรหัสใหม่',
+    bn: 'কোডের মেয়াদ শেষ হয়েছে। নতুন কোড অনুরোধ করুন।',
+  },
+  '잘못된 인증번호입니다. 다시 확인해주세요.': {
+    en: 'The code is incorrect. Please check again.',
+    th: 'รหัสไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง',
+    bn: 'কোডটি সঠিক নয়। আবার পরীক্ষা করুন।',
+  },
+  '인증에 실패했습니다. 다시 시도해주세요.': {
+    en: 'Verification failed. Please try again.',
+    th: 'ยืนยันไม่สำเร็จ กรุณาลองอีกครั้ง',
+    bn: 'যাচাই ব্যর্থ হয়েছে। আবার চেষ্টা করুন।',
+  },
+  '인증번호 재전송에 실패했습니다.': {
+    en: 'Failed to resend the verification code.',
+    th: 'ส่งรหัสยืนยันอีกครั้งไม่สำเร็จ',
+    bn: 'যাচাইকরণ কোড আবার পাঠানো যায়নি।',
+  },
+  '비밀번호는 최소 8자이며, 대문자/소문자/숫자/특수문자를 각각 1개 이상 포함해야 합니다.': {
+    en: 'The password must be at least 8 characters and include uppercase, lowercase, number, and special characters.',
+    th: 'รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร และมีตัวพิมพ์ใหญ่ ตัวพิมพ์เล็ก ตัวเลข และอักขระพิเศษอย่างน้อยอย่างละ 1 ตัว',
+    bn: 'পাসওয়ার্ড কমপক্ষে ৮ অক্ষরের হতে হবে এবং বড় হাতের অক্ষর, ছোট হাতের অক্ষর, সংখ্যা ও বিশেষ অক্ষর অন্তত ১টি করে থাকতে হবে।',
+  },
+  '비밀번호가 일치하지 않습니다.': {
+    en: 'Passwords do not match.',
+    th: 'รหัสผ่านไม่ตรงกัน',
+    bn: 'পাসওয়ার্ড মিলছে না।',
+  },
+  '초대코드는 6-12자리 영대문자와 숫자 조합이어야 합니다.': {
+    en: 'The invite code must be 6-12 uppercase letters and numbers.',
+    th: 'รหัสเชิญต้องเป็นตัวพิมพ์ใหญ่และตัวเลข 6-12 ตัว',
+    bn: 'আমন্ত্রণ কোড ৬-১২টি বড় হাতের অক্ষর ও সংখ্যার সমন্বয় হতে হবে।',
+  },
+  '중복된 정보가 있습니다. 확인해주세요.': {
+    en: 'Some information is duplicated. Please check again.',
+    th: 'มีข้อมูลซ้ำ กรุณาตรวจสอบอีกครั้ง',
+    bn: 'কিছু তথ্য ডুপ্লিকেট হয়েছে। আবার পরীক্ষা করুন।',
+  },
+  '인증 토큰이 유효하지 않습니다. 다시 인증해주세요.': {
+    en: 'The verification token is invalid. Please verify again.',
+    th: 'โทเค็นยืนยันไม่ถูกต้อง กรุณายืนยันอีกครั้ง',
+    bn: 'যাচাইকরণ টোকেন সঠিক নয়। আবার যাচাই করুন।',
+  },
+  '유효하지 않은 초대코드입니다.': {
+    en: 'Invalid invite code.',
+    th: 'รหัสเชิญไม่ถูกต้อง',
+    bn: 'আমন্ত্রণ কোড সঠিক নয়।',
+  },
+  '입력 정보를 확인해주세요.': {
+    en: 'Please check the information you entered.',
+    th: 'กรุณาตรวจสอบข้อมูลที่กรอก',
+    bn: 'আপনার লেখা তথ্য পরীক্ষা করুন।',
+  },
+  '회원가입에 실패했습니다. 다시 시도해주세요.': {
+    en: 'Sign up failed. Please try again.',
+    th: 'สมัครสมาชิกไม่สำเร็จ กรุณาลองอีกครั้ง',
+    bn: 'নিবন্ধন ব্যর্থ হয়েছে। আবার চেষ্টা করুন।',
+  },
   '이름 *': { en: 'Name *', th: 'ชื่อ *', bn: 'নাম *' },
   '비밀번호 *': { en: 'Password *', th: 'รหัสผ่าน *', bn: 'পাসওয়ার্ড *' },
   '비밀번호 확인 *': {
@@ -277,6 +422,56 @@ export const studentTextTranslations: Record<string, LocaleText> = {
     bn: 'নতুন পাসওয়ার্ড দিয়ে লগ ইন করুন।',
   },
   '로그인하러 가기': { en: 'Go to Login', th: 'ไปเข้าสู่ระบบ', bn: 'লগইনে যান' },
+  '요청 처리 중 오류가 발생했습니다.': {
+    en: 'An error occurred while processing the request.',
+    th: 'เกิดข้อผิดพลาดระหว่างดำเนินการคำขอ',
+    bn: 'অনুরোধ প্রক্রিয়াকরণের সময় একটি ত্রুটি ঘটেছে।',
+  },
+  '인증번호 전송에 실패했습니다. 잠시 후 다시 시도해주세요.': {
+    en: 'Failed to send the verification code. Please try again later.',
+    th: 'ส่งรหัสยืนยันไม่สำเร็จ กรุณาลองอีกครั้งภายหลัง',
+    bn: 'যাচাইকরণ কোড পাঠানো যায়নি। কিছুক্ষণ পরে আবার চেষ্টা করুন।',
+  },
+  '인증에 실패했습니다.': {
+    en: 'Verification failed.',
+    th: 'ยืนยันไม่สำเร็จ',
+    bn: 'যাচাই ব্যর্থ হয়েছে।',
+  },
+  '인증 처리 중 오류가 발생했습니다.': {
+    en: 'An error occurred while verifying.',
+    th: 'เกิดข้อผิดพลาดระหว่างยืนยัน',
+    bn: 'যাচাই করার সময় একটি ত্রুটি ঘটেছে।',
+  },
+  '인증번호 재전송에 실패했습니다. 잠시 후 다시 시도해주세요.': {
+    en: 'Failed to resend the verification code. Please try again later.',
+    th: 'ส่งรหัสยืนยันอีกครั้งไม่สำเร็จ กรุณาลองอีกครั้งภายหลัง',
+    bn: 'যাচাইকরণ কোড আবার পাঠানো যায়নি। কিছুক্ষণ পরে আবার চেষ্টা করুন।',
+  },
+  '재전송에 실패했습니다.': {
+    en: 'Resend failed.',
+    th: 'ส่งอีกครั้งไม่สำเร็จ',
+    bn: 'আবার পাঠানো ব্যর্থ হয়েছে।',
+  },
+  '비밀번호는 최소 8자 이상이어야 합니다.': {
+    en: 'The password must be at least 8 characters.',
+    th: 'รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร',
+    bn: 'পাসওয়ার্ড কমপক্ষে ৮ অক্ষরের হতে হবে।',
+  },
+  '대문자, 소문자, 숫자, 특수문자를 각각 1개 이상 포함해야 합니다.': {
+    en: 'Include at least one uppercase letter, lowercase letter, number, and special character.',
+    th: 'ต้องมีตัวพิมพ์ใหญ่ ตัวพิมพ์เล็ก ตัวเลข และอักขระพิเศษอย่างน้อยอย่างละ 1 ตัว',
+    bn: 'বড় হাতের অক্ষর, ছোট হাতের অক্ষর, সংখ্যা ও বিশেষ অক্ষর অন্তত ১টি করে থাকতে হবে।',
+  },
+  '비밀번호 변경에 실패했습니다.': {
+    en: 'Failed to change the password.',
+    th: 'เปลี่ยนรหัสผ่านไม่สำเร็จ',
+    bn: 'পাসওয়ার্ড পরিবর্তন করা যায়নি।',
+  },
+  '비밀번호 변경 중 오류가 발생했습니다.': {
+    en: 'An error occurred while changing the password.',
+    th: 'เกิดข้อผิดพลาดระหว่างเปลี่ยนรหัสผ่าน',
+    bn: 'পাসওয়ার্ড পরিবর্তনের সময় একটি ত্রুটি ঘটেছে।',
+  },
   '시험을 준비 중입니다...': {
     en: 'Preparing the exam...',
     th: 'กำลังเตรียมแบบทดสอบ...',
@@ -299,6 +494,71 @@ export const studentTextTranslations: Record<string, LocaleText> = {
   '취소': { en: 'Cancel', th: 'ยกเลิก', bn: 'বাতিল' },
   '제출 중...': { en: 'Submitting...', th: 'กำลังส่ง...', bn: 'জমা হচ্ছে...' },
   '시험 제출': { en: 'Submit Exam', th: 'ส่งแบบทดสอบ', bn: 'পরীক্ষা জমা দিন' },
+  '시험 응시 조건을 만족하지 않습니다.': {
+    en: 'You do not meet the exam requirements.',
+    th: 'คุณยังไม่ผ่านเงื่อนไขการสอบ',
+    bn: 'আপনি পরীক্ষার শর্ত পূরণ করেননি।',
+  },
+  '다시 수강하기 조건을 만족하지 않습니다.': {
+    en: 'You do not meet the retake requirements.',
+    th: 'คุณยังไม่ผ่านเงื่อนไขการเรียนใหม่',
+    bn: 'আপনি পুনরায় শেখার শর্ত পূরণ করেননি।',
+  },
+  '모든 강의 진도가 0%로 초기화됩니다. 계속하시겠습니까?': {
+    en: 'All lesson progress will be reset to 0%. Continue?',
+    th: 'ความคืบหน้าทุกบทเรียนจะถูกรีเซ็ตเป็น 0% ต้องการดำเนินการต่อหรือไม่?',
+    bn: 'সব লেসনের অগ্রগতি ০% এ রিসেট হবে। চালিয়ে যাবেন?',
+  },
+  '다시 수강하기가 완료되었습니다. 모든 강의를 처음부터 다시 수강해주세요.': {
+    en: 'Retake has been set up. Please take all lessons again from the beginning.',
+    th: 'ตั้งค่าเรียนใหม่เรียบร้อยแล้ว กรุณาเรียนทุกบทเรียนใหม่ตั้งแต่ต้น',
+    bn: 'পুনরায় শেখা প্রস্তুত হয়েছে। সব লেসন শুরু থেকে আবার নিন।',
+  },
+  '다시 수강하기 요청 중 오류가 발생했습니다.': {
+    en: 'An error occurred while requesting retake.',
+    th: 'เกิดข้อผิดพลาดระหว่างขอเรียนใหม่',
+    bn: 'পুনরায় শেখার অনুরোধের সময় একটি ত্রুটি ঘটেছে।',
+  },
+  '과목 상태 조회 실패': {
+    en: 'Failed to load subject status',
+    th: 'โหลดสถานะรายวิชาไม่สำเร็จ',
+    bn: 'বিষয়ের অবস্থা লোড করা যায়নি',
+  },
+  '과목을 찾을 수 없습니다': {
+    en: 'Subject not found',
+    th: 'ไม่พบรายวิชา',
+    bn: 'বিষয় পাওয়া যায়নি',
+  },
+  '모든 강의를 90% 이상 수강해주세요.': {
+    en: 'Please complete at least 90% of every lesson.',
+    th: 'กรุณาเรียนทุกบทเรียนอย่างน้อย 90%',
+    bn: 'সব লেসন অন্তত ৯০% সম্পন্ন করুন।',
+  },
+  '시험을 준비할 수 없습니다.': {
+    en: 'Cannot prepare the exam.',
+    th: 'ไม่สามารถเตรียมแบบทดสอบได้',
+    bn: 'পরীক্ষা প্রস্তুত করা যাচ্ছে না।',
+  },
+  '시험 시작 실패': {
+    en: 'Failed to start exam',
+    th: 'เริ่มแบบทดสอบไม่สำเร็จ',
+    bn: 'পরীক্ষা শুরু করা যায়নি',
+  },
+  '시험을 시작할 수 없습니다.': {
+    en: 'Cannot start the exam.',
+    th: 'ไม่สามารถเริ่มแบบทดสอบได้',
+    bn: 'পরীক্ষা শুরু করা যাচ্ছে না।',
+  },
+  '시험 제출 실패': {
+    en: 'Failed to submit exam',
+    th: 'ส่งแบบทดสอบไม่สำเร็จ',
+    bn: 'পরীক্ষা জমা দেওয়া যায়নি',
+  },
+  '시험 제출 중 오류가 발생했습니다.': {
+    en: 'An error occurred while submitting the exam.',
+    th: 'เกิดข้อผิดพลาดระหว่างส่งแบบทดสอบ',
+    bn: 'পরীক্ষা জমা দেওয়ার সময় একটি ত্রুটি ঘটেছে।',
+  },
   '시험을 시작할 수 없습니다': {
     en: 'Cannot start the exam',
     th: 'ไม่สามารถเริ่มแบบทดสอบได้',
@@ -327,10 +587,25 @@ export const studentTextTranslations: Record<string, LocaleText> = {
     th: 'ต้องการออกจากแบบทดสอบหรือไม่?',
     bn: 'আপনি কি পরীক্ষা ছাড়তে চান?',
   },
+  '시험을 종료하시겠습니까? 진행 상황이 저장되지 않습니다.': {
+    en: 'Do you want to exit the exam? Your progress will not be saved.',
+    th: 'ต้องการออกจากแบบทดสอบหรือไม่? ความคืบหน้าจะไม่ถูกบันทึก',
+    bn: 'আপনি কি পরীক্ষা ছাড়তে চান? অগ্রগতি সংরক্ষণ হবে না।',
+  },
   '진행 상황이 저장되지 않습니다.': {
     en: 'Your progress will not be saved.',
     th: 'ความคืบหน้าจะไม่ถูกบันทึก',
     bn: 'আপনার অগ্রগতি সংরক্ষণ হবে না।',
+  },
+  '모든 문항에 답을 선택해주세요.': {
+    en: 'Please select an answer for every question.',
+    th: 'กรุณาเลือกคำตอบให้ครบทุกข้อ',
+    bn: 'প্রতিটি প্রশ্নের উত্তর নির্বাচন করুন।',
+  },
+  '시험을 제출하시겠습니까? 제출 후에는 수정할 수 없습니다.': {
+    en: 'Submit the exam? You cannot edit it after submission.',
+    th: 'ต้องการส่งแบบทดสอบหรือไม่? หลังส่งแล้วจะแก้ไขไม่ได้',
+    bn: 'পরীক্ষা জমা দেবেন? জমা দেওয়ার পরে সংশোধন করা যাবে না।',
   },
   '계속 진행': { en: 'Continue', th: 'ทำต่อ', bn: 'চালিয়ে যান' },
   '종료': { en: 'Exit', th: 'ออก', bn: 'বের হন' },
@@ -362,6 +637,26 @@ export const studentTextTranslations: Record<string, LocaleText> = {
   '수료 기준': { en: 'Completion Criteria', th: 'เกณฑ์สำเร็จ', bn: 'সম্পন্নের মানদণ্ড' },
   '남은 시험 기회': { en: 'Exam Attempts Left', th: 'โอกาสสอบที่เหลือ', bn: 'বাকি পরীক্ষার সুযোগ' },
   '총 문항 수': { en: 'Total Questions', th: 'จำนวนคำถามทั้งหมด', bn: 'মোট প্রশ্ন' },
+  '과목을 다시 수강하시겠습니까?': {
+    en: 'Do you want to retake this subject?',
+    th: 'ต้องการเรียนรายวิชานี้ใหม่หรือไม่?',
+    bn: 'আপনি কি এই বিষয়টি আবার শিখতে চান?',
+  },
+  '모든 강의 진도가 0%로 초기화되고, 3회의 새로운 시험 기회가 주어집니다.': {
+    en: 'All lesson progress will be reset to 0%, and you will receive 3 new exam attempts.',
+    th: 'ความคืบหน้าทุกบทเรียนจะถูกรีเซ็ตเป็น 0% และจะได้รับโอกาสสอบใหม่ 3 ครั้ง',
+    bn: 'সব লেসনের অগ্রগতি ০% এ রিসেট হবে এবং ৩টি নতুন পরীক্ষার সুযোগ দেওয়া হবে।',
+  },
+  '과목이 초기화되었습니다. 모든 강의를 다시 수강해주세요.': {
+    en: 'The subject has been reset. Please take all lessons again.',
+    th: 'รีเซ็ตรายวิชาแล้ว กรุณาเรียนทุกบทเรียนใหม่',
+    bn: 'বিষয়টি রিসেট হয়েছে। সব লেসন আবার নিন।',
+  },
+  '다시 수강하기 중 오류가 발생했습니다.': {
+    en: 'An error occurred while setting up retake.',
+    th: 'เกิดข้อผิดพลาดระหว่างตั้งค่าเรียนใหม่',
+    bn: 'পুনরায় শেখা প্রস্তুত করার সময় একটি ত্রুটি ঘটেছে।',
+  },
   '과목을 수료하셨습니다!': {
     en: 'You completed the subject!',
     th: 'คุณสำเร็จรายวิชาแล้ว!',
@@ -436,7 +731,7 @@ export const studentTextTranslations: Record<string, LocaleText> = {
   '회사 배정 상태를 확인해주세요.': {
     en: 'Please check your company assignment status.',
     th: 'กรุณาตรวจสอบสถานะการกำหนดบริษัท',
-    bn: 'আপনার কোম্পানি বরাদ্দের অবস্থা 확인 করুন।',
+    bn: 'আপনার কোম্পানি বরাদ্দের অবস্থা পরীক্ষা করুন।',
   },
   '교육 시작일': { en: 'Training Start Date', th: 'วันเริ่มเรียน', bn: 'শিক্ষা শুরুর তারিখ' },
   '교육 종료일': { en: 'Training End Date', th: 'วันสิ้นสุดการเรียน', bn: 'শিক্ষা শেষের তারিখ' },
@@ -466,7 +761,7 @@ export const studentTextTranslations: Record<string, LocaleText> = {
   '산업안전보건법령에서 요구하는 법정·위탁 교육 과정을 체계적으로 운영하고 있습니다.': {
     en: 'It systematically operates legally required and commissioned training under occupational safety and health laws.',
     th: 'ดำเนินหลักสูตรตามกฎหมายและหลักสูตรที่ได้รับมอบหมายตามกฎหมายความปลอดภัยและอาชีวอนามัยอย่างเป็นระบบ',
-    bn: 'এটি পেশাগত নিরাপত্তা ও স্বাস্থ্য আইনে প্রয়োজনীয় আইনগত ও委託 শিক্ষা পদ্ধতিগতভাবে পরিচালনা করে।',
+    bn: 'এটি পেশাগত নিরাপত্তা ও স্বাস্থ্য আইনে প্রয়োজনীয় আইনগত ও কমিশনপ্রাপ্ত শিক্ষা পদ্ধতিগতভাবে পরিচালনা করে।',
   },
   '교육기간': { en: 'Training Period', th: 'ระยะเวลาเรียน', bn: 'শিক্ষার সময়কাল' },
   '교육기간은 회사(고객사) 단위로 설정되며, 시작일 기준 6개월 동안 수강이 가능합니다.': {
@@ -488,7 +783,7 @@ export const studentTextTranslations: Record<string, LocaleText> = {
   '100% 온라인 동영상 기반 이러닝 교육으로 제공됩니다.': {
     en: 'Training is provided as 100% online video-based e-learning.',
     th: 'การเรียนเป็นอีเลิร์นนิงแบบวิดีโอออนไลน์ 100%',
-    bn: 'শিক্ষা ১০০% অনলাইন ভিডিওভিত্তিক ই-লার্নিং হিসেবে 제공 করা হয়।',
+    bn: 'শিক্ষা ১০০% অনলাইন ভিডিওভিত্তিক ই-লার্নিং হিসেবে প্রদান করা হয়।',
   },
   '각 과목은 여러 개의 강의(레슨)으로 구성되며, 레슨별 학습 진도율이 자동으로 기록됩니다.': {
     en: 'Each subject consists of multiple lessons, and progress is recorded automatically for each lesson.',
@@ -511,7 +806,7 @@ export const studentTextTranslations: Record<string, LocaleText> = {
   '상단 내비게이션의 「강의실」 메뉴에서 배정된 교육과정을 확인합니다.': {
     en: 'Check your assigned training in the Classroom menu at the top.',
     th: 'ตรวจสอบหลักสูตรที่ได้รับมอบหมายจากเมนูห้องเรียนด้านบน',
-    bn: 'উপরের ক্লাসরুম মেনুতে বরাদ্দকৃত শিক্ষা 과정 দেখুন।',
+    bn: 'উপরের ক্লাসরুম মেনুতে বরাদ্দকৃত শিক্ষা কোর্স দেখুন।',
   },
   '동영상 학습': { en: 'Video Learning', th: 'เรียนผ่านวิดีโอ', bn: 'ভিডিও শিক্ষা' },
   '각 레슨의 동영상을 시청하며, 시청 시간에 따라 진도율이 자동으로 저장됩니다.': {
@@ -587,7 +882,7 @@ export const studentTextTranslations: Record<string, LocaleText> = {
   '제2조 (개인정보의 처리 및 보유 기간)': { en: 'Article 2. Processing and Retention Period', th: 'ข้อ 2 ระยะเวลาประมวลผลและเก็บรักษาข้อมูล', bn: 'ধারা ২. প্রক্রিয়াকরণ ও সংরক্ষণকাল' },
   '제3조 (처리하는 개인정보의 항목)': { en: 'Article 3. Personal Information Items Processed', th: 'ข้อ 3 รายการข้อมูลส่วนบุคคลที่ประมวลผล', bn: 'ধারা ৩. প্রক্রিয়াকৃত ব্যক্তিগত তথ্য' },
   '제4조 (개인정보의 제3자 제공)': { en: 'Article 4. Provision to Third Parties', th: 'ข้อ 4 การให้ข้อมูลแก่บุคคลที่สาม', bn: 'ধারা ৪. তৃতীয় পক্ষকে প্রদান' },
-  '제5조 (개인정보처리의 위탁)': { en: 'Article 5. Outsourcing of Processing', th: 'ข้อ 5 การ委託ประมวลผลข้อมูล', bn: 'ধারা ৫. প্রক্রিয়াকরণ আউটসোর্সিং' },
+  '제5조 (개인정보처리의 위탁)': { en: 'Article 5. Outsourcing of Processing', th: 'ข้อ 5 การมอบหมายการประมวลผลข้อมูล', bn: 'ধারা ৫. প্রক্রিয়াকরণ আউটসোর্সিং' },
   '제6조 (정보주체와 법정대리인의 권리·의무 및 행사방법)': { en: 'Article 6. Rights and How to Exercise Them', th: 'ข้อ 6 สิทธิและวิธีใช้สิทธิของเจ้าของข้อมูล', bn: 'ধারা ৬. অধিকার ও তা প্রয়োগের পদ্ধতি' },
   '제7조 (개인정보의 파기)': { en: 'Article 7. Destruction of Personal Information', th: 'ข้อ 7 การทำลายข้อมูลส่วนบุคคล', bn: 'ধারা ৭. ব্যক্তিগত তথ্য ধ্বংস' },
   '제8조 (개인정보의 안전성 확보조치)': { en: 'Article 8. Security Measures', th: 'ข้อ 8 มาตรการรักษาความปลอดภัย', bn: 'ধারা ৮. নিরাপত্তা ব্যবস্থা' },
@@ -619,6 +914,16 @@ export const studentTextTranslations: Record<string, LocaleText> = {
   '강사': { en: 'Instructor', th: 'ผู้สอน', bn: 'প্রশিক্ষক' },
   '답변': { en: 'Reply', th: 'ตอบ', bn: 'উত্তর' },
   '답변하기': { en: 'Reply', th: 'ตอบกลับ', bn: 'উত্তর দিন' },
+  '질문 등록에 실패했습니다.': {
+    en: 'Failed to submit the question.',
+    th: 'ส่งคำถามไม่สำเร็จ',
+    bn: 'প্রশ্ন জমা দেওয়া যায়নি।',
+  },
+  '답변 등록에 실패했습니다.': {
+    en: 'Failed to submit the reply.',
+    th: 'ส่งคำตอบไม่สำเร็จ',
+    bn: 'উত্তর জমা দেওয়া যায়নি।',
+  },
 };
 
 export const studentAttributeTranslations: Record<string, LocaleText> = {
@@ -667,6 +972,13 @@ export const studentAttributeTranslations: Record<string, LocaleText> = {
 
 export function translateStudentText(source: string, locale: Locale): string {
   if (locale === 'ko') return source;
+
+  if (source.includes('\n')) {
+    return source
+      .split('\n')
+      .map((line) => translateStudentText(line, locale))
+      .join('\n');
+  }
 
   const trimmed = source.trim();
   const direct = studentTextTranslations[trimmed]?.[locale];
