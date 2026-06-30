@@ -41,7 +41,7 @@ interface CurriculumItem {
 
 export default function CurriculumPage() {
   const router = useRouter();
-  const { isAuthenticated, isLoading: authLoading, logout } = useAuthGuard();
+  const { isAuthenticated, isLoading: authLoading } = useAuthGuard();
   const { locale } = useLocale();
   const [curriculumData, setCurriculumData] = useState<CurriculumItem[]>([]);
   const [companyPeriod, setCompanyPeriod] = useState<{ startDate: string; endDate: string; remainingDays: number } | null>(null);
@@ -235,50 +235,26 @@ export default function CurriculumPage() {
   return (
     <div className="student-page">
       <div className="student-container">
-        <div className="mb-4 rounded-lg border border-border bg-primary p-4 text-white shadow-md md:mb-6 md:rounded-xl md:p-7">
-          <div className="flex flex-row items-start justify-between gap-3 md:items-end">
-            <div>
-              <p className="text-xs font-bold text-white/75 md:text-sm">{t('강의실')}</p>
-              <h1 className="mt-1 text-xl font-black md:text-4xl">{t('배정된 교육과정')}</h1>
-              <p className="mt-2 hidden max-w-2xl text-base font-medium leading-relaxed text-white/85 md:block">
-                {t('교육 기간 안에 강의를 수강하고 시험을 완료해주세요.')}
-              </p>
+        <div className="mb-4 flex flex-col gap-3 md:mb-5 lg:flex-row lg:items-center lg:justify-between">
+          <h1 className="text-xl font-black text-text-primary md:text-2xl">
+            {t('배정된 교육과정')}
+          </h1>
+
+          {companyPeriod && (
+            <div className="student-panel flex flex-wrap items-center gap-2 px-3 py-2 text-xs font-bold text-text-secondary md:gap-3 md:px-4 md:text-sm">
+              <span className="text-text-primary">{t('수강 기간')}</span>
+              <span className="rounded-md bg-bg-elevated px-2.5 py-1">
+                {t('시작일:')} {companyPeriod.startDate ? new Date(companyPeriod.startDate).toLocaleDateString(dateLocale) : '-'}
+              </span>
+              <span className="rounded-md bg-bg-elevated px-2.5 py-1">
+                {t('종료일:')} {companyPeriod.endDate ? new Date(companyPeriod.endDate).toLocaleDateString(dateLocale) : '-'}
+              </span>
+              <span className={`rounded-md px-2.5 py-1 font-black ${companyPeriod.remainingDays > 30 ? 'bg-success-bg text-success' : companyPeriod.remainingDays > 7 ? 'bg-warning-bg text-warning' : 'bg-error-bg text-error'}`}>
+                D-{companyPeriod.remainingDays}
+              </span>
             </div>
-            <button
-              onClick={logout}
-              className="inline-flex min-h-9 shrink-0 items-center justify-center rounded-lg border border-white/30 px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-white/10 md:min-h-11 md:px-4 md:py-2 md:text-sm md:self-start"
-            >
-              {t('로그아웃')}
-            </button>
-          </div>
+          )}
         </div>
-        {/* 수강 기간 정보 */}
-        {companyPeriod && (
-          <div className="student-panel mb-5 p-4 md:mb-8 md:p-6">
-            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between md:gap-4">
-              <div className="min-w-0 flex-1">
-                <h2 className="text-lg font-black text-text-primary md:text-xl">{t('수강 기간')}</h2>
-                <div className="mt-2 grid grid-cols-2 gap-2 text-sm text-text-secondary md:mt-3 md:gap-3 md:text-base">
-                  <div className="student-stat">
-                    <div className="text-xs font-bold text-text-tertiary md:text-sm">{t('시작일:')}</div>
-                    <div className="mt-1 text-sm font-bold text-text-primary md:text-lg">{companyPeriod.startDate ? new Date(companyPeriod.startDate).toLocaleDateString(dateLocale) : '-'}</div>
-                  </div>
-                  <div className="student-stat">
-                    <div className="text-xs font-bold text-text-tertiary md:text-sm">{t('종료일:')}</div>
-                    <div className="mt-1 text-sm font-bold text-text-primary md:text-lg">{companyPeriod.endDate ? new Date(companyPeriod.endDate).toLocaleDateString(dateLocale) : '-'}</div>
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center justify-between rounded-lg border border-border bg-bg-elevated px-4 py-3 text-center md:block md:min-w-44 md:rounded-xl md:px-6 md:py-5">
-                <div className="text-xs font-bold text-text-tertiary md:text-sm">{t('남은 기간')}</div>
-                <div className={`text-2xl font-black md:mt-1 md:text-4xl ${companyPeriod.remainingDays > 30 ? 'text-success' : companyPeriod.remainingDays > 7 ? 'text-warning' : 'text-error'}`}>
-                  D-{companyPeriod.remainingDays}
-                </div>
-                <div className="hidden text-sm font-bold text-text-tertiary md:block">{t('남음')}</div>
-              </div>
-        </div>
-      </div>
-        )}
 
         {/* 과목 카드 그리드 (3열 → 2열 → 1열) */}
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3">
