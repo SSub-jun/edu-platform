@@ -140,18 +140,16 @@ export default function CompanyAssignPage() {
 
   if (success && assignedCompany) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6 bg-bg-primary">
-        <div className="w-full max-w-md bg-surface border border-border rounded-xl overflow-hidden">
-          <div className="text-center px-10 py-10 pb-5 bg-surface border-b border-border">
-            <div className="text-6xl mb-4 animate-bounce">🎉</div>
+      <div className="student-page flex items-center justify-center">
+        <div className="student-panel-strong w-full max-w-md overflow-hidden">
+          <div className="border-b border-border bg-bg-elevated px-8 py-8 text-center">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-success-bg text-2xl font-black text-success">OK</div>
             <h1 className="text-[32px] font-bold text-text-primary mb-3">{t('배정 완료!')}</h1>
             <p className="text-base text-text-secondary font-medium">{t('회사에 성공적으로 배정되었습니다')}</p>
           </div>
 
           <div className="p-10">
             <div className="text-center">
-              <div className="text-5xl mb-4">✅</div>
-              
               <h2 className="text-2xl font-bold text-text-primary mb-2 bg-gradient-to-r from-success to-primary bg-clip-text text-transparent">
                 {t('환영합니다!')}
               </h2>
@@ -160,7 +158,7 @@ export default function CompanyAssignPage() {
                 {t('이제 학습을 시작할 수 있습니다.')}
               </p>
 
-              <div className="bg-gradient-to-br from-surface to-bg-primary border border-border rounded-xl p-6 mb-6">
+              <div className="student-muted-box mb-6 text-center">
                 <div className="text-xl font-bold text-text-primary mb-1">
                   {assignedCompany.name}
                 </div>
@@ -176,7 +174,7 @@ export default function CompanyAssignPage() {
 
               <button
                 onClick={() => router.push('/curriculum')}
-                className="w-full h-12 bg-primary text-text-primary rounded-lg text-base font-semibold transition-all hover:bg-primary-600 active:bg-primary-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600 focus-visible:outline-offset-2"
+                className="student-button-primary w-full"
               >
                 {t('바로 시작하기')}
               </button>
@@ -188,17 +186,17 @@ export default function CompanyAssignPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-bg-primary">
-      <div className="w-full max-w-md bg-surface border border-border rounded-xl overflow-hidden">
-        <div className="text-center px-10 py-10 pb-5 bg-surface border-b border-border">
-          <div className="text-6xl mb-4">🏢</div>
+    <div className="student-page flex items-center justify-center">
+      <div className="student-panel-strong w-full max-w-md overflow-hidden">
+        <div className="border-b border-border bg-bg-elevated px-8 py-8 text-center">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-info-bg text-2xl font-black text-info">ID</div>
           <h1 className="text-[32px] font-bold text-text-primary mb-3">{t('회사 배정')}</h1>
           <p className="text-base text-text-secondary font-medium mb-4">
             {t('회사 코드를 입력하여')}<br />
             {t('소속 회사를 등록해주세요')}
           </p>
-          <div className="bg-info-bg border border-info rounded-lg px-4 py-3 text-info text-sm font-medium">
-            💡 {t('회사 코드는 관리자로부터 받으실 수 있습니다')}
+          <div className="bg-info-bg border border-info rounded-lg px-4 py-3 text-info text-sm font-bold">
+            {t('회사 코드는 관리자로부터 받으실 수 있습니다')}
           </div>
         </div>
 
@@ -211,7 +209,7 @@ export default function CompanyAssignPage() {
                 value={inviteCode}
                 onChange={(e) => handleInputChange(e.target.value)}
                 placeholder="COMPANY123"
-                className={`w-full h-14 px-4 bg-bg-primary border-2 rounded-lg text-center text-xl font-bold text-text-primary placeholder:text-text-tertiary placeholder:font-normal transition-all focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20 disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-surface tracking-widest ${
+                className={`student-input text-center text-xl tracking-widest ${
                   error ? 'border-error ring-2 ring-error/20' : 'border-border'
                 }`}
                 disabled={loading}
@@ -233,7 +231,7 @@ export default function CompanyAssignPage() {
               <button
                 type="submit"
                 disabled={loading || !inviteCode}
-                className="w-full h-12 bg-primary text-text-primary rounded-lg text-base font-semibold transition-all hover:bg-primary-600 active:bg-primary-700 disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600 focus-visible:outline-offset-2"
+                className="student-button-primary w-full"
               >
                 {loading ? (
                   <span className="inline-flex items-center gap-2">

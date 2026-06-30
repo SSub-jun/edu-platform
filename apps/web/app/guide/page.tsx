@@ -10,9 +10,11 @@ export default function GuidePage() {
   const t = (source: string) => translateStudentText(source, locale);
 
   return (
-    <div className="min-h-screen bg-bg-primary px-4 py-8 md:py-10">
-      <div className="max-w-4xl mx-auto bg-surface border border-border rounded-xl px-6 py-8 md:px-10 md:py-10">
-        <h1 className="text-2xl md:text-3xl font-bold text-text-primary mb-6">
+    <div className="student-page">
+      <div className="student-container max-w-4xl">
+      <div className="student-panel-strong px-5 py-6 md:px-8 md:py-8">
+        <p className="student-kicker">{t('안내')}</p>
+        <h1 className="student-title mt-1 mb-6">
           {t('교육소개 및 수강 안내')}
         </h1>
 
@@ -72,6 +74,7 @@ export default function GuidePage() {
             <li>{t('학습 중 오류 또는 문의 사항이 있을 경우, Q&A 메뉴 또는 회사 담당자를 통해 문의해 주세요.')}</li>
           </ul>
         </section>
+      </div>
       </div>
     </div>
   );

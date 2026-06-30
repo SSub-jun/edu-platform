@@ -65,10 +65,10 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-bg-primary">
-      <div className="w-full max-w-[520px] bg-surface border border-border rounded-xl overflow-hidden">
+    <div className="student-page flex items-center justify-center">
+      <div className="student-panel-strong w-full max-w-[560px] overflow-hidden">
         {/* Header */}
-        <div className="text-center px-10 py-10 pb-5 bg-surface border-b border-border">
+        <div className="border-b border-border bg-bg-elevated px-8 py-8 text-center md:px-10">
           <h1 className="text-[32px] font-bold text-text-primary mb-3">{t('회원가입')}</h1>
           <p className="text-base text-text-secondary font-medium">{t('교육 플랫폼에서 학습을 시작하세요')}</p>
           
@@ -111,7 +111,7 @@ export default function SignupPage() {
         </div>
 
         {/* Content */}
-        <div className="p-10">
+          <div className="p-6 md:p-10">
           {currentStep === 'phone' && (
             <StepPhone
               onComplete={handleStepComplete}
@@ -136,12 +136,12 @@ export default function SignupPage() {
         </div>
         
         {/* Login Section */}
-        <div className="px-10 py-5 text-center bg-bg-primary border-t border-border rounded-b-xl">
+        <div className="border-t border-border bg-bg-elevated px-8 py-5 text-center md:px-10">
           <p className="text-sm text-text-secondary font-medium mb-3">{t('이미 계정이 있으신가요?')}</p>
           <button
             type="button"
             onClick={() => router.push('/login')}
-            className="bg-transparent border-2 border-primary text-primary px-6 py-2.5 rounded-md text-sm font-semibold transition-all hover:bg-primary hover:text-white hover:-translate-y-0.5"
+            className="student-button-secondary min-h-11 px-6 py-2.5 text-sm"
           >
             {t('로그인')}
           </button>

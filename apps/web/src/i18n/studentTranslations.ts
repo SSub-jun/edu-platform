@@ -26,6 +26,21 @@ export const studentTextTranslations: Record<string, LocaleText> = {
     th: 'ศูนย์การศึกษา KIST',
     bn: 'KIST শিক্ষা কেন্দ্র',
   },
+  '계정': { en: 'Account', th: 'บัญชี', bn: 'অ্যাকাউন্ট' },
+  '안내': { en: 'Guide', th: 'คู่มือ', bn: 'নির্দেশিকা' },
+  '문의': { en: 'Help', th: 'สอบถาม', bn: 'সহায়তা' },
+  '배정된 교육과정': {
+    en: 'Assigned Courses',
+    th: 'หลักสูตรที่ได้รับมอบหมาย',
+    bn: 'নির্ধারিত কোর্স',
+  },
+  '교육 기간 안에 강의를 수강하고 시험을 완료해주세요.': {
+    en: 'Complete the lessons and exam before your training period ends.',
+    th: 'กรุณาเรียนบทเรียนและทำแบบทดสอบให้เสร็จก่อนสิ้นสุดระยะเวลาเรียน',
+    bn: 'শিক্ষার সময় শেষ হওয়ার আগে লেসন ও পরীক্ষা সম্পন্ন করুন।',
+  },
+  '남은 기간': { en: 'Time Left', th: 'เวลาที่เหลือ', bn: 'বাকি সময়' },
+  '학습평가': { en: 'Assessment', th: 'การประเมินผล', bn: 'মূল্যায়ন' },
   '인증 확인 중...': {
     en: 'Checking authentication...',
     th: 'กำลังตรวจสอบการยืนยันตัวตน...',

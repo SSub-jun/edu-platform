@@ -9,39 +9,39 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Background & Surface (Light Theme)
-        'bg-primary': '#FFFFFF',      // 최상위 페이지 배경 (화이트)
-        'surface': '#F6F8FB',         // 카드·입력 필드 배경 (아주 옅은 그레이/블루 톤)
-        'bg-surface': '#F6F8FB',      // 카드·입력 필드 배경
-        'bg-elevated': '#FFFFFF',     // 강조 영역 배경 (화이트 유지)
+        // Field-worker friendly light theme: high contrast, calm, trustworthy.
+        'bg-primary': '#F3F6F5',
+        'surface': '#FFFFFF',
+        'bg-surface': '#FFFFFF',
+        'bg-elevated': '#F9FBFA',
         
-        // Primary (네이비 포인트)
-        'primary': '#1F2A44',         // 네이비 포인트
-        'primary-600': '#223154',     // hover
-        'primary-700': '#1A2340',     // active
+        // Primary (trust navy)
+        'primary': '#143B52',
+        'primary-600': '#0F3146',
+        'primary-700': '#0A2638',
         
-        // Border (Light Theme)
-        'border': '#E5E7EB',          // 기본 테두리(라이트)
-        'border-light': '#D8DEE6',    // 미묘한 구분선
-        'border-focus': '#223154',    // focus ring (primary-600과 동일)
+        // Border
+        'border': '#D8E2DF',
+        'border-light': '#B9C8C4',
+        'border-focus': '#0F3146',
         
-        // Text (Light Theme - 짙은 텍스트)
-        'text-primary': '#1A1D21',    // 본문 기본(짙은 무채)
-        'text-secondary': '#4B5563',  // 보조 텍스트
-        'text-tertiary': '#6B7280',   // 힌트/비활성
+        // Text
+        'text-primary': '#13201D',
+        'text-secondary': '#42514D',
+        'text-tertiary': '#687873',
         
-        // Accent (골드 강조 - 최소 사용)
-        'accent': '#A67C52',
+        // Accent (safety amber, used sparingly)
+        'accent': '#D69E2E',
         
-        // Semantic (Light Theme 대응)
-        'success': '#0E9F6E',
-        'success-bg': '#ECFDF5',      // 연한 녹색 배경
-        'warning': '#B45309',
-        'warning-bg': '#FFFBEB',      // 연한 노란색 배경
-        'error': '#DC2626',
-        'error-bg': '#FEF2F2',        // 연한 빨간색 배경
-        'info': '#2563EB',
-        'info-bg': '#EFF6FF',         // 연한 파란색 배경
+        // Semantic
+        'success': '#147A55',
+        'success-bg': '#EAF7F0',
+        'warning': '#A15C00',
+        'warning-bg': '#FFF7E6',
+        'error': '#C92A2A',
+        'error-bg': '#FFF0F0',
+        'info': '#1C6C8C',
+        'info-bg': '#EAF6FA',
       },
       fontFamily: {
         sans: ['Pretendard', 'system-ui', 'sans-serif'],
@@ -69,4 +69,3 @@ const config: Config = {
 }
 
 export default config
-

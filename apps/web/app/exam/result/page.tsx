@@ -92,10 +92,10 @@ export default function ExamResultPage() {
 
   if (!attemptId || !score) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6 bg-bg-primary">
-        <div className="text-center bg-surface border border-border rounded-xl p-10">
+      <div className="student-page flex items-center justify-center">
+        <div className="student-panel p-10 text-center">
           <h3 className="text-xl font-bold text-text-primary mb-6">{t('결과를 찾을 수 없습니다')}</h3>
-          <Link href="/curriculum" className="inline-block px-6 py-3 bg-primary text-text-primary rounded-lg font-semibold transition-colors hover:bg-primary-600">
+          <Link href="/curriculum" className="student-button-primary">
             {t('커리큘럼으로 돌아가기')}
           </Link>
         </div>
@@ -110,14 +110,17 @@ export default function ExamResultPage() {
   const isPass = passed;
 
   return (
-    <div className="min-h-screen py-10 px-5 bg-bg-primary">
-      <div className="max-w-3xl mx-auto bg-surface border border-border rounded-xl p-8 md:p-10">
+    <div className="student-page">
+      <div className="student-container max-w-3xl">
+      <div className="student-panel-strong p-5 md:p-8">
         {/* 결과 헤더 */}
         <div className="text-center mb-8">
-          <div className={`text-6xl mb-4 ${isPass ? 'animate-bounce' : ''}`}>
-            {isPass ? '🎉' : '😔'}
+          <div className={`mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full border-4 text-3xl font-black ${
+            isPass ? 'border-success bg-success-bg text-success' : 'border-error bg-error-bg text-error'
+          }`}>
+            {isPass ? 'PASS' : '!'}
           </div>
-          <h1 className={`text-[32px] font-bold mb-3 ${isPass ? 'text-success' : 'text-error'}`}>
+          <h1 className={`text-3xl font-black mb-3 ${isPass ? 'text-success' : 'text-error'}`}>
             {isPass ? t('과목 수료!') : t('미수료')}
           </h1>
           <p className="text-lg text-text-secondary">
@@ -131,7 +134,7 @@ export default function ExamResultPage() {
         {/* 점수 정보 */}
         <div className="mb-8">
           {/* 총점 */}
-          <div className="bg-bg-primary border border-border rounded-xl p-8 text-center mb-4">
+          <div className="rounded-xl border border-border bg-bg-elevated p-6 text-center md:p-8 mb-4">
             <div className="text-sm text-text-tertiary mb-2">{t('과목 총점')}</div>
             <div className={`text-5xl font-bold mb-4 ${isPass ? 'text-success' : 'text-error'}`}>
               {t(`${Math.round(finalScoreNum)}점`)}
@@ -139,11 +142,11 @@ export default function ExamResultPage() {
             <div className="text-sm font-medium mb-4">
               {isPass ? (
                 <span className="text-success">
-                  ✅ {t('수료 완료 (총점 70점 이상)')}
+                  {t('수료 완료 (총점 70점 이상)')}
                 </span>
               ) : (
                 <span className="text-error">
-                  ❌ {t('수료 기준 미달 (총점 70점 미만)')}
+                  {t('수료 기준 미달 (총점 70점 미만)')}
                 </span>
               )}
             </div>
@@ -173,7 +176,7 @@ export default function ExamResultPage() {
 
           {/* 상세 정보 토글 */}
           <button 
-            className="w-full px-4 py-3 bg-bg-primary text-text-secondary border border-border rounded-lg text-sm font-medium transition-all hover:bg-surface hover:text-text-primary hover:border-border-light flex justify-between items-center"
+            className="student-button-secondary w-full justify-between text-sm"
             onClick={() => setShowDetails(!showDetails)}
           >
             <span>{showDetails ? t('상세 정보 숨기기') : t('상세 정보 보기')}</span>
@@ -183,7 +186,7 @@ export default function ExamResultPage() {
           </button>
 
           {showDetails && (
-            <div className="mt-4 p-5 bg-bg-primary border border-border rounded-lg animate-[slideDown_0.3s_ease-out]">
+            <div className="mt-4 rounded-lg border border-border bg-bg-elevated p-5 animate-[slideDown_0.3s_ease-out]">
               <div className="flex justify-between py-2 border-b border-border">
                 <span className="text-sm font-medium text-text-tertiary">{t('시도 ID')}</span>
                 <span className="text-sm text-text-primary">{attemptId}</span>
@@ -214,13 +217,13 @@ export default function ExamResultPage() {
             // 수료 시 액션
             <div className="flex flex-col gap-3">
               <div className="text-center p-6 bg-success-bg border border-success rounded-lg mb-3">
-                <p className="text-lg font-semibold text-success mb-2">🎊 {t('과목을 수료하셨습니다!')}</p>
+                <p className="text-lg font-semibold text-success mb-2">{t('과목을 수료하셨습니다!')}</p>
                 <p className="text-sm text-text-secondary">
                   {t('다른 과목을 확인하거나 강의를 복습해보세요.')}
                 </p>
               </div>
               
-              <Link href="/curriculum" className="w-full px-6 py-4 bg-primary text-text-primary rounded-lg font-semibold text-center transition-colors hover:bg-primary-600">
+              <Link href="/curriculum" className="student-button-primary w-full">
                 {t('커리큘럼으로 돌아가기')}
               </Link>
             </div>
@@ -232,12 +235,12 @@ export default function ExamResultPage() {
                 <>
                   <div className="text-center p-4 bg-warning-bg border border-warning rounded-lg">
                     <p className="text-sm font-medium text-warning">
-                      ⚠️ {t(`남은 시험 기회: ${remainingTriesNum}회`)}
+                      {t(`남은 시험 기회: ${remainingTriesNum}회`)}
                     </p>
                   </div>
                   
                   <button 
-                    className="w-full px-6 py-4 bg-primary text-text-primary rounded-lg font-semibold transition-all hover:bg-primary-600"
+                    className="student-button-primary w-full"
                     onClick={handleRetakeExam}
                   >
                     {t('재응시하기')}
@@ -247,7 +250,7 @@ export default function ExamResultPage() {
                 <>
                   <div className="text-center p-4 bg-error-bg border border-error rounded-lg">
                     <p className="text-sm font-medium text-error mb-2">
-                      ❌ {t('시험 기회를 모두 사용했습니다')}
+                      {t('시험 기회를 모두 사용했습니다')}
                     </p>
                     <p className="text-xs text-text-secondary">
                       {t('과목을 다시 수강하면 3회의 새로운 시험 기회가 주어집니다.')}
@@ -255,7 +258,7 @@ export default function ExamResultPage() {
                   </div>
                   
                   <button 
-                    className="w-full px-6 py-4 bg-warning text-white rounded-lg font-semibold transition-all hover:bg-warning/90 disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="inline-flex min-h-12 w-full items-center justify-center rounded-lg bg-warning px-5 py-3 text-base font-bold text-white transition-colors hover:bg-warning/90 disabled:cursor-not-allowed disabled:opacity-60"
                     onClick={handleRestartSubject}
                     disabled={restarting}
                   >
@@ -265,7 +268,7 @@ export default function ExamResultPage() {
                         {t('초기화 중...')}
                       </span>
                     ) : (
-                      `🔄 ${t('다시 수강하기')}`
+                      t('다시 수강하기')
                     )}
                   </button>
                 </>
@@ -273,7 +276,7 @@ export default function ExamResultPage() {
               
               <Link 
                 href="/curriculum"
-                className="w-full px-6 py-3 bg-bg-primary text-text-secondary border-2 border-border rounded-lg font-semibold text-center transition-all hover:bg-surface hover:text-text-primary hover:border-border-light"
+                className="student-button-secondary w-full"
               >
                 {t('커리큘럼으로 돌아가기')}
               </Link>
@@ -282,45 +285,46 @@ export default function ExamResultPage() {
         </div>
 
         {/* 다음 단계 안내 */}
-        <div className="bg-bg-primary border border-border rounded-xl p-6">
+        <div className="student-panel p-6">
           <h3 className="text-lg font-bold text-text-primary mb-4">{t('다음 단계')}</h3>
           <div className="flex flex-col gap-3">
             {isPass ? (
               <>
                 <div className="flex items-start gap-3">
-                  <span className="text-2xl flex-shrink-0">📚</span>
+                  <span className="mt-1 h-3 w-3 flex-shrink-0 rounded-full bg-success" />
                   <span className="text-base text-text-secondary">{t('다른 과목을 수강하거나 강의를 복습하세요')}</span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <span className="text-2xl flex-shrink-0">📊</span>
+                  <span className="mt-1 h-3 w-3 flex-shrink-0 rounded-full bg-success" />
                   <span className="text-base text-text-secondary">{t('커리큘럼에서 전체 진도를 확인하세요')}</span>
                 </div>
               </>
             ) : remainingTriesNum > 0 ? (
               <>
                 <div className="flex items-start gap-3">
-                  <span className="text-2xl flex-shrink-0">📖</span>
+                  <span className="mt-1 h-3 w-3 flex-shrink-0 rounded-full bg-warning" />
                   <span className="text-base text-text-secondary">{t('강의 내용을 다시 복습해보세요')}</span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <span className="text-2xl flex-shrink-0">✍️</span>
+                  <span className="mt-1 h-3 w-3 flex-shrink-0 rounded-full bg-warning" />
                   <span className="text-base text-text-secondary">{t(`남은 ${remainingTriesNum}회의 기회로 재응시하세요`)}</span>
                 </div>
               </>
             ) : (
               <>
                 <div className="flex items-start gap-3">
-                  <span className="text-2xl flex-shrink-0">🔄</span>
+                  <span className="mt-1 h-3 w-3 flex-shrink-0 rounded-full bg-warning" />
                   <span className="text-base text-text-secondary">{t('과목을 다시 수강하여 새로운 시험 기회를 받으세요')}</span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <span className="text-2xl flex-shrink-0">💪</span>
+                  <span className="mt-1 h-3 w-3 flex-shrink-0 rounded-full bg-warning" />
                   <span className="text-base text-text-secondary">{t('모든 강의를 90% 이상 수강하면 다시 시험을 볼 수 있습니다')}</span>
                 </div>
               </>
             )}
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

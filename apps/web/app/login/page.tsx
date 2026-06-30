@@ -5,9 +5,8 @@ export const dynamic = 'force-dynamic';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { authClient } from '../../lib/auth';
-import BrandTrustMini from '../../src/components/BrandTrustMini';
 import Image from 'next/image';
-import { Globe2 } from 'lucide-react';
+import { CheckCircle2, Globe2, ShieldCheck } from 'lucide-react';
 import { localeLabels, supportedLocales, type Locale } from '../../src/i18n/config';
 import { useLocale, useT } from '../../src/i18n/client';
 
@@ -108,14 +107,8 @@ export default function LoginPage() {
     }
   };
 
-  const handleTestAccountClick = (testUsername: string, testPassword: string) => {
-    setUsername(testUsername);
-    setPassword(testPassword);
-    setError('');
-  };
-
   return (
-    <div className="relative min-h-screen flex items-center justify-center p-4 md:p-6">
+    <div className="relative min-h-screen overflow-hidden p-4 md:p-6">
       {/* 배경 이미지 (전체 화면) */}
       <Image
         src="/images/LoginBackground.png"
@@ -127,13 +120,16 @@ export default function LoginPage() {
       />
 
       {/* 화이트 오버레이: 이미지 위에 흰색 톤을 덧씌워서 가독성 확보 */}
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-black/20" />
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-primary/72" />
 
-      {/* Desktop: 2-column grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-6xl items-center">
-        {/* Left: 타이틀 섹션 (Desktop only) */}
-        <div className="hidden md:flex md:flex-col md:justify-center md:gap-4 md:px-8">
-          <h1 className="text-[35px] md:text-[43px] leading-tight font-bold text-white drop-shadow-lg">
+      <div className="mx-auto flex min-h-[calc(100vh-2rem)] w-full max-w-6xl items-center md:min-h-[calc(100vh-3rem)]">
+        <div className="grid w-full grid-cols-1 items-center gap-6 md:grid-cols-[1fr_440px] md:gap-10">
+          <section className="text-white">
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/12 px-4 py-2 text-sm font-bold backdrop-blur">
+              <ShieldCheck className="h-5 w-5" aria-hidden="true" />
+              <span>{t('nav.brand')}</span>
+            </div>
+            <h1 className="text-3xl font-black leading-tight drop-shadow md:text-5xl">
             {t('login.hero.title').split('\n').map((line, index) => (
               <span key={line}>
                 {line}
@@ -141,13 +137,26 @@ export default function LoginPage() {
               </span>
             ))}
           </h1>
-          <p className="text-[20px] md:text-[24px] leading-relaxed font-semibold text-white/90 drop-shadow-md">
+            <p className="mt-4 max-w-xl text-lg font-semibold leading-relaxed text-white/90 drop-shadow md:text-2xl">
             {t('login.hero.subtitle')}
           </p>
-        </div>
+            <div className="mt-8 grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-3">
+              {[t('login.trust.compliance'), t('login.trust.progress'), t('login.trust.mobile')].map((item) => (
+                <div key={item} className="flex items-center gap-2 rounded-lg border border-white/20 bg-white/12 px-4 py-3 text-sm font-bold backdrop-blur">
+                  <CheckCircle2 className="h-5 w-5 shrink-0 text-white" aria-hidden="true" />
+                  <span>{item}</span>
+                </div>
+              ))}
+            </div>
+          </section>
 
-        {/* Right: Login Form */}
-        <div className="w-full max-w-md mx-auto md:mx-0 bg-surface/85 border border-border rounded-xl p-8 md:p-10 shadow-2xl">
+          <section className="student-panel-strong w-full bg-surface p-6 md:p-8">
+            <div className="mb-6">
+              <p className="student-kicker">{t('login.submit')}</p>
+              <h2 className="student-title mt-1">{t('login.submit')}</h2>
+              <p className="student-copy mt-2">{t('login.signup.prompt')}</p>
+            </div>
+
           {/* Error Message */}
         {error && (
             <div className="mb-6 p-4 bg-error-bg border border-error rounded-lg text-error text-sm font-semibold animate-[slideDown_0.3s_ease-out]">
@@ -170,7 +179,7 @@ export default function LoginPage() {
                   value={locale}
                   onChange={(e) => setLocale(e.target.value as Locale)}
                   aria-label="Language"
-                  className="w-full h-12 pl-12 pr-4 bg-bg-primary border-2 border-border rounded-lg text-base font-semibold text-text-primary transition-all focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20 disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-surface"
+                  className="student-input pl-12"
                   disabled={loading}
                 >
                   {supportedLocales.map((option) => (
@@ -190,7 +199,7 @@ export default function LoginPage() {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-                className="w-full h-12 px-4 bg-bg-primary border-2 border-border rounded-lg text-base text-text-primary placeholder:text-text-tertiary transition-all focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20 disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-surface"
+                className="student-input"
               disabled={loading}
             />
           </div>
@@ -204,14 +213,14 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder={t('login.password.placeholder')}
-                className="w-full h-12 px-4 bg-bg-primary border-2 border-border rounded-lg text-base text-text-primary placeholder:text-text-tertiary transition-all focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20 disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-surface"
+                className="student-input"
               disabled={loading}
             />
             <div className="flex justify-end mt-1">
               <button
                 type="button"
                 onClick={() => router.push('/reset-password')}
-                className="text-xs text-text-tertiary hover:text-primary-600 transition-colors"
+                className="text-sm font-bold text-info transition-colors hover:text-primary"
               >
                 {t('login.forgotPassword')}
               </button>
@@ -221,7 +230,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-              className="w-full h-12 bg-primary-600 text-white rounded-lg text-base font-semibold transition-all hover:bg-primary active:bg-primary-700 disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600 focus-visible:outline-offset-2"
+              className="student-button-primary w-full"
           >
             {loading ? (
                 <span className="inline-flex items-center gap-2">
@@ -235,25 +244,21 @@ export default function LoginPage() {
         </form>
 
           {/* Signup Section */}
-          <div className="mt-6 p-5 text-center bg-bg-primary rounded-lg border border-border">
+          <div className="mt-6 rounded-lg border border-border bg-bg-elevated p-5 text-center">
             <p className="text-sm text-text-secondary font-medium mb-3">{t('login.signup.prompt')}</p>
           <button
             type="button"
             onClick={() => router.push('/signup')}
-              className="w-full h-10 bg-success text-white rounded-md text-sm font-semibold transition-all hover:bg-success/90 active:bg-success/80 disabled:opacity-60 disabled:cursor-not-allowed"
+              className="student-button-success w-full text-sm"
             disabled={loading}
           >
             {t('login.signup.button')}
           </button>
         </div>
 
-        </div>
+          </section>
       </div>
-
-      {/* Mobile: BrandTrustMini at bottom */}
-      {/* <div className="mt-6 md:hidden w-full max-w-md mx-auto px-4">
-        <BrandTrustMini />
-      </div> */}
+    </div>
     </div>
   );
 }

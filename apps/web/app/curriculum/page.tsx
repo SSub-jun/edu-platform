@@ -5,7 +5,6 @@ export const dynamic = 'force-dynamic';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthGuard } from '../hooks/useAuthGuard';
-import { authClient } from '../../lib/auth';
 import { getErrorMessage } from '../../src/utils/errorMap';
 import { useLocale } from '../../src/i18n/client';
 import { translateStudentText } from '../../src/i18n/studentTranslations';
@@ -171,7 +170,7 @@ export default function CurriculumPage() {
   // 인증 로딩 중
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-bg-primary px-6 py-8">
+      <div className="student-page">
         <div className="flex justify-center items-center min-h-[400px]">
           <div className="text-text-secondary">{t('인증 확인 중...')}</div>
         </div>
@@ -186,7 +185,7 @@ export default function CurriculumPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-bg-primary px-6 py-8">
+      <div className="student-page">
         <div className="flex justify-center items-center min-h-[400px]">
           <div className="text-text-secondary">{t('로딩 중...')}</div>
         </div>
@@ -197,16 +196,16 @@ export default function CurriculumPage() {
   if (error) {
     const errorMessage = getErrorMessage(error);
     return (
-      <div className="min-h-screen bg-bg-primary px-6 py-8">
+      <div className="student-page">
         <div className="flex justify-center items-center min-h-[400px]">
-          <div className="bg-surface border border-error rounded-xl p-10 text-center max-w-md w-full">
+          <div className="student-panel p-10 text-center max-w-md w-full border-error">
             <h3 className="text-xl font-bold text-error mb-3">{t(errorMessage.title)}</h3>
             <p className="text-base text-text-secondary mb-6 leading-relaxed">
               {t(errorMessage.description)}
             </p>
             {errorMessage.actionLabel && (
               <button 
-                className="bg-error text-white px-6 py-3 rounded-md text-sm font-semibold hover:bg-error/90 transition-colors"
+                className="inline-flex min-h-12 items-center justify-center rounded-lg bg-error px-6 py-3 text-base font-bold text-white transition-colors hover:bg-error/90"
                 onClick={() => window.location.reload()}
               >
                 {t(errorMessage.actionLabel)}
@@ -220,9 +219,9 @@ export default function CurriculumPage() {
 
   if (!curriculumData || curriculumData.length === 0) {
     return (
-      <div className="min-h-screen bg-bg-primary px-6 py-8">
+      <div className="student-page">
         <div className="flex justify-center items-center min-h-[400px]">
-          <div className="bg-surface border border-border rounded-xl p-10 text-center max-w-md w-full">
+          <div className="student-panel p-10 text-center max-w-md w-full">
             <h3 className="text-xl font-bold text-text-primary mb-3">{t('등록된 과목이 없습니다')}</h3>
             <p className="text-base text-text-secondary leading-relaxed">
               {t('관리자에게 커리큘럼 등록을 요청해주세요.')}
@@ -234,28 +233,49 @@ export default function CurriculumPage() {
   }
 
   return (
-    <div className="min-h-screen bg-bg-primary px-6 py-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="student-page">
+      <div className="student-container">
+        <div className="mb-6 rounded-xl border border-border bg-primary p-5 text-white shadow-md md:p-7">
+          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="text-sm font-bold text-white/75">{t('강의실')}</p>
+              <h1 className="mt-1 text-2xl font-black md:text-4xl">{t('배정된 교육과정')}</h1>
+              <p className="mt-2 max-w-2xl text-base font-medium leading-relaxed text-white/85">
+                {t('교육 기간 안에 강의를 수강하고 시험을 완료해주세요.')}
+              </p>
+            </div>
+            <button
+              onClick={logout}
+              className="inline-flex min-h-11 items-center justify-center rounded-lg border border-white/30 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-white/10 md:self-start"
+            >
+              {t('로그아웃')}
+            </button>
+          </div>
+        </div>
         {/* 수강 기간 정보 */}
         {companyPeriod && (
-          <div className="bg-surface border border-border rounded-xl p-6 mb-8">
-            <h2 className="text-xl font-bold text-text-primary mb-4">📅 {t('수강 기간')}</h2>
-            <div className="flex flex-col md:flex-row md:items-center gap-4">
-              <div className="flex items-center gap-2 text-text-secondary">
-                <span className="font-semibold">{t('시작일:')}</span>
-                <span>{companyPeriod.startDate ? new Date(companyPeriod.startDate).toLocaleDateString(dateLocale) : '-'}</span>
+          <div className="student-panel mb-8 p-5 md:p-6">
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div>
+                <h2 className="text-xl font-black text-text-primary">{t('수강 기간')}</h2>
+                <div className="mt-3 grid grid-cols-1 gap-3 text-base text-text-secondary sm:grid-cols-2">
+                  <div className="student-stat">
+                    <div className="text-sm font-bold text-text-tertiary">{t('시작일:')}</div>
+                    <div className="mt-1 text-lg font-bold text-text-primary">{companyPeriod.startDate ? new Date(companyPeriod.startDate).toLocaleDateString(dateLocale) : '-'}</div>
+                  </div>
+                  <div className="student-stat">
+                    <div className="text-sm font-bold text-text-tertiary">{t('종료일:')}</div>
+                    <div className="mt-1 text-lg font-bold text-text-primary">{companyPeriod.endDate ? new Date(companyPeriod.endDate).toLocaleDateString(dateLocale) : '-'}</div>
+                  </div>
+                </div>
               </div>
-              <div className="hidden md:block text-text-tertiary">~</div>
-              <div className="flex items-center gap-2 text-text-secondary">
-                <span className="font-semibold">{t('종료일:')}</span>
-                <span>{companyPeriod.endDate ? new Date(companyPeriod.endDate).toLocaleDateString(dateLocale) : '-'}</span>
-          </div>
-              <div className="ml-auto flex items-center gap-2">
-                <span className={`text-lg font-bold ${companyPeriod.remainingDays > 30 ? 'text-success' : companyPeriod.remainingDays > 7 ? 'text-warning' : 'text-error'}`}>
+              <div className="rounded-xl border border-border bg-bg-elevated px-6 py-5 text-center md:min-w-44">
+                <div className="text-sm font-bold text-text-tertiary">{t('남은 기간')}</div>
+                <div className={`mt-1 text-4xl font-black ${companyPeriod.remainingDays > 30 ? 'text-success' : companyPeriod.remainingDays > 7 ? 'text-warning' : 'text-error'}`}>
                   D-{companyPeriod.remainingDays}
-                </span>
-                <span className="text-sm text-text-tertiary">{t('남음')}</span>
-          </div>
+                </div>
+                <div className="text-sm font-bold text-text-tertiary">{t('남음')}</div>
+              </div>
         </div>
       </div>
         )}
@@ -274,16 +294,16 @@ export default function CurriculumPage() {
           return (
               <div 
                 key={subject.id} 
-                className="bg-surface border border-border rounded-xl p-5 flex flex-col hover:shadow-lg transition-shadow"
+                className="student-panel flex flex-col p-5 transition-all hover:-translate-y-0.5 hover:shadow-md md:p-6"
               >
                 {/* 과목 헤더 */}
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
-                    <h3 className="text-lg font-bold text-text-primary mb-1 line-clamp-2">
+                    <h3 className="text-xl font-black text-text-primary mb-2 line-clamp-2">
                       {subject.name}
                     </h3>
                   {subject.description && (
-                      <p className="text-sm text-text-secondary line-clamp-2">
+                      <p className="text-base text-text-secondary line-clamp-2">
                       {subject.description}
                     </p>
                   )}
@@ -292,11 +312,11 @@ export default function CurriculumPage() {
                   {/* 수료 상태 뱃지 */}
                   <div className="ml-3">
                     {isPassed ? (
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-success text-white whitespace-nowrap">
-                        ✓ {t('수료')}
+                      <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold bg-success-bg border border-success text-success whitespace-nowrap">
+                        {t('수료')}
                     </span>
                     ) : (
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-warning text-white whitespace-nowrap">
+                      <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold bg-warning-bg border border-warning text-warning whitespace-nowrap">
                         {t('미수료')}
                               </span>
                             )}
@@ -309,18 +329,16 @@ export default function CurriculumPage() {
                     <span className="text-sm text-text-secondary">{t('전체 진도율')}</span>
                     <span className="text-sm font-bold text-text-primary">{Math.round(avgProgress)}%</span>
                   </div>
-                  <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="student-progress-track">
                     <div 
-                      className={`h-full transition-all duration-300 ${
-                        avgProgress >= 90 ? 'bg-success' : 'bg-info'
-                      }`}
+                      className={`h-full rounded-full transition-all duration-300 ${avgProgress >= 90 ? 'bg-success' : 'bg-info'}`}
                       style={{ width: `${avgProgress}%` }}
                     />
                           </div>
                         </div>
 
                 {/* 레슨 수 정보 */}
-                <div className="text-sm text-text-tertiary mb-4">
+                <div className="student-muted-box mb-4 text-sm font-bold">
                   {t(`총 ${lessons.length}개 강의`)}
                         </div>
 
@@ -330,7 +348,7 @@ export default function CurriculumPage() {
                   {isPassed && (
                     <button
                       onClick={() => handleViewLessons(subject.id)}
-                      className="w-full px-4 py-2.5 bg-primary text-white rounded-md text-sm font-semibold hover:bg-primary-600 transition-colors"
+                      className="student-button-primary w-full"
                     >
                       {t('강의 다시보기')}
                     </button>
@@ -341,13 +359,13 @@ export default function CurriculumPage() {
                     <>
                       <button
                         onClick={() => handleStartExam(subject)}
-                        className="w-full px-4 py-2.5 bg-info text-white rounded-md text-sm font-semibold hover:bg-info/90 transition-colors"
+                        className="student-button-primary w-full"
                       >
-                        ✅ {t(`시험 보기 (${remainingTries}/3회 남음)`)}
+                        {t(`시험 보기 (${remainingTries}/3회 남음)`)}
                       </button>
                       <button
                         onClick={() => handleViewLessons(subject.id)}
-                        className="w-full px-4 py-2.5 bg-surface border border-border text-text-primary rounded-md text-sm font-semibold hover:bg-bg-elevated transition-colors"
+                        className="student-button-secondary w-full"
                       >
                         {t('강의 보기')}
                       </button>
@@ -359,18 +377,18 @@ export default function CurriculumPage() {
                     <>
                       <button
                         onClick={() => handleRestart(subject)}
-                        className="w-full px-4 py-2.5 bg-warning text-white rounded-md text-sm font-semibold hover:bg-warning/90 transition-colors"
+                        className="inline-flex min-h-12 w-full items-center justify-center rounded-lg bg-warning px-5 py-3 text-base font-bold text-white transition-colors hover:bg-warning/90"
                       >
-                        🔄 {t('다시 수강하기')}
+                        {t('다시 수강하기')}
                       </button>
                       <button
                         onClick={() => handleViewLessons(subject.id)}
-                        className="w-full px-4 py-2.5 bg-surface border border-border text-text-primary rounded-md text-sm font-semibold hover:bg-bg-elevated transition-colors"
+                        className="student-button-secondary w-full"
                       >
                         {t('강의 보기')}
                       </button>
                       <div className="text-xs text-error text-center mt-1">
-                        ⚠️ {t('3회 시험 기회를 모두 사용했습니다')}
+                        {t('3회 시험 기회를 모두 사용했습니다')}
                       </div>
                     </>
                   )}
@@ -380,7 +398,7 @@ export default function CurriculumPage() {
                     <>
                       <button
                         onClick={() => handleViewLessons(subject.id)}
-                        className="w-full px-4 py-2.5 bg-primary text-white rounded-md text-sm font-semibold hover:bg-primary-600 transition-colors"
+                        className="student-button-primary w-full"
                       >
                         {t('강의 수강하기')}
                       </button>

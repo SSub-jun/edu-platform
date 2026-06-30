@@ -167,17 +167,20 @@ export default function QnaPage() {
   if (!isAuthenticated) return null;
 
   return (
-    <div className="min-h-screen p-6 bg-bg-primary">
-      <div className="max-w-4xl mx-auto">
+    <div className="student-page">
+      <div className="student-container max-w-4xl">
         {/* 상단 영역: 간단한 타이틀 + 질문하기 버튼 */}
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-text-primary">
+        <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="student-kicker">{t('문의')}</p>
+          <h1 className="student-title mt-1">
               Q&A
             </h1>
+          </div>
             {userRole === 'student' && (
               <button
                 onClick={() => setShowQuestionForm(!showQuestionForm)}
-              className="px-5 py-2.5 bg-info text-white border-0 rounded-md cursor-pointer font-medium transition-colors hover:bg-info/90"
+              className="student-button-primary"
               >
                 {showQuestionForm ? t('취소') : t('질문하기')}
               </button>
@@ -186,7 +189,7 @@ export default function QnaPage() {
 
         {/* 질문 작성 폼 (학생만) */}
         {showQuestionForm && userRole === 'student' && (
-          <div className="bg-surface p-6 rounded-xl mb-6 border border-border">
+          <div className="student-panel mb-6 p-5 md:p-6">
             <h3 className="m-0 mb-5 text-text-primary text-lg font-semibold">
               {t('새 질문 작성')}
             </h3>
@@ -196,7 +199,7 @@ export default function QnaPage() {
                 placeholder={ta('질문 제목을 입력하세요')}
                 value={questionTitle}
                 onChange={(e) => setQuestionTitle(e.target.value)}
-                className="w-full px-4 py-3 bg-bg-primary border-2 border-border rounded-lg text-base text-text-primary placeholder:text-text-tertiary outline-none transition-all focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20"
+                className="student-input"
                 required
               />
               <textarea
@@ -204,12 +207,12 @@ export default function QnaPage() {
                 value={questionBody}
                 onChange={(e) => setQuestionBody(e.target.value)}
                 rows={5}
-                className="w-full px-4 py-3 bg-bg-primary border-2 border-border rounded-lg text-base text-text-primary placeholder:text-text-tertiary resize-y outline-none transition-all leading-normal focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20"
+                className="min-h-32 w-full rounded-lg border-2 border-border bg-bg-elevated px-4 py-3 text-base text-text-primary placeholder:text-text-tertiary outline-none transition-all focus:border-info focus:ring-2 focus:ring-info/20"
                 required
               />
               <button
                 type="submit"
-                className="px-6 py-3 bg-success text-white border-0 rounded-lg cursor-pointer text-base font-semibold transition-colors hover:bg-success/90 self-start"
+                className="student-button-success self-start"
               >
                 {t('질문 등록')}
               </button>
@@ -220,21 +223,21 @@ export default function QnaPage() {
         {/* Q&A 목록 */}
         <div className="flex flex-col gap-5">
           {loading ? (
-            <div className="text-center py-10 bg-surface border border-border rounded-xl">
+            <div className="student-panel py-10 text-center">
               <div className="flex items-center justify-center gap-2 text-text-secondary">
                 <div className="w-5 h-5 border-2 border-text-tertiary/30 border-t-text-tertiary rounded-full animate-spin"></div>
               {t('로딩 중...')}
               </div>
             </div>
           ) : posts.length === 0 ? (
-            <div className="text-center py-10 bg-surface border border-border rounded-xl text-text-secondary">
+            <div className="student-panel py-10 text-center text-text-secondary">
               {t('아직 질문이 없습니다.')}
             </div>
           ) : (
             posts.map((post) => (
               <div
                 key={post.id}
-                className="bg-surface p-5 rounded-xl border border-border"
+                className="student-panel p-5"
               >
                 {/* 질문 */}
                 <div className="mb-4">

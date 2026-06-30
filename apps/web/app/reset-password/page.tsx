@@ -236,9 +236,9 @@ export default function ResetPasswordPage() {
         sizes="100vw"
         className="object-cover -z-10"
       />
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-black/20" />
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-primary/72" />
 
-      <div className="w-full max-w-md mx-auto bg-surface/85 border border-border rounded-xl p-8 md:p-10 shadow-2xl">
+      <div className="student-panel-strong w-full max-w-md bg-surface p-6 md:p-8">
         {/* ─── Step 1: 전화번호 입력 ─── */}
         {step === 'phone' && (
           <>
@@ -271,7 +271,7 @@ export default function ResetPasswordPage() {
                   }}
                   placeholder="01012345678"
                   inputMode="numeric"
-                  className="w-full h-12 px-4 bg-bg-primary border-2 border-border rounded-lg text-base text-text-primary placeholder:text-text-tertiary transition-all focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20"
+                  className="student-input"
                   disabled={phoneSending}
                   onKeyDown={(e) => e.key === 'Enter' && handleSendOtp()}
                 />
@@ -281,7 +281,7 @@ export default function ResetPasswordPage() {
                 type="button"
                 onClick={handleSendOtp}
                 disabled={phoneSending}
-                className="w-full h-12 bg-primary-600 text-white rounded-lg text-base font-semibold transition-all hover:bg-primary active:bg-primary-700 disabled:opacity-60 disabled:cursor-not-allowed"
+                className="student-button-primary w-full"
               >
                 {phoneSending ? (
                   <span className="inline-flex items-center gap-2">
@@ -350,7 +350,7 @@ export default function ResetPasswordPage() {
               type="button"
               onClick={handleVerifyOtp}
               disabled={otpVerifying || otpDigits.join('').length !== 6}
-              className="w-full h-12 bg-primary-600 text-white rounded-lg text-base font-semibold transition-all hover:bg-primary active:bg-primary-700 disabled:opacity-60 disabled:cursor-not-allowed mb-4"
+              className="student-button-primary w-full"
             >
               {otpVerifying ? (
                 <span className="inline-flex items-center gap-2">
@@ -408,7 +408,7 @@ export default function ResetPasswordPage() {
                     setPasswordError('');
                   }}
                   placeholder={ta('8자 이상, 대/소문자/숫자/특수문자 포함')}
-                  className="w-full h-12 px-4 bg-bg-primary border-2 border-border rounded-lg text-base text-text-primary placeholder:text-text-tertiary transition-all focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20"
+                  className="student-input"
                   disabled={resetting}
                 />
               </div>
@@ -425,7 +425,7 @@ export default function ResetPasswordPage() {
                     setPasswordError('');
                   }}
                   placeholder={ta('비밀번호를 다시 입력해주세요')}
-                  className="w-full h-12 px-4 bg-bg-primary border-2 border-border rounded-lg text-base text-text-primary placeholder:text-text-tertiary transition-all focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20"
+                  className="student-input"
                   disabled={resetting}
                   onKeyDown={(e) => e.key === 'Enter' && handleResetPassword()}
                 />
@@ -445,7 +445,7 @@ export default function ResetPasswordPage() {
                 type="button"
                 onClick={handleResetPassword}
                 disabled={resetting}
-                className="w-full h-12 bg-primary-600 text-white rounded-lg text-base font-semibold transition-all hover:bg-primary active:bg-primary-700 disabled:opacity-60 disabled:cursor-not-allowed"
+                className="student-button-primary w-full"
               >
                 {resetting ? (
                   <span className="inline-flex items-center gap-2">
@@ -476,7 +476,7 @@ export default function ResetPasswordPage() {
             <button
               type="button"
               onClick={() => router.push('/login')}
-              className="w-full h-12 bg-primary-600 text-white rounded-lg text-base font-semibold transition-all hover:bg-primary active:bg-primary-700"
+              className="student-button-primary w-full"
             >
               {t('로그인하러 가기')}
             </button>
