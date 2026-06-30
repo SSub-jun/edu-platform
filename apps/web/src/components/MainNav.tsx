@@ -21,6 +21,13 @@ export function MainNav() {
   const [isReady, setIsReady] = useState(false);
   const [isStudent, setIsStudent] = useState(false);
 
+  const handleLocaleChange = (nextLocale: Locale) => {
+    if (nextLocale === locale) return;
+
+    setLocale(nextLocale);
+    window.location.reload();
+  };
+
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -102,7 +109,7 @@ export function MainNav() {
             />
             <select
               value={locale}
-              onChange={(event) => setLocale(event.target.value as Locale)}
+              onChange={(event) => handleLocaleChange(event.target.value as Locale)}
               aria-label="Language"
               className="h-10 w-full rounded-lg border-2 border-border bg-bg-elevated pl-9 pr-2 text-xs font-bold text-text-secondary focus:border-info focus:outline-none focus:ring-2 focus:ring-info/20 md:w-[132px]"
             >
