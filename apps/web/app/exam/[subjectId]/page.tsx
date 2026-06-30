@@ -33,7 +33,7 @@ export default function ExamPage() {
   const subjectId = params.subjectId as string;
   const { locale } = useLocale();
   const t = (source: string) => translateStudentText(source, locale);
-  
+
   const [examData, setExamData] = useState<ExamData | null>(null);
   const [subjectStatus, setSubjectStatus] = useState<SubjectStatus | null>(null);
   const [answers, setAnswers] = useState<Record<string, number>>({});
@@ -71,7 +71,7 @@ export default function ExamPage() {
       const data = curriculum.data || [];
       const curriculumItem = data.find((item: any) => item.subject?.id === subjectId);
       const subject = curriculumItem?.subject;
-      
+
       if (!subject) {
         console.error('[EXAM] Curriculum data:', curriculum);
         console.error('[EXAM] Looking for subjectId:', subjectId);
@@ -163,7 +163,7 @@ export default function ExamPage() {
         }
         const payload = JSON.parse(atob(tokenParts[1]!)); // JWT는 항상 3개 부분으로 구성
         const userRole = payload.role;
-        
+
         if (userRole === 'instructor') {
           router.push('/instructor');
         } else if (userRole === 'admin') {
@@ -213,7 +213,7 @@ export default function ExamPage() {
       }
 
       const data = await response.json();
-      
+
       // Subject 기반 결과 페이지로 이동
       router.push(`/exam/result?subjectId=${subjectId}&attemptId=${examData.attemptId}&score=${data.examScore}&finalScore=${data.finalScore || 0}&passed=${data.passed || false}&progressPercent=${subjectStatus?.progressPercent || 0}&remainingTries=${(subjectStatus?.remainingTries || 3) - 1}`);
     } catch (error) {
@@ -226,7 +226,7 @@ export default function ExamPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-bg-primary">
+      <div className="student-page flex items-center justify-center">
         <div className="flex items-center gap-2 text-lg text-text-secondary">
           <div className="w-5 h-5 border-2 border-text-tertiary/30 border-t-text-tertiary rounded-full animate-spin"></div>
           {t('시험을 준비 중입니다...')}
@@ -237,46 +237,48 @@ export default function ExamPage() {
 
   if (!examData) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-bg-primary">
+      <div className="student-page flex items-center justify-center">
         <div className="text-lg text-text-secondary">{t('시험 데이터를 불러올 수 없습니다.')}</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen py-10 px-5 bg-bg-primary">
-      <div className="max-w-4xl mx-auto bg-surface border border-border rounded-xl p-8 md:p-10">
+    <div className="student-page">
+      <div className="student-container max-w-4xl">
+      <div className="student-panel-strong p-5 md:p-8">
         {/* 시험 헤더 */}
         <div className="mb-8">
-          <div className="flex justify-between items-start mb-4">
+          <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div>
-              <h1 className="text-[28px] font-bold text-text-primary mb-2">
+              <p className="student-kicker">{t('학습평가')}</p>
+              <h1 className="student-title mt-1">
                 {t(`${examData.subjectName || '과목'} 시험`)}
               </h1>
-              <p className="text-sm text-text-secondary">
+              <p className="student-copy mt-2">
                 {t('모든 문제에 답변한 후 제출해주세요')}
               </p>
             </div>
-            <div className="text-sm text-text-secondary px-4 py-2 bg-bg-primary rounded-full border border-border">
+            <div className="rounded-lg border border-border bg-bg-elevated px-4 py-3 text-base font-black text-text-primary">
               {t(`${examData.questions.length}문제`)}
             </div>
           </div>
-          
+
           {/* 시험 정보 카드 */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-bg-primary border border-border rounded-lg">
-            <div className="text-center">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+            <div className="student-stat text-center">
               <div className="text-xs text-text-tertiary mb-1">{t('현재 진도율')}</div>
               <div className="text-lg font-bold text-text-primary">
                 {Math.round(subjectStatus?.progressPercent || 0)}%
               </div>
             </div>
-            <div className="text-center">
+            <div className="student-stat text-center">
               <div className="text-xs text-text-tertiary mb-1">{t('시험 차수')}</div>
               <div className="text-lg font-bold text-text-primary">
                 {t(`${(subjectStatus?.examAttemptCount || 0) + 1}회차`)}
               </div>
             </div>
-            <div className="text-center">
+            <div className="student-stat text-center">
               <div className="text-xs text-text-tertiary mb-1">{t('남은 기회')}</div>
               <div className="text-lg font-bold text-warning">
                 {t(`${subjectStatus?.remainingTries || 3}회`)}
@@ -287,17 +289,17 @@ export default function ExamPage() {
 
         <div className="mb-8">
           {examData.questions.map((question, index) => (
-            <div key={question.id} className="mb-8 p-6 border border-border rounded-xl bg-bg-primary">
-              <h3 className="text-lg mb-5 text-text-primary font-semibold">
+            <div key={question.id} className="mb-6 rounded-xl border border-border bg-bg-elevated p-5 md:p-6">
+              <h3 className="mb-5 text-lg font-black leading-relaxed text-text-primary">
                 {index + 1}. {question.content}
               </h3>
-              
+
               <div className="flex flex-col gap-2.5">
                 {question.choices.map((choice, choiceIndex) => (
-                  <label key={choiceIndex} className={`flex items-center px-4 py-3 border-2 rounded-lg cursor-pointer transition-all ${
-                    answers[question.id] === choiceIndex 
-                      ? 'border-info bg-info-bg' 
-                      : 'border-border bg-surface hover:border-border-light hover:bg-surface/80'
+                  <label key={choiceIndex} className={`flex min-h-14 cursor-pointer items-center rounded-lg border-2 px-4 py-3 transition-all ${
+                    answers[question.id] === choiceIndex
+                      ? 'border-info bg-info-bg shadow-sm'
+                      : 'border-border bg-surface hover:border-border-light'
                   }`}>
                     <input
                       type="radio"
@@ -317,18 +319,18 @@ export default function ExamPage() {
           ))}
         </div>
 
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col-reverse gap-3 md:flex-row md:items-center md:justify-between">
           <button
             onClick={handleBackToDashboard}
-            className="px-6 py-3 bg-bg-primary text-text-secondary border border-border rounded-md text-base font-medium cursor-pointer transition-all hover:bg-surface hover:text-text-primary hover:border-border-light"
+            className="student-button-secondary"
           >
             {t('취소')}
           </button>
-          
+
           <button
             onClick={handleSubmit}
             disabled={submitting}
-            className="px-8 py-4 bg-success text-white border-0 rounded-md text-base font-semibold transition-all hover:bg-success/90 disabled:cursor-not-allowed disabled:opacity-60"
+            className="student-button-success md:min-w-44"
           >
             {submitting ? (
               <span className="inline-flex items-center gap-2">
@@ -340,6 +342,7 @@ export default function ExamPage() {
             )}
           </button>
         </div>
+      </div>
       </div>
     </div>
   );

@@ -62,7 +62,7 @@ export default function StudentPage() {
 
   if (isLoading || !isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-bg-primary">
+      <div className="student-page flex items-center justify-center">
         <div className="flex items-center gap-2 text-text-secondary">
           <div className="w-5 h-5 border-2 border-text-tertiary/30 border-t-text-tertiary rounded-full animate-spin" />
           <span>{t('인증 중...')}</span>
@@ -81,12 +81,14 @@ export default function StudentPage() {
   };
 
   return (
-    <div className="min-h-screen bg-bg-primary px-4 py-8 md:py-10">
-      <div className="max-w-3xl mx-auto bg-surface border border-border rounded-xl px-6 py-8 md:px-10 md:py-10">
+    <div className="student-page">
+      <div className="student-container max-w-4xl">
+      <div className="student-panel-strong px-5 py-6 md:px-8 md:py-8">
         {/* 헤더 */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-text-primary mb-2">
+            <p className="student-kicker">{t('계정')}</p>
+            <h1 className="student-title mt-1 mb-2">
               {t('내 정보')}
           </h1>
             <p className="text-sm md:text-base text-text-secondary">
@@ -95,7 +97,7 @@ export default function StudentPage() {
           </div>
           <button
             onClick={logout}
-            className="px-4 py-2 rounded-lg bg-error text-white text-sm font-semibold transition-colors hover:bg-error/90"
+            className="inline-flex min-h-11 items-center justify-center rounded-lg bg-error px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-error/90"
           >
             {t('로그아웃')}
           </button>
@@ -114,26 +116,26 @@ export default function StudentPage() {
               <h2 className="text-lg font-semibold text-text-primary mb-4">
                 {t('기본 정보')}
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-bg-primary border border-border rounded-xl p-5">
-                <div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="student-stat">
                   <div className="text-xs text-text-tertiary mb-1">{t('이름')}</div>
                   <div className="text-base font-medium text-text-primary">
                     {profile?.name ?? '-'}
                   </div>
                 </div>
-                <div>
+                <div className="student-stat">
                   <div className="text-xs text-text-tertiary mb-1">{t('아이디')}</div>
                   <div className="text-base font-medium text-text-primary">
                     {profile?.username ?? '-'}
                   </div>
                 </div>
-                <div>
+                <div className="student-stat">
                   <div className="text-xs text-text-tertiary mb-1">{t('역할')}</div>
                   <div className="text-base font-medium text-text-primary">
                     {profile ? t(roleLabel[profile.role]) : '-'}
                   </div>
                 </div>
-                <div>
+                <div className="student-stat">
                   <div className="text-xs text-text-tertiary mb-1">{t('휴대폰 번호')}</div>
                   <div className="text-base text-text-primary">
                     {profile?.phone ?? '-'}
@@ -147,7 +149,7 @@ export default function StudentPage() {
               <h2 className="text-lg font-semibold text-text-primary mb-4">
                 {t('소속 및 교육기간')}
               </h2>
-              <div className="bg-bg-primary border border-border rounded-xl p-5 space-y-3">
+              <div className="student-panel p-5 space-y-3">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                   <div>
                     <div className="text-xs text-text-tertiary mb-1">{t('소속 회사')}</div>
@@ -185,13 +187,13 @@ export default function StudentPage() {
               <h2 className="text-lg font-semibold text-text-primary mb-4">
                 {t('기타')}
               </h2>
-              <div className="bg-bg-primary border border-border rounded-xl p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+              <div className="student-panel p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                 <div className="text-sm text-text-secondary">
                   {t('강의실에서 학습 진도와 시험 결과를 확인하실 수 있습니다.')}
           </div>
                 <Link
                   href="/curriculum"
-                  className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold transition-colors hover:bg-primary-600"
+                  className="student-button-primary text-sm"
                 >
                   {t('강의실로 이동')}
                 </Link>
@@ -199,6 +201,7 @@ export default function StudentPage() {
             </section>
           </div>
         )}
+      </div>
       </div>
     </div>
   );

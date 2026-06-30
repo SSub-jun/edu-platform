@@ -164,7 +164,7 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
           value={formData.name}
           onChange={(e) => handleInputChange('name', e.target.value)}
           placeholder={ta('이름을 입력하세요')}
-          className="w-full h-12 px-4 bg-bg-primary border-2 border-border rounded-lg text-base text-text-primary placeholder:text-text-tertiary transition-all focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20 disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-surface"
+          className="student-input"
           disabled={loading}
           required
         />
@@ -265,7 +265,7 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
           value={formData.inviteCode}
           onChange={(e) => handleInputChange('inviteCode', e.target.value.toUpperCase())}
           placeholder={ta('회사 초대코드를 입력하세요')}
-          className="w-full h-12 px-4 bg-bg-primary border-2 border-border rounded-lg text-base text-text-primary placeholder:text-text-tertiary transition-all focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20 disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-surface"
+          className="student-input"
           disabled={loading}
           maxLength={12}
         />
@@ -307,7 +307,7 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
         <button
           type="button"
           onClick={onBack}
-          className="w-full h-12 bg-bg-primary text-text-secondary border-2 border-border rounded-lg text-base font-semibold transition-all hover:bg-surface hover:text-text-primary hover:border-border-light disabled:opacity-60 disabled:cursor-not-allowed"
+          className="student-button-secondary w-full"
           disabled={loading}
         >
           {t('이전')}
@@ -323,7 +323,7 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
             !isPasswordValid(formData.password) ||
             !privacyAgreed
           }
-          className="w-full h-12 bg-primary text-white rounded-lg text-base font-semibold transition-all hover:bg-primary-600 active:bg-primary-700 disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600 focus-visible:outline-offset-2"
+          className="student-button-primary w-full"
         >
           {loading ? (
             <span className="inline-flex items-center gap-2">

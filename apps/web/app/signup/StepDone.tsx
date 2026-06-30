@@ -30,8 +30,8 @@ export default function StepDone({ onComplete, signupData }: StepDoneProps) {
 
   return (
     <div className="text-center">
-      <div className="text-6xl mb-4 animate-bounce">
-        🎉
+      <div className="text-2xl mb-4">
+        OK
       </div>
       
       <h2 className="text-2xl font-bold text-text-primary mb-4 bg-gradient-to-r from-success to-primary bg-clip-text text-transparent">
@@ -43,7 +43,7 @@ export default function StepDone({ onComplete, signupData }: StepDoneProps) {
         {t('이제 학습을 시작할 수 있습니다.')}
       </p>
 
-      <div className="bg-gradient-to-br from-surface to-bg-primary border border-border rounded-xl p-6 mb-8">
+      <div className="student-muted-box p-6 mb-8">
         <h3 className="text-base font-semibold text-text-primary mb-4">
           {t('가입 정보')}
         </h3>
@@ -83,7 +83,7 @@ export default function StepDone({ onComplete, signupData }: StepDoneProps) {
 
       <button
         onClick={onComplete}
-        className="w-full max-w-[200px] h-12 bg-primary text-white rounded-lg text-base font-semibold transition-all hover:bg-primary-600 active:bg-primary-700 mx-auto"
+        className="student-button-primary mx-auto w-full max-w-[220px]"
       >
         {t('바로 시작하기')}
       </button>

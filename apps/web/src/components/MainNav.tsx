@@ -64,30 +64,30 @@ export function MainNav() {
   }
 
   return (
-    <header className="w-full border-b border-border bg-surface/80 backdrop-blur-sm">
-      <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3 md:py-4">
-        <Link href="/curriculum" className="flex items-center gap-2">
-          <span className="text-[1.3rem] md:text-[1.5rem] font-bold text-text-primary tracking-tight">
+    <header className="sticky top-0 z-40 w-full border-b border-border bg-surface/95 shadow-sm backdrop-blur">
+      <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-3 md:flex-row md:items-center md:justify-between md:px-6">
+        <Link href="/curriculum" className="flex items-center gap-3">
+          <span aria-hidden="true" className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-base font-black text-white">
+            K
+          </span>
+          <span className="text-lg font-black tracking-tight text-text-primary md:text-xl">
             {t("nav.brand")}
           </span>
         </Link>
-        <nav className="flex items-center gap-1 md:gap-2 text-sm md:text-base flex-grow justify-end">
-          {navItems.map((item, index) => {
+        <nav className="grid w-full grid-cols-2 gap-2 text-sm md:flex md:w-auto md:items-center md:justify-end md:text-base">
+          {navItems.map((item) => {
             const isActive =
               item.href === "/curriculum"
                 ? pathname === "/curriculum"
                 : pathname.startsWith(item.href);
 
             return (
-              <div key={item.href} className="flex items-center">
-                {index > 0 && (
-                  <div className="h-4 mx-2 border-l border-border opacity-40" />
-                )}
+              <div key={item.href} className="flex w-full items-center md:w-auto md:shrink-0">
                 <Link
                   href={item.href}
-                  className={`px-3 py-1.5 md:px-4 md:py-2 rounded font-medium transition-colors ${isActive
-                      ? "bg-primary text-white"
-                      : "text-text-secondary hover:text-text-primary hover:bg-bg-primary"
+                  className={`inline-flex min-h-10 w-full items-center justify-center rounded-lg px-4 py-2 text-center font-bold transition-colors md:w-auto ${isActive
+                      ? "bg-primary text-white shadow-sm"
+                      : "border border-border bg-bg-elevated text-text-secondary hover:text-text-primary"
                     }`}
                 >
                   {t(item.labelKey) || item.fallback}
@@ -95,16 +95,16 @@ export function MainNav() {
               </div>
             );
           })}
-          <div className="relative ml-2 shrink-0">
+          <div className="relative col-span-2 w-full shrink-0 md:col-span-1 md:ml-2 md:w-auto">
             <Globe2
               aria-hidden="true"
-              className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-text-secondary"
+              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-secondary"
             />
             <select
               value={locale}
               onChange={(event) => setLocale(event.target.value as Locale)}
               aria-label="Language"
-              className="h-9 w-[116px] rounded border border-border bg-bg-primary pl-8 pr-2 text-xs font-semibold text-text-secondary focus:outline-none focus:ring-2 focus:ring-primary-600 md:w-[128px]"
+              className="h-10 w-full rounded-lg border-2 border-border bg-bg-elevated pl-9 pr-2 text-xs font-bold text-text-secondary focus:border-info focus:outline-none focus:ring-2 focus:ring-info/20 md:w-[132px]"
             >
               {supportedLocales.map((item) => (
                 <option key={item} value={item}>

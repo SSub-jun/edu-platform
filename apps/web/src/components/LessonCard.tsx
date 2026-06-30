@@ -16,7 +16,7 @@ export default function LessonCard({ lesson, remainingDays }: LessonCardProps) {
   const { id, title, progressPercent, status, remainingTries } = lesson;
   const { locale } = useLocale();
   const t = (source: string) => translateStudentText(source, locale);
-  
+
   // 상태에 따른 배지 상태 결정
   const getBadgeStatus = (): BadgeStatus => {
     if (status === 'locked') return 'locked';
@@ -27,7 +27,7 @@ export default function LessonCard({ lesson, remainingDays }: LessonCardProps) {
 
   // 학습하기 버튼 활성화 여부
   const canLearn = status !== 'locked';
-  
+
   // 시험보기 버튼 활성화 여부
   const canTakeExam = status !== 'locked' && progressPercent >= 90 && remainingTries > 0;
   const examDisabledReason = progressPercent < 90
@@ -59,7 +59,7 @@ export default function LessonCard({ lesson, remainingDays }: LessonCardProps) {
       {/* Progress */}
       <div className="flex items-center gap-2 mb-4">
         <div className="flex-1 h-2 bg-surface border border-border rounded-md overflow-hidden">
-          <div 
+          <div
             className="h-full bg-primary rounded-md transition-[width] duration-300 ease-linear"
             style={{ width: `${Math.min(progressPercent, 100)}%` }}
           />
@@ -87,11 +87,11 @@ export default function LessonCard({ lesson, remainingDays }: LessonCardProps) {
 
       {/* Actions */}
       <div className="flex gap-2">
-        <Link 
+        <Link
           href={`/lesson/${id}`}
           className={`flex-1 inline-flex items-center justify-center h-11 px-6 rounded-btn text-[14px] leading-5 font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600 focus-visible:outline-offset-2 ${
-            canLearn 
-              ? 'bg-transparent border border-border text-text-secondary hover:bg-surface' 
+            canLearn
+              ? 'bg-transparent border border-border text-text-secondary hover:bg-surface'
               : 'opacity-60 cursor-not-allowed pointer-events-none bg-surface text-text-tertiary'
           }`}
           aria-disabled={!canLearn}
@@ -99,12 +99,12 @@ export default function LessonCard({ lesson, remainingDays }: LessonCardProps) {
         >
           {t('학습하기')}
         </Link>
-        
-        <Link 
+
+        <Link
           href={`/exam/lesson/${id}`}
           className={`flex-1 inline-flex items-center justify-center h-11 px-6 rounded-btn text-[14px] leading-5 font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600 focus-visible:outline-offset-2 ${
-            canTakeExam 
-              ? 'bg-primary text-text-primary hover:bg-primary-600 active:bg-primary-700' 
+            canTakeExam
+              ? 'bg-primary text-white hover:bg-primary-600 active:bg-primary-700'
               : 'opacity-60 cursor-not-allowed pointer-events-none bg-surface text-text-tertiary'
           }`}
           aria-disabled={!canTakeExam}

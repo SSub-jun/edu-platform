@@ -139,7 +139,7 @@ export default function ExamPage() {
               : t('레슨 진도가 90% 이상이어야 시험을 볼 수 있습니다.')
             }
           </p>
-          <Link href={`/lesson/${lessonId}`} className="inline-block px-6 py-3 bg-primary text-text-primary rounded-lg font-semibold transition-colors hover:bg-primary-600">
+          <Link href={`/lesson/${lessonId}`} className="inline-block px-6 py-3 bg-primary text-white rounded-lg font-semibold transition-colors hover:bg-primary-600">
             {t('레슨으로 돌아가기')}
           </Link>
         </div>
@@ -185,7 +185,7 @@ export default function ExamPage() {
               {t('레슨으로 돌아가기')}
             </Link>
             <button 
-              className="flex-1 px-6 py-3 bg-primary text-text-primary rounded-lg font-semibold transition-all hover:bg-primary-600 active:bg-primary-700 disabled:opacity-60 disabled:cursor-not-allowed"
+              className="flex-1 px-6 py-3 bg-primary text-white rounded-lg font-semibold transition-all hover:bg-primary-600 active:bg-primary-700 disabled:opacity-60 disabled:cursor-not-allowed"
               onClick={handleStartExam}
               disabled={startExamMutation.isPending || lessonStatus.remainingTries === 0}
             >
@@ -261,7 +261,7 @@ export default function ExamPage() {
             </button>
           ) : (
             <button 
-                className="px-5 py-2.5 bg-primary text-text-primary rounded-md font-semibold transition-all hover:bg-primary-600"
+                className="px-5 py-2.5 bg-primary text-white rounded-md font-semibold transition-all hover:bg-primary-600"
               onClick={handleNextQuestion}
             >
               {t('다음 문제')}

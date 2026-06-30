@@ -225,7 +225,7 @@ export default function StepPhone({ onComplete, initialData }: StepPhoneProps) {
         <button
           type="submit"
           disabled={loading || !phone}
-          className="w-full h-12 bg-primary text-white rounded-lg text-base font-semibold transition-all hover:bg-primary-600 active:bg-primary-700 disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600 focus-visible:outline-offset-2"
+          className="student-button-primary w-full"
         >
           {loading ? (
             <span className="inline-flex items-center gap-2">
@@ -296,7 +296,7 @@ export default function StepPhone({ onComplete, initialData }: StepPhoneProps) {
         <button
           type="button"
           onClick={() => setIsPhoneSubmitted(false)}
-          className="w-full h-12 bg-bg-primary text-text-secondary border-2 border-border rounded-lg text-base font-semibold transition-all hover:bg-surface hover:text-text-primary hover:border-border-light disabled:opacity-60 disabled:cursor-not-allowed"
+          className="student-button-secondary w-full"
           disabled={loading}
         >
           {t('번호 변경')}
@@ -305,7 +305,7 @@ export default function StepPhone({ onComplete, initialData }: StepPhoneProps) {
         <button
           type="submit"
           disabled={loading || otp.some(digit => !digit)}
-          className="w-full h-12 bg-primary text-white rounded-lg text-base font-semibold transition-all hover:bg-primary-600 active:bg-primary-700 disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600 focus-visible:outline-offset-2"
+          className="student-button-primary w-full"
         >
           {loading ? (
             <span className="inline-flex items-center gap-2">

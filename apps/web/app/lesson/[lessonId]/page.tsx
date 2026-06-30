@@ -212,8 +212,8 @@ export default function LessonPage() {
 
   if (statusLoading) {
     return (
-      <div className="min-h-screen py-6 px-4 bg-bg-primary">
-        <div className="max-w-7xl mx-auto">
+      <div className="student-page">
+        <div className="student-container">
           <div className="animate-pulse space-y-4">
             <div className="h-8 bg-surface rounded w-1/4"></div>
             <div className="h-96 bg-surface rounded"></div>
@@ -227,18 +227,18 @@ export default function LessonPage() {
   if (statusError) {
     const errorMessage = getErrorMessage(statusError);
     return (
-      <div className="min-h-screen flex items-center justify-center p-6 bg-bg-primary">
-        <div className="bg-surface border border-error rounded-xl p-8 max-w-md text-center">
+      <div className="student-page flex items-center justify-center">
+        <div className="student-panel max-w-md border-error p-8 text-center">
           <h3 className="text-xl font-bold text-error mb-3">{t(errorMessage.title)}</h3>
           <p className="text-base text-text-secondary mb-6">{t(errorMessage.description)}</p>
           <div className="flex gap-3">
               <button 
-              className="flex-1 px-5 py-3 bg-primary text-text-primary rounded-lg font-semibold transition-colors hover:bg-primary-600"
+              className="student-button-primary flex-1"
                 onClick={() => window.location.reload()}
               >
                 {errorMessage.actionLabel ? t(errorMessage.actionLabel) : t('다시 시도')}
               </button>
-            <Link href="/curriculum" className="flex-1 px-5 py-3 bg-bg-primary text-text-secondary border border-border rounded-lg font-semibold text-center transition-all hover:bg-surface hover:text-text-primary">
+            <Link href="/curriculum" className="student-button-secondary flex-1">
                 {t('커리큘럼으로')}
               </Link>
           </div>
@@ -249,10 +249,10 @@ export default function LessonPage() {
 
   if (!lessonStatus) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6 bg-bg-primary">
-        <div className="text-center bg-surface border border-border rounded-xl p-10">
+      <div className="student-page flex items-center justify-center">
+        <div className="student-panel p-10 text-center">
           <h3 className="text-xl font-bold text-text-primary mb-6">{t('레슨을 찾을 수 없습니다')}</h3>
-          <Link href="/curriculum" className="inline-block px-6 py-3 bg-primary text-text-primary rounded-lg font-semibold transition-colors hover:bg-primary-600">
+          <Link href="/curriculum" className="student-button-primary">
             {t('커리큘럼으로 돌아가기')}
           </Link>
         </div>
@@ -266,12 +266,12 @@ export default function LessonPage() {
   const displayProgressPercent = optimisticProgress?.progressPercent ?? progressPercent;
 
   return (
-    <div className="min-h-screen py-4 px-4 bg-bg-primary">
-      <div className="max-w-7xl mx-auto">
+    <div className="student-page">
+      <div className="student-container">
       {/* 상단 헤더 */}
         <div className="mb-6">
-          <nav className="flex items-center gap-2 text-sm mb-4">
-            <Link href="/curriculum" className="text-primary hover:text-primary-600 font-medium transition-colors">
+          <nav className="mb-4 flex items-center gap-2 text-sm">
+            <Link href="/curriculum" className="font-bold text-info transition-colors hover:text-primary">
             {t('커리큘럼')}
           </Link>
             <span className="text-text-tertiary">→</span>
@@ -280,9 +280,13 @@ export default function LessonPage() {
           </span>
         </nav>
 
-          <div className="bg-surface border border-border rounded-xl p-5">
-            <h1 className="text-2xl font-bold text-text-primary mb-3">{t(`레슨 ${lessonId}`)}</h1>
-            <div className="flex items-center gap-4 mb-4">
+          <div className="student-panel p-5 md:p-6">
+            <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div>
+                <p className="student-kicker">{t('동영상 학습')}</p>
+                <h1 className="student-title mt-1">{t(`레슨 ${lessonId}`)}</h1>
+              </div>
+              <div className="flex items-center gap-3">
             <StatusBadge 
               status={
                 !unlocked ? 'locked' : 
@@ -290,14 +294,15 @@ export default function LessonPage() {
                 displayProgressPercent > 0 ? 'in-progress' : 'available'
               } 
             />
-              <span className="text-sm font-medium text-text-secondary">
+                <span className="text-base font-black text-text-primary">
               {t(`진도율 ${Math.round(displayProgressPercent)}%`)}
             </span>
+              </div>
         </div>
 
-            <div className="w-full h-2 bg-bg-primary rounded-full overflow-hidden border border-border">
+            <div className="student-progress-track">
           <div 
-                className="h-full bg-primary rounded-full transition-[width] duration-300 ease-linear"
+                className="student-progress-bar"
             style={{ width: `${Math.min(displayProgressPercent, 100)}%` }}
           />
             </div>
@@ -308,7 +313,7 @@ export default function LessonPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Video Player Section - DO NOT MODIFY INTERNAL UI */}
           <div className="lg:col-span-2">
-            <div className="bg-black rounded-xl overflow-hidden">
+            <div className="overflow-hidden rounded-xl bg-black shadow-md">
           <VideoPlayer
             src={signedVideoUrl}
             title={t(`레슨 ${lessonId}`)}
@@ -334,16 +339,16 @@ export default function LessonPage() {
         {/* 사이드바 */}
           <div className="flex flex-col gap-4">
           {/* 레슨 진행 정보 */}
-            <div className="bg-surface border border-border rounded-xl p-5">
+            <div className="student-panel p-5">
               <h3 className="text-lg font-bold text-text-primary mb-4">{t('학습 진행 상황')}</h3>
               <div className="flex flex-col gap-3">
-                <div className="flex justify-between items-center">
+                <div className="student-stat flex justify-between items-center">
                   <span className="text-sm text-text-tertiary">{t('현재 진도율')}</span>
                   <span className="text-base font-bold text-text-primary">
                   {Math.round(displayProgressPercent)}%
                 </span>
               </div>
-                <div className="flex justify-between items-center">
+                <div className="student-stat flex justify-between items-center">
                   <span className="text-sm text-text-tertiary">{t('학습 상태')}</span>
                   <span className="text-base font-semibold text-text-primary">
                   {displayProgressPercent >= 90 ? t('완료') : t('진행 중')}
@@ -354,9 +359,9 @@ export default function LessonPage() {
 
           {/* 다음 레슨 정보 */}
           {!nextLoading && nextAvailable?.lock && nextAvailable.blockedBy && (
-              <div className="bg-surface border border-border rounded-xl p-5">
+              <div className="student-panel p-5">
                 <h3 className="text-lg font-bold text-text-primary mb-4">{t('다음 레슨 상태')}</h3>
-                <div className="bg-bg-primary border border-border rounded-lg p-4">
+                <div className="student-muted-box">
                   <p className="text-sm text-text-secondary">
                     <strong className="text-text-primary">{nextAvailable.blockedBy.lessonTitle}</strong> {t('완료 후')}{' '}
                     {t('다음 레슨이 해금됩니다.')}
@@ -367,12 +372,11 @@ export default function LessonPage() {
 
           {/* 진도 차단 사유 */}
           {blockers && blockers.length > 0 && (
-              <div className="bg-surface border border-error rounded-xl p-5">
+              <div className="student-panel border-error p-5">
                 <h3 className="text-lg font-bold text-error mb-4">{t('접근 제한')}</h3>
                 <div className="flex flex-col gap-2">
                 {blockers.map((blocker, index) => (
-                    <div key={index} className="flex items-start gap-2 p-3 bg-error-bg border border-error rounded-lg">
-                      <span className="text-lg flex-shrink-0">⚠️</span>
+                    <div key={index} className="flex items-start gap-2 rounded-lg border border-error bg-error-bg p-3">
                       <span className="text-sm text-error">
                       {blocker.message}
                     </span>
@@ -383,8 +387,8 @@ export default function LessonPage() {
           )}
 
           {/* 과목 시험 안내 */}
-            <div className="bg-surface border border-border rounded-xl p-5">
-              <h3 className="text-lg font-bold text-text-primary mb-4">💡 {t('시험 안내')}</h3>
+            <div className="student-panel p-5">
+              <h3 className="text-lg font-bold text-text-primary mb-4">{t('시험 안내')}</h3>
               <p className="text-sm text-text-secondary leading-relaxed">
                 {t('과목의')} <strong className="text-text-primary">{t('모든 레슨')}</strong>{t('을 90% 이상 완료하면')}<br/>
                 <Link href="/curriculum" className="text-primary hover:text-primary-600 font-medium underline transition-colors">
