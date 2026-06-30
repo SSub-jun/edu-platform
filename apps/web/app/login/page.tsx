@@ -108,7 +108,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden p-4 md:p-6">
+    <div className="relative min-h-screen overflow-y-auto p-3 md:overflow-hidden md:p-6">
       {/* 배경 이미지 (전체 화면) */}
       <Image
         src="/images/LoginBackground.png"
@@ -122,9 +122,9 @@ export default function LoginPage() {
       {/* 화이트 오버레이: 이미지 위에 흰색 톤을 덧씌워서 가독성 확보 */}
       <div className="pointer-events-none absolute inset-0 -z-10 bg-primary/72" />
 
-      <div className="mx-auto flex min-h-[calc(100vh-2rem)] w-full max-w-6xl items-center md:min-h-[calc(100vh-3rem)]">
-        <div className="grid w-full grid-cols-1 items-center gap-6 md:grid-cols-[1fr_440px] md:gap-10">
-          <section className="text-white">
+      <div className="mx-auto flex min-h-[calc(100vh-1.5rem)] w-full max-w-6xl items-center md:min-h-[calc(100vh-3rem)]">
+        <div className="grid w-full grid-cols-1 items-center gap-4 md:grid-cols-[1fr_440px] md:gap-10">
+          <section className="hidden text-white md:block">
             <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/12 px-4 py-2 text-sm font-bold backdrop-blur">
               <ShieldCheck className="h-5 w-5" aria-hidden="true" />
               <span>{t('nav.brand')}</span>
@@ -150,11 +150,18 @@ export default function LoginPage() {
             </div>
           </section>
 
-          <section className="student-panel-strong w-full bg-surface p-6 md:p-8">
-            <div className="mb-6">
+          <section className="student-panel-strong w-full bg-surface p-5 md:p-8">
+            <div className="mb-4 flex items-center gap-3 md:hidden">
+              <span aria-hidden="true" className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-sm font-black text-white">
+                K
+              </span>
+              <span className="text-base font-black text-text-primary">{t('nav.brand')}</span>
+            </div>
+
+            <div className="mb-4 md:mb-6">
               <p className="student-kicker">{t('login.submit')}</p>
               <h2 className="student-title mt-1">{t('login.submit')}</h2>
-              <p className="student-copy mt-2">{t('login.signup.prompt')}</p>
+              <p className="student-copy mt-2 hidden md:block">{t('login.signup.prompt')}</p>
             </div>
 
           {/* Error Message */}
@@ -165,7 +172,7 @@ export default function LoginPage() {
         )}
 
           {/* Form */}
-          <form onSubmit={handleLogin} className="flex flex-col gap-6">
+          <form onSubmit={handleLogin} className="flex flex-col gap-4 md:gap-6">
             <div className="flex flex-col gap-2">
               <label className="sr-only">
                 {t('login.language.label')}
@@ -244,7 +251,7 @@ export default function LoginPage() {
         </form>
 
           {/* Signup Section */}
-          <div className="mt-6 rounded-lg border border-border bg-bg-elevated p-5 text-center">
+          <div className="mt-4 rounded-lg border border-border bg-bg-elevated p-4 text-center md:mt-6 md:p-5">
             <p className="text-sm text-text-secondary font-medium mb-3">{t('login.signup.prompt')}</p>
           <button
             type="button"

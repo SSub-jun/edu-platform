@@ -114,18 +114,18 @@ export default function ExamResultPage() {
   return (
     <div className="student-page">
       <div className="student-container max-w-3xl">
-      <div className="student-panel-strong p-5 md:p-8">
+      <div className="student-panel-strong p-4 md:p-8">
         {/* 결과 헤더 */}
-        <div className="text-center mb-8">
-          <div className={`mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full border-4 text-3xl font-black ${
+        <div className="mb-5 text-center md:mb-8">
+          <div className={`mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full border-4 text-2xl font-black md:mb-4 md:h-20 md:w-20 md:text-3xl ${
             isPass ? 'border-success bg-success-bg text-success' : 'border-error bg-error-bg text-error'
           }`}>
             {isPass ? 'PASS' : '!'}
           </div>
-          <h1 className={`text-3xl font-black mb-3 ${isPass ? 'text-success' : 'text-error'}`}>
+          <h1 className={`mb-2 text-2xl font-black md:mb-3 md:text-3xl ${isPass ? 'text-success' : 'text-error'}`}>
             {isPass ? t('과목 수료!') : t('미수료')}
           </h1>
-          <p className="text-lg text-text-secondary">
+          <p className="text-sm text-text-secondary md:text-lg">
             {isPass 
               ? t('축하합니다! 과목을 수료하셨습니다!')
               : t('아쉽지만 수료 기준에 미달했습니다.')
@@ -134,11 +134,11 @@ export default function ExamResultPage() {
         </div>
 
         {/* 점수 정보 */}
-        <div className="mb-8">
+        <div className="mb-5 md:mb-8">
           {/* 총점 */}
-          <div className="rounded-xl border border-border bg-bg-elevated p-6 text-center md:p-8 mb-4">
+          <div className="mb-4 rounded-lg border border-border bg-bg-elevated p-4 text-center md:rounded-xl md:p-8">
             <div className="text-sm text-text-tertiary mb-2">{t('과목 총점')}</div>
-            <div className={`text-5xl font-bold mb-4 ${isPass ? 'text-success' : 'text-error'}`}>
+            <div className={`mb-3 text-4xl font-bold md:mb-4 md:text-5xl ${isPass ? 'text-success' : 'text-error'}`}>
               {t(`${Math.round(finalScoreNum)}점`)}
             </div>
             <div className="text-sm font-medium mb-4">
@@ -154,10 +154,10 @@ export default function ExamResultPage() {
             </div>
             
             {/* 점수 구성 */}
-            <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-border">
+            <div className="mt-4 grid grid-cols-2 gap-3 border-t border-border pt-4 md:mt-6 md:gap-4 md:pt-6">
               <div>
                 <div className="text-xs text-text-tertiary mb-1">{t('진도율 (20%)')}</div>
-                <div className="text-2xl font-bold text-text-primary">
+                <div className="text-xl font-bold text-text-primary md:text-2xl">
                   {t(`${Math.round(progressNum * 0.2)}점`)}
                 </div>
                 <div className="text-xs text-text-secondary mt-1">
@@ -166,7 +166,7 @@ export default function ExamResultPage() {
               </div>
               <div>
                 <div className="text-xs text-text-tertiary mb-1">{t('시험 점수 (80%)')}</div>
-                <div className="text-2xl font-bold text-text-primary">
+                <div className="text-xl font-bold text-text-primary md:text-2xl">
                   {t(`${Math.round(scoreNum * 0.8)}점`)}
                 </div>
                 <div className="text-xs text-text-secondary mt-1">
@@ -214,13 +214,13 @@ export default function ExamResultPage() {
         </div>
 
         {/* 액션 버튼 */}
-        <div className="mb-8">
+        <div className="mb-5 md:mb-8">
           {isPass ? (
             // 수료 시 액션
             <div className="flex flex-col gap-3">
-              <div className="text-center p-6 bg-success-bg border border-success rounded-lg mb-3">
-                <p className="text-lg font-semibold text-success mb-2">{t('과목을 수료하셨습니다!')}</p>
-                <p className="text-sm text-text-secondary">
+              <div className="mb-3 rounded-lg border border-success bg-success-bg p-4 text-center md:p-6">
+                <p className="mb-1 text-base font-semibold text-success md:mb-2 md:text-lg">{t('과목을 수료하셨습니다!')}</p>
+                <p className="hidden text-sm text-text-secondary md:block">
                   {t('다른 과목을 확인하거나 강의를 복습해보세요.')}
                 </p>
               </div>

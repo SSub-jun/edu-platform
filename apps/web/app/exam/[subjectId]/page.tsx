@@ -246,26 +246,26 @@ export default function ExamPage() {
   return (
     <div className="student-page">
       <div className="student-container max-w-4xl">
-      <div className="student-panel-strong p-5 md:p-8">
+      <div className="student-panel-strong p-4 md:p-8">
         {/* 시험 헤더 */}
-        <div className="mb-8">
-          <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+        <div className="mb-5 md:mb-8">
+          <div className="mb-4 flex items-start justify-between gap-3 md:mb-5 md:gap-4">
             <div>
               <p className="student-kicker">{t('학습평가')}</p>
               <h1 className="student-title mt-1">
                 {t(`${examData.subjectName || '과목'} 시험`)}
               </h1>
-              <p className="student-copy mt-2">
+              <p className="student-copy mt-2 hidden md:block">
                 {t('모든 문제에 답변한 후 제출해주세요')}
               </p>
             </div>
-            <div className="rounded-lg border border-border bg-bg-elevated px-4 py-3 text-base font-black text-text-primary">
+            <div className="shrink-0 rounded-lg border border-border bg-bg-elevated px-3 py-2 text-sm font-black text-text-primary md:px-4 md:py-3 md:text-base">
               {t(`${examData.questions.length}문제`)}
             </div>
           </div>
 
           {/* 시험 정보 카드 */}
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+          <div className="grid grid-cols-3 gap-2 md:gap-3">
             <div className="student-stat text-center">
               <div className="text-xs text-text-tertiary mb-1">{t('현재 진도율')}</div>
               <div className="text-lg font-bold text-text-primary">
@@ -287,16 +287,16 @@ export default function ExamPage() {
           </div>
         </div>
 
-        <div className="mb-8">
+        <div className="mb-5 md:mb-8">
           {examData.questions.map((question, index) => (
-            <div key={question.id} className="mb-6 rounded-xl border border-border bg-bg-elevated p-5 md:p-6">
-              <h3 className="mb-5 text-lg font-black leading-relaxed text-text-primary">
+            <div key={question.id} className="mb-4 rounded-lg border border-border bg-bg-elevated p-4 md:mb-6 md:rounded-xl md:p-6">
+              <h3 className="mb-4 text-base font-black leading-relaxed text-text-primary md:mb-5 md:text-lg">
                 {index + 1}. {question.content}
               </h3>
 
               <div className="flex flex-col gap-2.5">
                 {question.choices.map((choice, choiceIndex) => (
-                  <label key={choiceIndex} className={`flex min-h-14 cursor-pointer items-center rounded-lg border-2 px-4 py-3 transition-all ${
+                  <label key={choiceIndex} className={`flex min-h-12 cursor-pointer items-center rounded-lg border-2 px-3 py-2.5 transition-all md:min-h-14 md:px-4 md:py-3 ${
                     answers[question.id] === choiceIndex
                       ? 'border-info bg-info-bg shadow-sm'
                       : 'border-border bg-surface hover:border-border-light'
@@ -309,7 +309,7 @@ export default function ExamPage() {
                       onChange={() => handleAnswerChange(question.id, choiceIndex)}
                       className="mr-3 w-4 h-4"
                     />
-                    <span className="text-base text-text-primary">
+                    <span className="text-sm text-text-primary md:text-base">
                       {String.fromCharCode(65 + choiceIndex)}. {choice}
                     </span>
                   </label>
