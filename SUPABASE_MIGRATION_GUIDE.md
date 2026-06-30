@@ -40,7 +40,7 @@ cd packages/db && npx prisma migrate deploy && cd ../../apps/api && node dist/ma
 ```bash
 # 1. packages/db/.env 파일 생성 또는 수정
 cd packages/db
-echo "DATABASE_URL=postgresql://postgres.foakaexaaslaheygqbam:iRLX%21Y2aH.kH%26T4@aws-1-ap-northeast-2.pooler.supabase.com:5432/postgres" > .env
+echo "DATABASE_URL=postgresql://postgres.<project-ref>:<password>@<pooler-host>:5432/postgres" > .env
 
 # 2. 마이그레이션 실행
 pnpm prisma migrate deploy
@@ -160,7 +160,7 @@ ALTER TABLE "public"."user_cohorts"
 ```bash
 # Supabase 데이터베이스 스키마 확인
 cd packages/db
-DATABASE_URL="postgresql://postgres.foakaexaaslaheygqbam:iRLX%21Y2aH.kH%26T4@aws-1-ap-northeast-2.pooler.supabase.com:5432/postgres" pnpm prisma db pull
+DATABASE_URL="postgresql://postgres.<project-ref>:<password>@<pooler-host>:5432/postgres" pnpm prisma db pull
 
 # 또는 Railway에서 로그 확인
 # Railway Dashboard → Deployments → Build Logs
@@ -171,4 +171,3 @@ DATABASE_URL="postgresql://postgres.foakaexaaslaheygqbam:iRLX%21Y2aH.kH%26T4@aws
 - **Session Mode (포트 5432)** 사용 필수 (마이그레이션용)
 - Transaction Mode (포트 6543)는 마이그레이션 불가
 - 프로덕션 환경에서는 반드시 백업 후 실행
-

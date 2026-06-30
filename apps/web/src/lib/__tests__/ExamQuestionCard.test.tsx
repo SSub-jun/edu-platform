@@ -1,17 +1,17 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import ExamQuestionCard from '../components/ExamQuestionCard';
-import { ExamQuestion, ExamAnswer } from '../types/api';
+import ExamQuestionCard from '../../components/ExamQuestionCard';
+import { ExamQuestion } from '../../types/api';
 
 const mockQuestion: ExamQuestion = {
   id: 'question-1',
-  stem: '다음 중 올바른 변수 선언 방법은?',
+  content: '다음 중 올바른 변수 선언 방법은?',
   choices: [
-    { id: 'choice-1', text: 'var name = "홍길동"', order: 1 },
-    { id: 'choice-2', text: 'variable name = "홍길동"', order: 2 },
-    { id: 'choice-3', text: 'name = "홍길동"', order: 3 },
-    { id: 'choice-4', text: 'string name = "홍길동"', order: 4 },
+    'var name = "홍길동"',
+    'variable name = "홍길동"',
+    'name = "홍길동"',
+    'string name = "홍길동"',
   ],
 };
 
@@ -104,7 +104,7 @@ describe('ExamQuestionCard', () => {
   });
 
   it('진행 도트를 올바르게 표시한다', () => {
-    render(
+    const { container } = render(
       <ExamQuestionCard
         question={mockQuestion}
         questionIndex={2}
@@ -113,7 +113,7 @@ describe('ExamQuestionCard', () => {
       />
     );
 
-    const dots = screen.container.querySelectorAll('[class*="dot"]');
+    const dots = container.querySelectorAll('[class*="dot"]');
     expect(dots).toHaveLength(5);
     
     // 현재 문제는 active, 이전 문제들은 completed 상태여야 함
@@ -122,12 +122,6 @@ describe('ExamQuestionCard', () => {
     expect(dots[1]).toHaveClass('dotCompleted');
   });
 });
-
-
-
-
-
-
 
 
 

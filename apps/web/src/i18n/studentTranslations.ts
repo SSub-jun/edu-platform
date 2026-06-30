@@ -534,6 +534,11 @@ export const studentTextTranslations: Record<string, LocaleText> = {
     th: 'เกิดข้อผิดพลาดระหว่างขอเรียนใหม่',
     bn: 'পুনরায় শেখার অনুরোধের সময় একটি ত্রুটি ঘটেছে।',
   },
+  '다시 수강하기 실패': {
+    en: 'Failed to restart the course',
+    th: 'เริ่มเรียนใหม่ไม่สำเร็จ',
+    bn: 'কোর্স আবার শুরু করা যায়নি',
+  },
   '과목 상태 조회 실패': {
     en: 'Failed to load subject status',
     th: 'โหลดสถานะรายวิชาไม่สำเร็จ',
@@ -652,6 +657,7 @@ export const studentTextTranslations: Record<string, LocaleText> = {
   '수료 기준': { en: 'Completion Criteria', th: 'เกณฑ์สำเร็จ', bn: 'সম্পন্নের মানদণ্ড' },
   '남은 시험 기회': { en: 'Exam Attempts Left', th: 'โอกาสสอบที่เหลือ', bn: 'বাকি পরীক্ষার সুযোগ' },
   '총 문항 수': { en: 'Total Questions', th: 'จำนวนคำถามทั้งหมด', bn: 'মোট প্রশ্ন' },
+  '3문항': { en: '3 questions', th: '3 ข้อ', bn: '৩ প্রশ্ন' },
   '과목을 다시 수강하시겠습니까?': {
     en: 'Do you want to retake this subject?',
     th: 'ต้องการเรียนรายวิชานี้ใหม่หรือไม่?',
