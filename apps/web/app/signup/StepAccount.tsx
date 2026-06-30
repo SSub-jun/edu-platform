@@ -15,7 +15,6 @@ interface StepAccountProps {
 
 interface PasswordStrength {
   hasLowerCase: boolean;
-  hasUpperCase: boolean;
   hasNumber: boolean;
   hasSpecialChar: boolean;
   hasMinLength: boolean;
@@ -37,7 +36,6 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
   const ta = (source: string) => translateStudentAttribute(source, locale);
   const [passwordStrength, setPasswordStrength] = useState<PasswordStrength>({
     hasLowerCase: false,
-    hasUpperCase: false,
     hasNumber: false,
     hasSpecialChar: false,
     hasMinLength: false,
@@ -50,20 +48,22 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
   const checkPasswordStrength = (password: string) => {
     setPasswordStrength({
       hasLowerCase: /[a-z]/.test(password),
-      hasUpperCase: /[A-Z]/.test(password),
       hasNumber: /\d/.test(password),
-      hasSpecialChar: /[^A-Za-z0-9]/.test(password),
+      hasSpecialChar: /[^A-Za-z0-9\s]/.test(password),
       hasMinLength: password.length >= 8,
     });
   };
 
   const isPasswordValid = (password: string): boolean => {
-    const pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+    const pattern = /^(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z0-9])(?!.*[A-Z])[\x21-\x7E]{8,}$/;
     return pattern.test(password);
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    const nextValue = field === 'password' || field === 'confirmPassword'
+      ? value.toLowerCase()
+      : value;
+    setFormData(prev => ({ ...prev, [field]: nextValue }));
     setError('');
   };
 
@@ -72,7 +72,7 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
     
     // 클라이언트 측 검증
     if (!isPasswordValid(formData.password)) {
-      setError('비밀번호는 최소 8자이며, 대문자/소문자/숫자/특수문자를 각각 1개 이상 포함해야 합니다.');
+      setError('비밀번호는 최소 8자이며, 소문자/숫자/특수문자를 각각 1개 이상 포함해야 합니다.');
       return;
     }
 
@@ -136,7 +136,7 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
         const data = error.response.data;
         switch (data?.code) {
           case 'WEAK_PASSWORD':
-            setError('비밀번호는 최소 8자이며, 대문자/소문자/숫자/특수문자를 각각 1개 이상 포함해야 합니다.');
+            setError('비밀번호는 최소 8자이며, 소문자/숫자/특수문자를 각각 1개 이상 포함해야 합니다.');
             break;
           case 'INVALID_OTP':
             setError('인증 토큰이 유효하지 않습니다. 다시 인증해주세요.');
@@ -206,16 +206,6 @@ export default function StepAccount({ onComplete, onBack, initialData }: StepAcc
                 </div>
                 <span className={passwordStrength.hasLowerCase ? 'text-success' : 'text-text-tertiary'}>
                   {t('소문자 포함')}
-                </span>
-              </div>
-              <div className="flex items-center gap-2 text-xs">
-                <div className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] transition-all ${
-                  passwordStrength.hasUpperCase ? 'bg-success text-white' : 'bg-surface border border-border text-text-tertiary'
-                }`}>
-                  {passwordStrength.hasUpperCase ? '✓' : '○'}
-                </div>
-                <span className={passwordStrength.hasUpperCase ? 'text-success' : 'text-text-tertiary'}>
-                  {t('대문자 포함')}
                 </span>
               </div>
               <div className="flex items-center gap-2 text-xs">

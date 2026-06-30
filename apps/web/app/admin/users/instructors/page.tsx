@@ -237,7 +237,7 @@ export default function AdminInstructorsPage() {
                 <input
                   type="password"
                   value={newInstructor.password}
-                  onChange={(e) => setNewInstructor({ ...newInstructor, password: e.target.value })}
+                  onChange={(e) => setNewInstructor({ ...newInstructor, password: e.target.value.toLowerCase() })}
                   placeholder="비밀번호를 입력하세요"
                   style={{
                     width: '100%',

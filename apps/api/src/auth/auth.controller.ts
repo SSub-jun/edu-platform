@@ -192,7 +192,7 @@ export class AuthController {
     schema: {
       examples: {
         weakPassword: {
-          value: { code: 'WEAK_PASSWORD', message: '비밀번호는 최소 8자이며, 대문자/소문자/숫자/특수문자를 각각 1개 이상 포함해야 합니다.' }
+          value: { code: 'WEAK_PASSWORD', message: '비밀번호는 최소 8자이며, 소문자/숫자/특수문자를 각각 1개 이상 포함해야 합니다.' }
         },
         invalidOtp: {
           value: { code: 'INVALID_OTP', message: '유효하지 않은 인증 토큰입니다.' }
