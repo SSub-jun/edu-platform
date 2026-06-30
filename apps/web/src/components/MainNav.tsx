@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Globe2 } from "lucide-react";
+import { authClient } from "../../lib/auth";
 import { localeLabels, supportedLocales, type Locale } from "../i18n/config";
 import { useLocale, useT } from "../i18n/client";
 
@@ -26,6 +27,10 @@ export function MainNav() {
 
     setLocale(nextLocale);
     window.location.reload();
+  };
+
+  const handleLogout = () => {
+    void authClient.logout();
   };
 
   useEffect(() => {
@@ -120,6 +125,13 @@ export function MainNav() {
               ))}
             </select>
           </div>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="inline-flex min-h-9 shrink-0 items-center justify-center whitespace-nowrap rounded-lg border border-error/30 bg-error-bg px-3 py-1.5 text-xs font-bold text-error transition-colors hover:bg-error/10 md:min-h-10 md:px-4 md:py-2 md:text-sm"
+          >
+            {t("nav.logout")}
+          </button>
         </nav>
       </div>
     </header>
