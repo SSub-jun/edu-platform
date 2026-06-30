@@ -1,14 +1,16 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import LessonCard from '../components/LessonCard';
-import { Lesson } from '../types/api';
+import LessonCard from '../../components/LessonCard';
+import { Lesson } from '../../types/api';
 
 // Mock Next.js Link
 jest.mock('next/link', () => {
-  return ({ children, href }: { children: React.ReactNode; href: string }) => (
-    <a href={href}>{children}</a>
-  );
+  return function MockLink({ children, href, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement> & { children: React.ReactNode; href: string }) {
+    return (
+    <a href={href} {...props}>{children}</a>
+    );
+  };
 });
 
 const mockLesson: Lesson = {
@@ -80,8 +82,7 @@ describe('LessonCard', () => {
 
     render(<LessonCard lesson={passedLesson} remainingDays={30} />);
     
-    expect(screen.getByText('완료')).toBeInTheDocument();
-    expect(screen.getByText('완료')).toBeInTheDocument(); // 시험 응시 기회 섹션
+    expect(screen.getAllByText('완료')).toHaveLength(2);
   });
 
   it('남은 기간을 올바르게 표시한다', () => {
@@ -102,9 +103,6 @@ describe('LessonCard', () => {
     expect(screen.getByText('5분')).toBeInTheDocument();
   });
 });
-
-
-
 
 
 

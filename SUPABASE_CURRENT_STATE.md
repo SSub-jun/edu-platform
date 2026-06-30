@@ -81,7 +81,7 @@ ALTER TABLE "public"."company_lessons"
 cd packages/db
 
 # 2. 베이스라인 마이그레이션 생성
-DATABASE_URL="postgresql://postgres.foakaexaaslaheygqbam:iRLX%21Y2aH.kH%26T4@aws-1-ap-northeast-2.pooler.supabase.com:5432/postgres" \
+DATABASE_URL="postgresql://postgres.<project-ref>:<password>@<pooler-host>:5432/postgres" \
 pnpm prisma migrate resolve --applied "20251009105315_add_max_reached_seconds_to_progress"
 
 # 3. company_lessons 테이블 추가를 위한 새 마이그레이션 생성
@@ -92,7 +92,7 @@ pnpm prisma migrate dev --name add_company_lessons_table
 
 ```bash
 # 1. 현재 DB 상태를 Prisma 스키마로 가져오기
-DATABASE_URL="postgresql://postgres.foakaexaaslaheygqbam:iRLX%21Y2aH.kH%26T4@aws-1-ap-northeast-2.pooler.supabase.com:5432/postgres" \
+DATABASE_URL="postgresql://postgres.<project-ref>:<password>@<pooler-host>:5432/postgres" \
 pnpm prisma db pull
 
 # 2. 차이점 확인 후 수동 조정
@@ -161,4 +161,3 @@ WHERE table_name = 'companies' AND column_name IN ('startDate', 'endDate');
 - **Session Mode (포트 5432)** 사용 필수
 - 프로덕션 환경이므로 신중하게 실행
 - 실행 전 Supabase Dashboard에서 백업 확인
-

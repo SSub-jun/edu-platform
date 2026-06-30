@@ -80,7 +80,7 @@ export default function ExamPage() {
       }
 
       if (!subject.canTakeExam) {
-        alert(t('시험 응시 조건을 만족하지 않습니다.\n모든 강의를 90% 이상 수강해주세요.'));
+        alert(`${t('시험 응시 조건을 만족하지 않습니다.')}\n${t('모든 강의를 90% 이상 수강해주세요.')}`);
         router.push('/curriculum');
         return;
       }

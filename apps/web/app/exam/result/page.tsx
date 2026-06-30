@@ -8,6 +8,8 @@ import Link from 'next/link';
 import { useLocale } from '../../../src/i18n/client';
 import { translateStudentText } from '../../../src/i18n/studentTranslations';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+
 export default function ExamResultPage() {
   const router = useRouter();
   const { locale } = useLocale();
@@ -63,13 +65,13 @@ export default function ExamResultPage() {
   const handleRestartSubject = async () => {
     if (!subjectId) return;
     
-    if (!confirm(t('과목을 다시 수강하시겠습니까?\n모든 강의 진도가 0%로 초기화되고, 3회의 새로운 시험 기회가 주어집니다.'))) {
+    if (!confirm(`${t('과목을 다시 수강하시겠습니까?')}\n${t('모든 강의 진도가 0%로 초기화되고, 3회의 새로운 시험 기회가 주어집니다.')}`)) {
       return;
     }
 
     setRestarting(true);
     try {
-      const response = await fetch(`http://localhost:4000/exam/subjects/${subjectId}/restart`, {
+      const response = await fetch(`${API_URL}/exam/subjects/${subjectId}/restart`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
