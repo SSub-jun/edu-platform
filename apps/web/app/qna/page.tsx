@@ -170,7 +170,7 @@ export default function QnaPage() {
     <div className="student-page">
       <div className="student-container max-w-4xl">
         {/* 상단 영역: 간단한 타이틀 + 질문하기 버튼 */}
-        <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="mb-4 flex items-center justify-between gap-3 md:mb-6">
           <div>
             <p className="student-kicker">{t('문의')}</p>
           <h1 className="student-title mt-1">
@@ -180,7 +180,7 @@ export default function QnaPage() {
             {userRole === 'student' && (
               <button
                 onClick={() => setShowQuestionForm(!showQuestionForm)}
-              className="student-button-primary"
+              className="student-button-primary shrink-0 px-4 py-2 text-sm"
               >
                 {showQuestionForm ? t('취소') : t('질문하기')}
               </button>
@@ -189,8 +189,8 @@ export default function QnaPage() {
 
         {/* 질문 작성 폼 (학생만) */}
         {showQuestionForm && userRole === 'student' && (
-          <div className="student-panel mb-6 p-5 md:p-6">
-            <h3 className="m-0 mb-5 text-text-primary text-lg font-semibold">
+          <div className="student-panel mb-4 p-4 md:mb-6 md:p-6">
+            <h3 className="m-0 mb-4 text-base font-semibold text-text-primary md:mb-5 md:text-lg">
               {t('새 질문 작성')}
             </h3>
             <form onSubmit={handleQuestionSubmit} className="flex flex-col gap-4">
@@ -221,7 +221,7 @@ export default function QnaPage() {
         )}
 
         {/* Q&A 목록 */}
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-4 md:gap-5">
           {loading ? (
             <div className="student-panel py-10 text-center">
               <div className="flex items-center justify-center gap-2 text-text-secondary">
@@ -237,15 +237,15 @@ export default function QnaPage() {
             posts.map((post) => (
               <div
                 key={post.id}
-                className="student-panel p-5"
+                className="student-panel p-4 md:p-5"
               >
                 {/* 질문 */}
                 <div className="mb-4">
-                  <div className="flex justify-between items-start mb-2.5 gap-4">
-                    <h3 className="m-0 text-lg text-text-primary font-bold flex-1">
+                  <div className="mb-2.5 flex flex-col gap-1 md:flex-row md:items-start md:justify-between md:gap-4">
+                    <h3 className="m-0 flex-1 text-base font-bold text-text-primary md:text-lg">
                       {post.title}
                     </h3>
-                    <div className="text-xs text-text-tertiary whitespace-nowrap">
+                    <div className="text-xs text-text-tertiary md:whitespace-nowrap">
                       {maskPhone(post.user.username)} ({post.user.role === 'student' ? t('학생') : t('강사')}) | {new Date(post.createdAt).toLocaleString()}
                     </div>
                   </div>

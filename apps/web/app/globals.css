@@ -102,7 +102,7 @@ textarea:focus-visible {
 
 @layer components {
   .student-page {
-    @apply min-h-screen bg-bg-primary px-4 py-5 md:px-6 md:py-8;
+    @apply min-h-screen bg-bg-primary px-3 py-3 md:px-6 md:py-8;
   }
 
   .student-container {
@@ -122,11 +122,11 @@ textarea:focus-visible {
   }
 
   .student-title {
-    @apply text-2xl font-bold leading-tight text-text-primary md:text-3xl;
+    @apply text-xl font-bold leading-tight text-text-primary md:text-3xl;
   }
 
   .student-copy {
-    @apply text-base leading-relaxed text-text-secondary;
+    @apply text-sm leading-relaxed text-text-secondary md:text-base;
   }
 
   .student-input {
@@ -154,10 +154,10 @@ textarea:focus-visible {
   }
 
   .student-stat {
-    @apply rounded-lg border border-border bg-bg-elevated p-4;
+    @apply rounded-lg border border-border bg-bg-elevated p-3 md:p-4;
   }
 
   .student-muted-box {
-    @apply rounded-lg border border-border bg-bg-elevated p-4 text-text-secondary;
+    @apply rounded-lg border border-border bg-bg-elevated p-3 text-text-secondary md:p-4;
   }
 }

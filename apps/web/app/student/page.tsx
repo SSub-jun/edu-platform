@@ -83,21 +83,21 @@ export default function StudentPage() {
   return (
     <div className="student-page">
       <div className="student-container max-w-4xl">
-      <div className="student-panel-strong px-5 py-6 md:px-8 md:py-8">
+      <div className="student-panel-strong px-4 py-5 md:px-8 md:py-8">
         {/* 헤더 */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="mb-5 flex items-start justify-between gap-3 md:mb-8 md:items-center">
           <div>
             <p className="student-kicker">{t('계정')}</p>
-            <h1 className="student-title mt-1 mb-2">
+            <h1 className="student-title mt-1 md:mb-2">
               {t('내 정보')}
           </h1>
-            <p className="text-sm md:text-base text-text-secondary">
+            <p className="hidden text-sm text-text-secondary md:block md:text-base">
               {t('계정 정보와 소속, 교육기간을 확인할 수 있습니다.')}
             </p>
           </div>
           <button
             onClick={logout}
-            className="inline-flex min-h-11 items-center justify-center rounded-lg bg-error px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-error/90"
+            className="inline-flex min-h-9 shrink-0 items-center justify-center rounded-lg bg-error px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-error/90 md:min-h-11 md:px-4 md:py-2 md:text-sm"
           >
             {t('로그아웃')}
           </button>
@@ -110,13 +110,13 @@ export default function StudentPage() {
             <span>{t('내 정보를 불러오는 중입니다...')}</span>
           </div>
         ) : (
-          <div className="space-y-8">
+          <div className="space-y-5 md:space-y-8">
             {/* 기본 정보 */}
             <section>
-              <h2 className="text-lg font-semibold text-text-primary mb-4">
+              <h2 className="mb-3 text-base font-semibold text-text-primary md:mb-4 md:text-lg">
                 {t('기본 정보')}
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-2 md:gap-4">
                 <div className="student-stat">
                   <div className="text-xs text-text-tertiary mb-1">{t('이름')}</div>
                   <div className="text-base font-medium text-text-primary">
@@ -146,10 +146,10 @@ export default function StudentPage() {
 
             {/* 소속 및 교육기간 */}
             <section>
-              <h2 className="text-lg font-semibold text-text-primary mb-4">
+              <h2 className="mb-3 text-base font-semibold text-text-primary md:mb-4 md:text-lg">
                 {t('소속 및 교육기간')}
               </h2>
-              <div className="student-panel p-5 space-y-3">
+              <div className="student-panel space-y-3 p-4 md:p-5">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                   <div>
                     <div className="text-xs text-text-tertiary mb-1">{t('소속 회사')}</div>
@@ -165,7 +165,7 @@ export default function StudentPage() {
                       : t('회사 배정 상태를 확인해주세요.')}
                   </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3 md:gap-4">
                   <div>
                     <div className="text-xs text-text-tertiary mb-1">{t('교육 시작일')}</div>
                     <div className="text-base text-text-primary">
@@ -184,11 +184,11 @@ export default function StudentPage() {
 
             {/* 기타 */}
             <section>
-              <h2 className="text-lg font-semibold text-text-primary mb-4">
+              <h2 className="mb-3 text-base font-semibold text-text-primary md:mb-4 md:text-lg">
                 {t('기타')}
               </h2>
-              <div className="student-panel p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                <div className="text-sm text-text-secondary">
+              <div className="student-panel flex flex-col gap-3 p-4 md:flex-row md:items-center md:justify-between md:p-5">
+                <div className="hidden text-sm text-text-secondary md:block">
                   {t('강의실에서 학습 진도와 시험 결과를 확인하실 수 있습니다.')}
           </div>
                 <Link
