@@ -269,12 +269,12 @@ export class AuthService {
 
     // 3. 비밀번호 정책 서버측 검증
     const passwordPattern =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+      /^(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z0-9])(?!.*[A-Z])[\x21-\x7E]{8,}$/;
     if (!passwordPattern.test(password)) {
       throw new UnprocessableEntityException({
         code: 'WEAK_PASSWORD',
         message:
-          '비밀번호는 최소 8자이며, 대문자/소문자/숫자/특수문자를 각각 1개 이상 포함해야 합니다.',
+          '비밀번호는 최소 8자이며, 소문자/숫자/특수문자를 각각 1개 이상 포함해야 합니다.',
       });
     }
 
@@ -611,12 +611,12 @@ export class AuthService {
 
     // 3. 비밀번호 정책 검증
     const passwordPattern =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+      /^(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z0-9])(?!.*[A-Z])[\x21-\x7E]{8,}$/;
     if (!passwordPattern.test(newPassword)) {
       throw new UnprocessableEntityException({
         code: 'WEAK_PASSWORD',
         message:
-          '비밀번호는 최소 8자이며, 대문자/소문자/숫자/특수문자를 각각 1개 이상 포함해야 합니다.',
+          '비밀번호는 최소 8자이며, 소문자/숫자/특수문자를 각각 1개 이상 포함해야 합니다.',
       });
     }
 

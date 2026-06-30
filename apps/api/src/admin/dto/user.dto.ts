@@ -18,13 +18,13 @@ export class CreateAdminUserDto {
   username: string;
 
   @ApiProperty({
-    description: '비밀번호 (최소 8자, 대문자/소문자/숫자/특수문자 각 1+ 포함)',
-    example: 'AdminPassword123!',
+    description: '비밀번호 (최소 8자, 소문자/숫자/특수문자 각 1+ 포함, 대문자 불가)',
+    example: 'adminpassword123!',
   })
   @IsString()
   @MinLength(8)
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/, {
-    message: '비밀번호는 최소 8자이며, 대문자/소문자/숫자/특수문자를 각각 1개 이상 포함해야 합니다',
+  @Matches(/^(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z0-9])(?!.*[A-Z])[\x21-\x7E]{8,}$/, {
+    message: '비밀번호는 최소 8자이며, 소문자/숫자/특수문자를 각각 1개 이상 포함해야 합니다',
   })
   password: string;
 
@@ -92,8 +92,6 @@ export class AdminUserResponseDto {
   @ApiProperty({ description: '마지막 로그인', nullable: true })
   lastLoginAt: string | null;
 }
-
-
 
 
 

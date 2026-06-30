@@ -163,7 +163,7 @@ describe('Signup Flow (e2e)', () => {
         .send({
           phone: testPhone,
           otpToken,
-          password: 'TestPassword123!',
+          password: 'testpassword123!',
           username: 'testuser',
           email: 'test@example.com',
         })
@@ -205,7 +205,7 @@ describe('Signup Flow (e2e)', () => {
         .send({
           phone: testPhone,
           otpToken: 'invalid-token',
-          password: 'TestPassword123!',
+          password: 'testpassword123!',
           username: 'testuser',
         })
         .expect(422);
@@ -220,7 +220,7 @@ describe('Signup Flow (e2e)', () => {
         .send({
           phone: testPhone,
           otpToken,
-          password: 'TestPassword123!',
+          password: 'testpassword123!',
           username: 'testuser1',
         })
         .expect(201);
@@ -253,7 +253,7 @@ describe('Signup Flow (e2e)', () => {
         .send({
           phone: testPhone,
           otpToken: newVerifyResponse.body.otpToken,
-          password: 'TestPassword123!',
+          password: 'testpassword123!',
           username: 'testuser2',
         })
         .expect(409);
@@ -318,7 +318,7 @@ describe('Signup Flow (e2e)', () => {
         .send({
           phone: testPhone,
           otpToken,
-          password: 'TestPassword123!',
+          password: 'testpassword123!',
           username: 'testuser',
           inviteCode: 'TESTCODE123',
         })
@@ -340,7 +340,7 @@ describe('Signup Flow (e2e)', () => {
         .send({
           phone: testPhone,
           otpToken,
-          password: 'TestPassword123!',
+          password: 'testpassword123!',
           username: 'testuser',
           inviteCode: 'INVALIDCODE',
         })

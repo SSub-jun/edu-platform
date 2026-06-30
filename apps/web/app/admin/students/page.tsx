@@ -282,7 +282,7 @@ export default function AdminStudentsPage() {
                 <input
                   type="password"
                   value={newStudent.password}
-                  onChange={(e) => setNewStudent({ ...newStudent, password: e.target.value })}
+                  onChange={(e) => setNewStudent({ ...newStudent, password: e.target.value.toLowerCase() })}
                   placeholder="초기 비밀번호"
                   style={{
                     width: '100%',
@@ -682,4 +682,3 @@ export default function AdminStudentsPage() {
     </div>
   );
 }
-

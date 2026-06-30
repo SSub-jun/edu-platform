@@ -203,7 +203,7 @@ describe('AuthService - register flow hooks', () => {
     await service.register(
       '01012345678',
       'otp-token',
-      'Password123!',
+      'password123!',
       '홍길동',
       'INVITE01',
     );

@@ -185,10 +185,10 @@ export default function ResetPasswordPage() {
     }
 
     const passwordPattern =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+      /^(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z0-9])(?!.*[A-Z])[\x21-\x7E]{8,}$/;
     if (!passwordPattern.test(newPassword)) {
       setPasswordError(
-        '대문자, 소문자, 숫자, 특수문자를 각각 1개 이상 포함해야 합니다.',
+        '소문자, 숫자, 특수문자를 각각 1개 이상 포함해야 합니다.',
       );
       return;
     }
@@ -404,10 +404,10 @@ export default function ResetPasswordPage() {
                   type="password"
                   value={newPassword}
                   onChange={(e) => {
-                    setNewPassword(e.target.value);
+                    setNewPassword(e.target.value.toLowerCase());
                     setPasswordError('');
                   }}
-                  placeholder={ta('8자 이상, 대/소문자/숫자/특수문자 포함')}
+                  placeholder={ta('8자 이상, 소문자/숫자/특수문자 포함')}
                   className="student-input"
                   disabled={resetting}
                 />
@@ -421,7 +421,7 @@ export default function ResetPasswordPage() {
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => {
-                    setConfirmPassword(e.target.value);
+                    setConfirmPassword(e.target.value.toLowerCase());
                     setPasswordError('');
                   }}
                   placeholder={ta('비밀번호를 다시 입력해주세요')}
@@ -435,7 +435,7 @@ export default function ResetPasswordPage() {
                 <p>{t('비밀번호 규칙:')}</p>
                 <ul className="list-disc list-inside space-y-0.5">
                   <li>{t('최소 8자 이상')}</li>
-                  <li>{t('대문자, 소문자 각 1개 이상')}</li>
+                  <li>{t('소문자 1개 이상')}</li>
                   <li>{t('숫자 1개 이상')}</li>
                   <li>{t('특수문자 1개 이상')}</li>
                 </ul>

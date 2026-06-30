@@ -310,6 +310,11 @@ export const studentTextTranslations: Record<string, LocaleText> = {
     th: 'รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร และมีตัวพิมพ์ใหญ่ ตัวพิมพ์เล็ก ตัวเลข และอักขระพิเศษอย่างน้อยอย่างละ 1 ตัว',
     bn: 'পাসওয়ার্ড কমপক্ষে ৮ অক্ষরের হতে হবে এবং বড় হাতের অক্ষর, ছোট হাতের অক্ষর, সংখ্যা ও বিশেষ অক্ষর অন্তত ১টি করে থাকতে হবে।',
   },
+  '비밀번호는 최소 8자이며, 소문자/숫자/특수문자를 각각 1개 이상 포함해야 합니다.': {
+    en: 'The password must be at least 8 characters and include lowercase, number, and special characters.',
+    th: 'รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร และมีตัวพิมพ์เล็ก ตัวเลข และอักขระพิเศษอย่างน้อยอย่างละ 1 ตัว',
+    bn: 'পাসওয়ার্ড কমপক্ষে ৮ অক্ষরের হতে হবে এবং ছোট হাতের অক্ষর, সংখ্যা ও বিশেষ অক্ষর অন্তত ১টি করে থাকতে হবে।',
+  },
   '비밀번호가 일치하지 않습니다.': {
     en: 'Passwords do not match.',
     th: 'รหัสผ่านไม่ตรงกัน',
@@ -418,6 +423,11 @@ export const studentTextTranslations: Record<string, LocaleText> = {
     th: 'มีตัวพิมพ์ใหญ่และตัวพิมพ์เล็กอย่างน้อยอย่างละ 1 ตัว',
     bn: 'কমপক্ষে একটি বড় ও একটি ছোট হাতের অক্ষর',
   },
+  '소문자 1개 이상': {
+    en: 'At least one lowercase letter',
+    th: 'ตัวพิมพ์เล็กอย่างน้อย 1 ตัว',
+    bn: 'কমপক্ষে একটি ছোট হাতের অক্ষর',
+  },
   '숫자 1개 이상': { en: 'At least one number', th: 'ตัวเลขอย่างน้อย 1 ตัว', bn: 'কমপক্ষে একটি সংখ্যা' },
   '특수문자 1개 이상': {
     en: 'At least one special character',
@@ -476,6 +486,11 @@ export const studentTextTranslations: Record<string, LocaleText> = {
     en: 'Include at least one uppercase letter, lowercase letter, number, and special character.',
     th: 'ต้องมีตัวพิมพ์ใหญ่ ตัวพิมพ์เล็ก ตัวเลข และอักขระพิเศษอย่างน้อยอย่างละ 1 ตัว',
     bn: 'বড় হাতের অক্ষর, ছোট হাতের অক্ষর, সংখ্যা ও বিশেষ অক্ষর অন্তত ১টি করে থাকতে হবে।',
+  },
+  '소문자, 숫자, 특수문자를 각각 1개 이상 포함해야 합니다.': {
+    en: 'Include at least one lowercase letter, number, and special character.',
+    th: 'ต้องมีตัวพิมพ์เล็ก ตัวเลข และอักขระพิเศษอย่างน้อยอย่างละ 1 ตัว',
+    bn: 'ছোট হাতের অক্ষর, সংখ্যা ও বিশেষ অক্ষর অন্তত ১টি করে থাকতে হবে।',
   },
   '비밀번호 변경에 실패했습니다.': {
     en: 'Failed to change the password.',
@@ -1396,6 +1411,11 @@ export const studentAttributeTranslations: Record<string, LocaleText> = {
     en: '8+ chars with upper/lowercase, number, and special char',
     th: '8 ตัวขึ้นไป พร้อมตัวพิมพ์ใหญ่/เล็ก ตัวเลข และอักขระพิเศษ',
     bn: '৮+ অক্ষর, বড়/ছোট অক্ষর, সংখ্যা ও বিশেষ অক্ষরসহ',
+  },
+  '8자 이상, 소문자/숫자/특수문자 포함': {
+    en: '8+ chars with lowercase, number, and special char',
+    th: '8 ตัวขึ้นไป พร้อมตัวพิมพ์เล็ก ตัวเลข และอักขระพิเศษ',
+    bn: '৮+ অক্ষর, ছোট হাতের অক্ষর, সংখ্যা ও বিশেষ অক্ষরসহ',
   },
   '비밀번호를 다시 입력해주세요': {
     en: 'Enter your password again',
